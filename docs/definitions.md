@@ -21,7 +21,7 @@ Calc-Malc is intended to read and evaluate arthemetic expressions and let en use
 
 ## Input
 
-<---- image here ---->
+<img src="https://raw.githubusercontent.com/nnecklace/calc-malc/main/docs/images/a1.png" width="800px"/>
 
 The above explains what language is recognized by Calc-Malc. All the arthemetic expressions that Calc-Malc recognizes are in infix notation, e.g. `2 + 2 * 2`. During evaluation of the expressions, the expression will be transfored from infix to postfix notation, e.g `2 + 2 * 2 ==> 222*+`. Inputs in the form of assigments will be transformed to AST. E.g. `fn f(x) = 2 + 2 * x`.
 
