@@ -45,8 +45,12 @@ It is difficult to estimate the time and space complexity for this project. Idea
 
 ## References
 
-[Shunting Yard](https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
-[Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)
-[AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
-[Parsing Algorithms](https://tomassetti.me/guide-parsing-algorithms-terminology/)
-[Context Free Grammars](https://www.cs.rochester.edu/~nelson/courses/csc_173/grammars/cfg.html)
+1. [Shunting Yard](https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
+
+2. [Reverse Polish Notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation)
+
+3. [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+
+4. [Parsing Algorithms](https://tomassetti.me/guide-parsing-algorithms-terminology/)
+
+5. [Context Free Grammars](https://www.cs.rochester.edu/~nelson/courses/csc_173/grammars/cfg.html)
