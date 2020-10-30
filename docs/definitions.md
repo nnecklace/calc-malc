@@ -37,6 +37,19 @@ The above explains what language is recognized by Calc-Malc. All the arthemetic 
               2   x 
 ```
 
+Example of what an input that Calc-Malc would accept:
+
+```
+fn f(x) = 2^x+4*x
+
+var x = f(5)
+var c = 5
+var y = 0
+
+loop 5 = y = c*f(10)
+
+sqrt((2+2)*2+c*log(y))
+```
 
 ## Time and space complexity
 
