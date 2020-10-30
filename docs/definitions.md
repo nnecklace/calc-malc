@@ -2,7 +2,7 @@
 
 ## Background
 
-I belong to the tietojenkäsittelytieteen kandidaattiohjelma (TKT). My project will be in English, as will all documents, code and comments.
+I belong to the tietojenkäsittelytieteen kandidaattiohjelma (TKT). My project will be in English, as will all documents, code and comments. The programming language the project is written in is Java.
 
 
 ## Algorithms & Data structures
