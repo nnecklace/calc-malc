@@ -14,3 +14,5 @@ What I learned this week is that java doesn't allow generic type arrays. Also le
 Unclear at this point is what actually is unclear :) I'm optimistic about my project so far. Not still quite sure how to make the syntax checking at runtime and if I need any tree structures, most probably will though. Still some uncertainty how I should parse something like `f(x,y) = 2 * x + y / 4`.
 
 Next up is lexing and fixing the algorithm to accept mathematical functions, like: abs, log, sqrt, etc...
+
+Test coverage is currently 86% some small edge cases were left un tested. Hopefully by next week test coverage will be > 95%.
