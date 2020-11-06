@@ -17,7 +17,7 @@ CalcMalc is simple arthemetic REPL (Read, Evaluate, Parse, Loop). CalcMalc can r
 
 ## Requirements
 
-Java 14 
+Java 14 or higher
 
 gradle 6.7
 
@@ -27,6 +27,6 @@ Run the project `./gradlew run`
 
 Run unit tests `./gradlew test`
 
-Run jacoco test coverage `./gradlew jacocoTestCoverage`
+Run jacoco test coverage `./gradlew jacocoTestReport` (make sure you run the unit tests first)
 
 Run checkstyle `./gradlew checkstyleMain`
