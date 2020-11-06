@@ -1,10 +1,9 @@
 # CalcMalc
 
 ## Week reports
+[Week report 1](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-1.md)
 
-[Week report 1](https://raw.githubusercontent.com/nnecklace/calc-malc/main/docs/reports/week-1.md)
-
-[Week report 2](https://raw.githubusercontent.com/nnecklace/calc-malc/main/docs/reports/week-2.md)
+[Week report 2](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-2.md)
 
 ## Overview 
 
