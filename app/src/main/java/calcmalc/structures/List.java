@@ -29,7 +29,7 @@ public class List<T> implements Listable<T> {
             return null;
         }
 
-        return list[head-1];
+        return list[head - 1];
     }
 
     public int getSize() {
@@ -43,7 +43,9 @@ public class List<T> implements Listable<T> {
     public void remove(int index) {
         if (index <= size && index >= 0) {
             list[index] = null;
-            if (index == head) head--;
+            if (index == head) {
+                head--;
+            }
         }
     }
 
@@ -60,7 +62,7 @@ public class List<T> implements Listable<T> {
     }
 
     private void grow() {
-        if (size*2 > MAX_SIZE) {
+        if (size * 2 > MAX_SIZE) {
             size = MAX_SIZE;
             isFull = true;
         } else {
@@ -69,7 +71,7 @@ public class List<T> implements Listable<T> {
 
         T[] copy = (T[]) new Object[size];
 
-        for (int i = 0; i < size/2; ++i) {
+        for (int i = 0; i < size / 2; ++i) {
             copy[i] = list[i]; 
         }
 
