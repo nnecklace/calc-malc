@@ -17,7 +17,7 @@ public class List<T> implements Listable<T> {
     }
 
     public T get(int index) {
-        if (index > size && index < 0) {
+        if (index >= size && index < 0) {
             return null;
         }
 
