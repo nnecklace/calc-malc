@@ -38,6 +38,10 @@ dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
 }
 
+run {
+    standardInput = System.in
+}
+
 application {
     // Define the main class for the application.
     mainClass = 'calcmalc.App'
