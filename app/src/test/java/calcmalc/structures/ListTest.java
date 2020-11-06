@@ -107,6 +107,12 @@ public class ListTest {
     }
 
     @Test
+    public void testGetLastOnEmptyList() {
+        Listable<Integer> list = new List<>();
+        assertNull(list.getLast());
+    }
+
+    @Test
     public void testIsFull() {
         Listable<Integer> list = new List<>();
         for (int i = 0; i < 10000000; i++) {

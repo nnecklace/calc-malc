@@ -17,13 +17,18 @@ public class List<T> implements Listable<T> {
     }
 
     public T get(int index) {
-        if (index > size) {
+        if (index > size && index < 0) {
             return null;
         }
+
         return list[index];
     }
     
     public T getLast() {
+        if (head == 0) {
+            return null;
+        }
+
         return list[head-1];
     }
 
@@ -36,14 +41,16 @@ public class List<T> implements Listable<T> {
     }
 
     public void remove(int index) {
-        if (index <= size) {
+        if (index <= size && index >= 0) {
             list[index] = null;
             if (index == head) head--;
         }
     }
 
     public void push(T element) {
-        if (isFull) return;
+        if (isFull) {
+            return;
+        }
 
         if (head == size) {
             grow();
