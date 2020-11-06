@@ -3,6 +3,13 @@
  */
 package calcmalc;
 
+import calcmalc.structures.List;
+import calcmalc.structures.Stack;
+import calcmalc.structures.Queue;
+import calcmalc.logic.Parser;
+import java.text.ParseException;
+import java.util.Scanner;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
@@ -10,5 +17,21 @@ public class App {
 
     public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+        Stack<String> stack = new Stack<>(new List<String>());
+        Queue<String> queue = new Queue<>(new List<String>());
+        Parser parser = new Parser(stack, queue);
+        Scanner input = new Scanner(System.in);
+
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+
+            try {
+                parser.parse(line);
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+            }
+
+            System.out.println(parser.show());
+        }
     }
 }
