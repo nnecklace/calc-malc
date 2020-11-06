@@ -28,4 +28,8 @@ public class Stack<T> {
     public T peek() {
         return list.getLast();
     }
+
+    public boolean isEmpty() {
+        return list.getLast() == null;
+    }
 }

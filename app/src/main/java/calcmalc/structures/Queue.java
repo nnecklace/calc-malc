@@ -35,4 +35,8 @@ public class Queue<T> {
     public int getTail() {
         return tail;
     }
+
+    public boolean isEmpty() {
+        return head == tail;
+    }
 }
