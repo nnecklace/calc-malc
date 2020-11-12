@@ -4,14 +4,12 @@ import java.util.Random;
 import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import calcmalc.structures.List;
-import calcmalc.structures.Listable;
 
 public class ListTest {
     @Test
     public void testListIsCreatedWithCorrectSize() {
         Listable<Integer> list = new List<>();
-        assertEquals(list.getSize(), 8);
+        assertEquals(list.getSpace(), 8);
     }
     
     @Test
@@ -40,19 +38,19 @@ public class ListTest {
         for (int i = 0; i <= 8; ++i) {
             list.push(i);
         }
-        assertEquals(list.getSize(), 16);
+        assertEquals(list.getSpace(), 16);
 
         for (int i = 8; i < 16; ++i) {
             list.push(i);
         }
 
-        assertEquals(list.getSize(), 32);
+        assertEquals(list.getSpace(), 32);
 
         for (int i = 16; i < 32; ++i) {
             list.push(i);
         }
 
-        assertEquals(list.getSize(), 64);
+        assertEquals(list.getSpace(), 64);
     }
 
     @Test
@@ -104,6 +102,33 @@ public class ListTest {
         for (Integer i : indexes) {
             assertNull(list.get(i));
         }
+    }
+
+    @Test
+    public void testRemoveElementAtIncorrectIndex() {
+        Listable<Integer> list = new List<>();
+        assertEquals(list.size(), 0);
+        list.remove(-1);
+        assertEquals(list.size(), 0);
+        list.remove(8);
+        assertEquals(list.size(), 0);
+    }
+
+    @Test
+    public void testGetElementAtIncorrectIndex() {
+        Listable<Integer> list = new List<>();
+        Integer i = list.get(-1);
+        assertNull(i);
+        list.push(1);
+        list.push(2);
+        i = list.get(2);
+        assertNull(i);
+        i = list.get(3);
+        assertNull(i);
+        assertEquals((Integer)1, list.get(0));
+        assertEquals((Integer)2, list.get(1));
+        i = list.get(8);
+        assertNull(i);
     }
 
     @Test

@@ -2,8 +2,6 @@ package calcmalc.structures;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import calcmalc.structures.Queue;
-import calcmalc.structures.List;
 
 public class QueueTest {
     @Test
@@ -34,5 +32,13 @@ public class QueueTest {
         assertEquals((Integer)1, queue.dequeue());
         assertEquals((Integer)2, queue.dequeue());
         assertEquals((Integer)3, queue.dequeue());
+    }
+
+    @Test
+    public void testQueueIsEmpty() {
+        Queue<Integer> queue = new Queue<>(new List<Integer>());
+        assertTrue(queue.isEmpty());
+        queue.enqueue(1);
+        assertFalse(queue.isEmpty());
     }
 }

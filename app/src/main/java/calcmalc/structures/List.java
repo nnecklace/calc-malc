@@ -27,7 +27,7 @@ public class List<T> implements Listable<T> {
      * @return T the generic element at the given position of the list or null if index is negitive or above the current size of the list
      */
     public T get(int index) {
-        if (index >= size && index < 0) {
+        if (index >= size || index < 0) {
             return null;
         }
 
@@ -50,7 +50,7 @@ public class List<T> implements Listable<T> {
      * Method getter for size property
      * @return size property
      */
-    public int getSize() {
+    public int getSpace() {
         return size;
     }
 
@@ -58,7 +58,7 @@ public class List<T> implements Listable<T> {
      * Method getter for head property
      * @return head property
      */
-    public int getHead() {
+    public int size() {
         return head;
     }
 
@@ -67,7 +67,7 @@ public class List<T> implements Listable<T> {
      * @param index index of the element to be removed
      */
     public void remove(int index) {
-        if (index <= size && index >= 0) {
+        if (index < size && index >= 0) {
             list[index] = null;
             if (index == head) {
                 head--;
@@ -119,5 +119,9 @@ public class List<T> implements Listable<T> {
      */
     public boolean isFull() {
         return isFull;
+    }
+
+    public boolean isEmpty() {
+        return head == 0;
     }
 }

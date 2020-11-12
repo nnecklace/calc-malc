@@ -1,7 +1,5 @@
 package calcmalc.structures;
 
-import calcmalc.structures.Listable;
-
 /**
  * Queue data structure
  * Queue is a FIFO data structure similar to a list. Each operation is a constant time O(1) operation.

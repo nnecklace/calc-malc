@@ -1,7 +1,5 @@
 package calcmalc.structures;
 
-import calcmalc.structures.Listable;
-
 /**
  * Stack data structure.
  * Stack is a LIFO data structure similar to list. Elements can only be pushed onto the stack and poped from the top of the stack.
@@ -33,7 +31,7 @@ public class Stack<T> {
             return null;
         }
 
-        int head = list.getHead();
+        int head = list.size();
         list.remove(head);
         return top;
     }
@@ -44,6 +42,10 @@ public class Stack<T> {
      */
     public T peek() {
         return list.getLast();
+    }
+
+    public Listable<T> asList() {
+        return list;
     }
 
     /**
