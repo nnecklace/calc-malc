@@ -1,136 +1,177 @@
 package calcmalc.logic;
 
 import calcmalc.structures.Stack;
-import calcmalc.structures.Queue;
+import calcmalc.structures.ASTNode;
+import calcmalc.structures.Listable;
+import calcmalc.structures.List;
+import calcmalc.logic.types.Token;
 import java.text.ParseException;
 
 /**
  * Parser for the Shunting Yard algoritm. Main objective of the class is to convert expressions into RPN (reverse polish notation)
  */
 public class Parser {
-    private Stack<String> operators;
-    private Queue<String> output;
+    private Stack<Token> operators = new Stack<>(new List<>());
+    private Stack<ASTNode> nodes = new Stack<>(new List<>());
+    private Stack<ASTNode> functions = new Stack<>(new List<>());
+    private Listable<Token> tokens;
+    private int position = 0;
 
-    public Parser(Stack<String> operators, Queue<String> output) {
-        this.operators = operators;
-        this.output = output;
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setTokens(Listable<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    public Listable<Token> getTokens() {
+        return tokens;
     }
 
     /**
-     * Method checks if the token is a type of number.
-     * @param token String token to be checked
-     * @return true if token is a type of number else false
-     */
-    private boolean isNumber(String token) {
-        return token != null && token.matches("[0-9]+");
-    }
-
-    /**
-     * Method checks if the token is a type of operator.
-     * @param token String token to be checked
-     * @return true if token is a type of operator else false
-     */
-    private boolean isOperator(String token) {
-        return token != null && token.matches("\\+|\\*|/|\\-");
-    }
-
-    /**
-     * Method checks if the token is a type of open parenthesis.
-     * @param token String token to be checked
-     * @return true if token is a type of open parenthesis else false
-     */
-    private boolean isOpenParenthesis(String token) {
-        return token != null && token.matches("\\(");
-    }
-
-    /**
-     * Method checks if the token is a type of closing parenthesis.
-     * @param token String token to be checked
-     * @return true if token is a type of closing parenthesis else false
-     */
-    private boolean isCloseParenthesis(String token) {
-        return token != null && token.matches("\\)");
-    }
-
-     // TODO: Remove and create a data type for this precedence levels
-    private int precedenceLevel(String token) {
-        if (token == null) {
-            return -1;
-        }
-
-        if (token.equals("*") || token.equals("/")) {
-            return 2;
-        }
-
-        if (token.equals("+") || token.equals("-")) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Method accepts arthemetic expressions and converts them to RPN
-     * Currently method assumes that inputs in the expression are separated by space
+     * Method accepts list of tokens for the arthemetic expression
      * @param input the expression to be converted
+     * @return stack of nodes with the top of the stack being root node
      * @throws ParseException if illegal input
      */
-    public void parse(String input) throws ParseException {
-        for (String token : input.split(" ")) {
-            if (isNumber(token)) {
-                output.enqueue(token);
-                continue;
+    public Stack<ASTNode> parse(Listable<Token> tokens) throws ParseException {
+        setTokens(tokens);
+        while (getPosition() < tokens.size()) {
+            Token token = tokens.get(getPosition());
+            shuntingYardParse(token);
+            setPosition(getPosition()+1);
+        }
+        return popRemainingTokens();
+    }
+
+    /**
+     * Parses functions and its arguments
+     * @param tokens List of tokens, ideally this should contain arguments for the function
+     * @param from indicating where to start parsing from
+     * @return stack of nodes that represent the functions arguments
+     * @throws ParseException on illegal input
+     */
+    public Stack<ASTNode> parseFunction(Listable<Token> tokens) throws ParseException {
+        setTokens(tokens);
+        Token token = tokens.get(getPosition());
+        while (token != null) {
+            shuntingYardParse(token);
+            setPosition(getPosition()+1);
+            if (token.isEmpty() && token.getKey().equals(")")) {
+                break;
             }
-            
-            if (isOperator(token)) {
-                while (!operators.isEmpty() && !isOpenParenthesis(operators.peek()) && precedenceLevel(operators.peek()) >= precedenceLevel(token)) {
-                    String operator = operators.pop();
-                    output.enqueue(operator);
-                }
-                operators.push(token);
-                continue;
+            token = tokens.get(getPosition());
+        }
+        return popRemainingTokens();
+    }
+
+    private Stack<ASTNode> popRemainingTokens() throws ParseException {
+        while (!operators.isEmpty()) {
+            Token operator = operators.pop();
+
+            if (operator.getKey().equals("(")) {
+                throw new ParseException("Syntax error missing parenthesis 1", 0);
             }
 
-            if (isOpenParenthesis(token)) {
-                operators.push(token);
-                continue;
-            }
-
-            if (isCloseParenthesis(token)) {
-                while (!isOpenParenthesis(operators.peek())) {
-                    String operator = operators.pop();
-                    output.enqueue(operator);
-                }
-
-                if (!isOpenParenthesis(operators.peek())) {
-                    throw new ParseException("Syntax error missing parenthesis!", 0);
-                }
-
-                operators.pop();
-            }
+            addOperatorNode(operator);
         }
 
-        while (!operators.isEmpty()) {
-            String operator = operators.pop();
+        return nodes;
+    }
 
-            if (isOpenParenthesis(operator)) {
-                throw new ParseException("Syntax error missing parenthesis", 0);
+    private void parseFunctionArguments(ASTNode root) throws ParseException {
+        Parser parser = new Parser();
+        parser.setPosition(getPosition()+1);
+        Stack<ASTNode> children = parser.parseFunction(getTokens());
+        setPosition(parser.getPosition()-1);
+        root.setChildren(children.asList());
+        functions.push(root);
+    }
+
+    // This the main algorithm of the program, explaining it is rather difficult
+    // Wikipedia however has a very good and simple explanation of the algorithm
+    // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+    private void shuntingYardParse(Token token) throws ParseException {
+        if (token.isNumber()) {
+            nodes.push(new ASTNode(token));
+        } 
+        else if (token.isFunction()) {
+            // This is currently where we diverge from the standard algorithm
+            // Here we recursively parse the function and its arguments
+            operators.push(token);
+            ASTNode root = new ASTNode(token);
+            parseFunctionArguments(root);
+        }
+        else if (token.isOperator()) {
+            while (
+                !operators.isEmpty() && 
+                !operators.peek().getKey().equals("(") && 
+                operators.peek().getPrecedence() >= token.getPrecedence()
+            ) {
+                Token operator = operators.pop();
+                addOperatorNode(operator);
             }
+            operators.push(token);
+        } 
+        else if (token.isEmpty()) {
+            if (token.getKey().equals("(")) {
+                operators.push(token);
+            } 
+            else {
+                while (!operators.isEmpty() && !operators.peek().getKey().equals("(")) {
+                    Token operator = operators.pop();
+                    addOperatorNode(operator);
+                }
 
-            output.enqueue(operator);
+                if (operators.isEmpty() || !operators.peek().getKey().equals("(")) {
+                    throw new ParseException("Syntax error missing parenthesis! 2", 0);
+                }
+
+                if (!token.getKey().equals(",")) {
+                    operators.pop();
+                }
+            }
+        }
+    }
+
+    private void addOperatorNode(Token operator) {
+        if (operator.isFunction()) {
+            nodes.push(functions.pop());
+        } 
+        else {
+            ASTNode node = new ASTNode(operator);
+            node.addChild(nodes.pop());
+            node.addChild(nodes.pop());
+            nodes.push(node);
         }
     }
 
     /**
-     * Method shows the RPN form of the expression that was parsed
-     * @return the RPN form of the expression
+     * Prints the abstract syntax tree in RPN normal form
+     * @return The RPN form of the tree structure
      */
-    public String show() {
-        String o = "";
-        while (!output.isEmpty()) {
-            o += output.dequeue();
+    public String printTree() {
+        ASTNode root = nodes.pop();
+        return dfs(root);
+    } 
+
+    private String dfs(ASTNode node) {
+        if (node.token().isNumber()) {
+            return node.token().getKey();
         }
 
-        return o;
+        String branches = "";
+
+        while (!node.getChildren().isEmpty()) {
+            branches += dfs(node.getChildren().getLast());
+            node.getChildren().remove(node.getChildren().size());
+        }
+
+        return (branches += node.token().getKey());
     }
 }
