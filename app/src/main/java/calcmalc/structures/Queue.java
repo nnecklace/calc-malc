@@ -14,6 +14,7 @@ public class Queue<T> {
     public Queue(Listable<T> list) {
         this.list = list;
         this.tail = 0;
+        this.head = list.size();
     }
 
     /**
