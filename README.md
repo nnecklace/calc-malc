@@ -5,6 +5,8 @@
 
 [Week report 2](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-2.md)
 
+[Week report 3](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-3.md)
+
 ## Overview 
 
 Faculty: TKT
