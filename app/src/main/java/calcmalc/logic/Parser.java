@@ -1,8 +1,8 @@
 package calcmalc.logic;
 
 import calcmalc.structures.Stack;
+import calcmalc.structures.Queue;
 import calcmalc.structures.ASTNode;
-import calcmalc.structures.Listable;
 import calcmalc.structures.List;
 import calcmalc.logic.types.Token;
 import java.text.ParseException;
@@ -14,23 +14,10 @@ public class Parser {
     private Stack<Token> operators = new Stack<>(new List<>());
     private Stack<ASTNode> nodes = new Stack<>(new List<>());
     private Stack<ASTNode> functions = new Stack<>(new List<>());
-    private Listable<Token> tokens;
-    private int position = 0;
+    private Queue<Token> tokens;
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public void setTokens(Listable<Token> tokens) {
+    public Parser(Queue<Token> tokens) {
         this.tokens = tokens;
-    }
-
-    public Listable<Token> getTokens() {
-        return tokens;
     }
 
     /**
@@ -39,12 +26,10 @@ public class Parser {
      * @return stack of nodes with the top of the stack being root node
      * @throws ParseException if illegal input
      */
-    public Stack<ASTNode> parse(Listable<Token> tokens) throws ParseException {
-        setTokens(tokens);
-        while (getPosition() < tokens.size()) {
-            Token token = tokens.get(getPosition());
+    public Stack<ASTNode> parse() throws ParseException {
+        while (!tokens.isEmpty()) {
+            Token token = tokens.dequeue();
             shuntingYardParse(token);
-            setPosition(getPosition()+1);
         }
         return popRemainingTokens();
     }
@@ -56,16 +41,13 @@ public class Parser {
      * @return stack of nodes that represent the functions arguments
      * @throws ParseException on illegal input
      */
-    public Stack<ASTNode> parseFunction(Listable<Token> tokens) throws ParseException {
-        setTokens(tokens);
-        Token token = tokens.get(getPosition());
-        while (token != null) {
+    public Stack<ASTNode> parseFunction() throws ParseException {
+        while (!tokens.isEmpty()) {
+            Token token = tokens.dequeue();
             shuntingYardParse(token);
-            setPosition(getPosition()+1);
             if (token.isEmpty() && token.getKey().equals(")")) {
                 break;
             }
-            token = tokens.get(getPosition());
         }
         return popRemainingTokens();
     }
@@ -84,15 +66,6 @@ public class Parser {
         return nodes;
     }
 
-    private void parseFunctionArguments(ASTNode root) throws ParseException {
-        Parser parser = new Parser();
-        parser.setPosition(getPosition()+1);
-        Stack<ASTNode> children = parser.parseFunction(getTokens());
-        setPosition(parser.getPosition()-1);
-        root.setChildren(children.asList());
-        functions.push(root);
-    }
-
     // This the main algorithm of the program, explaining it is rather difficult
     // Wikipedia however has a very good and simple explanation of the algorithm
     // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
@@ -105,7 +78,10 @@ public class Parser {
             // Here we recursively parse the function and its arguments
             operators.push(token);
             ASTNode root = new ASTNode(token);
-            parseFunctionArguments(root);
+            Parser parser = new Parser(tokens);
+            Stack<ASTNode> children = parser.parseFunction();
+            root.setChildren(children.asList());
+            functions.push(root);
         }
         else if (token.isOperator()) {
             while (
