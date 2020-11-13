@@ -114,13 +114,18 @@ public class List<T> implements Listable<T> {
     }
 
     /**
-     * Method getter for isFull property
+     * Method getter for isFull property which indicates if list is completely full meaning used up all memory that it can use
+     * This could ideally be removed and let users set their own memory limits
      * @return isFull property
      */
     public boolean isFull() {
         return isFull;
     }
 
+    /**
+     * Boolean function to check wheather lis is empty or not
+     * @return true if head is at position 0 meaning that the list is empty
+     */
     public boolean isEmpty() {
         return head == 0;
     }
