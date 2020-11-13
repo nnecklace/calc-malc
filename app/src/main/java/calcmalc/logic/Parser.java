@@ -77,8 +77,7 @@ public class Parser {
     private void shuntingYardParse(Token token) throws ParseException {
         if (token.isNumber()) {
             nodes.push(new ASTNode(token));
-        } 
-        else if (token.isFunction()) {
+        } else if (token.isFunction()) {
             // This is currently where we diverge from the standard algorithm
             // Here we recursively parse the function and its arguments
             operators.push(token);
@@ -87,23 +86,20 @@ public class Parser {
             Stack<ASTNode> children = parser.parseFunction();
             root.setChildren(children.asList());
             functions.push(root);
-        }
-        else if (token.isOperator()) {
+        } else if (token.isOperator()) {
             while (
-                !operators.isEmpty() && 
-                !operators.peek().getKey().equals("(") && 
-                operators.peek().getPrecedence() >= token.getPrecedence()
+                    !operators.isEmpty() && 
+                    !operators.peek().getKey().equals("(") && 
+                    operators.peek().getPrecedence() >= token.getPrecedence()
             ) {
                 Token operator = operators.pop();
                 addOperatorNode(operator);
             }
             operators.push(token);
-        } 
-        else if (token.isEmpty()) {
+        } else if (token.isEmpty()) {
             if (token.getKey().equals("(")) {
                 operators.push(token);
-            } 
-            else {
+            } else {
                 while (!operators.isEmpty() && !operators.peek().getKey().equals("(")) {
                     Token operator = operators.pop();
                     addOperatorNode(operator);
@@ -129,8 +125,7 @@ public class Parser {
     private void addOperatorNode(Token operator) {
         if (operator.isFunction()) {
             nodes.push(functions.pop());
-        } 
-        else {
+        } else {
             ASTNode node = new ASTNode(operator);
             node.addChild(nodes.pop());
             node.addChild(nodes.pop());

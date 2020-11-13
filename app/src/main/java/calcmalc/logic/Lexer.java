@@ -19,23 +19,19 @@ public class Lexer {
             String c = Character.toString(expression.charAt(i));
             if (c.matches("\\+|\\*|/|\\-")) {
                 tokens.push(new Operator(c));
-            }
-            else if (c.matches("[0-9]")) {
+            } else if (c.matches("[0-9]")) {
                 StringBuilder number = new StringBuilder();
                 number.append(c);
                 i = scan(expression, number, i, "[0-9]");
                 tokens.push(new Numeric(number.toString()));
-            }
-            else if (c.matches("[_a-zA-Z]")) {
+            } else if (c.matches("[_a-zA-Z]")) {
                 StringBuilder symbol = new StringBuilder();
                 symbol.append(c);
                 i = scan(expression, symbol, i, "[_a-zA-Z]");
                 tokens.push(new Symbol(symbol.toString()));
-            }
-            else if (c.matches("\\(") || c.matches("\\)") || c.matches(",")) {
+            } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",")) {
                 tokens.push(new Empty(c));
-            }
-            else {
+            } else {
                 throw new ParseException("Unknown character", 0);
             }
         }
@@ -54,8 +50,8 @@ public class Lexer {
      */
     private int scan(String expression, StringBuilder tokenName, int i, String pattern) {
         int pos = i;
-        while (pos+1 < expression.length() && Character.toString(expression.charAt(pos+1)).matches(pattern)) {
-            tokenName.append(expression.charAt(pos+1));
+        while (pos + 1 < expression.length() && Character.toString(expression.charAt(pos + 1)).matches(pattern)) {
+            tokenName.append(expression.charAt(pos + 1));
             pos++;
         }
         return pos;
