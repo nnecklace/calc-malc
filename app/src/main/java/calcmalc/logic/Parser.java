@@ -52,6 +52,11 @@ public class Parser {
         return popRemainingTokens();
     }
 
+    /**
+     * Pops all the remaining operators from the operator stack and creates ast nodes of them
+     * @return stack of ast nodes, ideally should only return one root node but incase of function arguments or variables it will return many nodes
+     * @throws ParseException
+     */
     private Stack<ASTNode> popRemainingTokens() throws ParseException {
         while (!operators.isEmpty()) {
             Token operator = operators.pop();
@@ -115,6 +120,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Add nodes to the abstract syntax tree
+     * @param operator to add to the tree, 
+     * if operator is a mathematical operator we pop the previously added nodes since they will be the numbers for the operator
+     * If token is a function we pop the top function from the function stack and add it to the tree
+     */
     private void addOperatorNode(Token operator) {
         if (operator.isFunction()) {
             nodes.push(functions.pop());
@@ -136,6 +147,11 @@ public class Parser {
         return dfs(root);
     } 
 
+    /**
+     * Normal depth first search traversal of the abstract syntax tree the parser created
+     * @param node root node of the tree
+     * @return String representing the node and its position in RPN normal form
+     */
     private String dfs(ASTNode node) {
         if (node.token().isNumber()) {
             return node.token().getKey();

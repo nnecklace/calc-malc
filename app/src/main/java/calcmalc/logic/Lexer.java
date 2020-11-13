@@ -43,6 +43,15 @@ public class Lexer {
         return tokens;
     }
 
+    /**
+     * Method reads all character until it can no longer match the following character with the givin regex.
+     * Perhaps a bit needlessly complicated function
+     * @param expression the String expression the algoritm is going to evaluate
+     * @param tokenName the token name, all the characters that match the regex will be append to this token name
+     * @param i the position in the expression we are currently in
+     * @param pattern the regex to match
+     * @return the position in the expression where we no longer match with the regex
+     */
     private int scan(String expression, StringBuilder tokenName, int i, String pattern) {
         int pos = i;
         while (pos+1 < expression.length() && Character.toString(expression.charAt(pos+1)).matches(pattern)) {
