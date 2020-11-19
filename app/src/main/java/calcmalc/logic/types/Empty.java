@@ -1,7 +1,5 @@
 package calcmalc.logic.types;
 
-import calcmalc.logic.types.Token;
-
 public class Empty implements Token {
     private String key;
 
