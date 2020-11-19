@@ -16,8 +16,14 @@ public class Lexer {
         Listable<Token> tokens = new List<>();
         for (int i = 0; i < expression.length(); ++i) {
             String c = Character.toString(expression.charAt(i));
-            if (c.matches("\\+|\\*|/|\\-")) {
-                tokens.push(new Operator(c));
+            if (c.matches("\\+|\\*|/|\\-|\\^|\\%")) {
+                // check if operator is unary - operator
+                if ("-".equals(c) && (tokens.isEmpty() || !tokens.getLast().isNumber())) {
+                    // unary minus operator
+                    tokens.push(new Operator("$"));
+                } else {
+                    tokens.push(new Operator(c));
+                }
             } else if (c.matches("[0-9]")) {
                 StringBuilder number = new StringBuilder();
                 number.append(c);

@@ -3,12 +3,13 @@ package calcmalc.logic;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import calcmalc.structures.Listable;
+import calcmalc.exceptions.LexerException;
 import calcmalc.logic.types.Token;
 import java.text.ParseException;
 
 public class LexerTest {
     @Test
-    public void testLexingForSimpleInput() throws ParseException {
+    public void testLexingForSimpleInput() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("1+1");
         assertTrue(tokens.get(0).isNumber());
@@ -17,7 +18,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexingSymbols() throws ParseException {
+    public void testLexingSymbols() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("sqrt(1)");
         assertTrue(tokens.get(0).isFunction());
@@ -27,7 +28,7 @@ public class LexerTest {
     }
 
     @Test 
-    public void testLexingMultiDigitNumber() throws ParseException {
+    public void testLexingMultiDigitNumber() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("100+100*1560");
         assertTrue(tokens.get(0).isNumber());
@@ -38,7 +39,7 @@ public class LexerTest {
     }
 
     @Test 
-    public void testLexingOperators() throws ParseException {
+    public void testLexingOperators() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("2+2*5/5-1");
         assertTrue(tokens.get(0).isNumber());
@@ -53,7 +54,7 @@ public class LexerTest {
     }
 
     @Test 
-    public void testLexingFunctionArguments() throws ParseException {
+    public void testLexingFunctionArguments() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("max(2,3)");
         assertTrue(tokens.get(0).isFunction());
@@ -67,8 +68,8 @@ public class LexerTest {
     @Test
     public void testLexThrowsOnUnknownCharacter() {
         Lexer lexer = new Lexer();
-        Exception exception = assertThrows(ParseException.class, () -> {
-            Listable<Token> tokens = lexer.lex("2:2");
+        Exception exception = assertThrows(LexerException.class, () -> {
+            Listable<Token> tokens = lexer.lex("2@2");
         });
     }
 }

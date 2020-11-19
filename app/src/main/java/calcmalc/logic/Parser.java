@@ -127,8 +127,13 @@ public class Parser {
             nodes.push(functions.pop());
         } else {
             ASTNode node = new ASTNode(operator);
-            node.addChild(nodes.pop());
-            node.addChild(nodes.pop());
+            if ("$".equals(operator.getKey())) {
+                node.addChild(nodes.pop());
+            } else {
+                node.addChild(nodes.pop());
+                node.addChild(nodes.pop());
+            }
+
             nodes.push(node);
         }
     }
