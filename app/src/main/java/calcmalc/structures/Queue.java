@@ -64,4 +64,12 @@ public class Queue<T> {
     public boolean isEmpty() {
         return head == tail;
     }
+
+    /**
+     * Method gets size of the queue
+     * @return size (#elements) of the queue
+     */
+    public int size() {
+        return head - tail;
+    }
 }

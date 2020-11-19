@@ -41,4 +41,40 @@ public class QueueTest {
         queue.enqueue(1);
         assertFalse(queue.isEmpty());
     }
+
+    @Test
+    public void testQueueSize() {
+        Queue<Integer> queue = new Queue<>(new List<Integer>());
+        queue.enqueue(1);
+        queue.enqueue(2);
+        queue.enqueue(3);
+        assertEquals(3, queue.size());
+        queue.dequeue();
+        assertEquals(2, queue.size());
+        queue.enqueue(3);
+        queue.enqueue(3);
+        assertEquals(4, queue.size());
+        queue.dequeue();
+        queue.dequeue();
+        queue.dequeue();
+        queue.dequeue();
+        assertEquals(0, queue.size());
+    }
+
+    @Test
+    public void testQueueSizeCannotBeNegative() {
+        Queue<Integer> queue = new Queue<>(new List<Integer>());
+        queue.dequeue();
+        queue.dequeue();
+        assertEquals(0, queue.size());
+        queue.enqueue(1);
+        queue.enqueue(2);
+        queue.enqueue(3);
+        assertEquals(3, queue.size());
+        queue.dequeue();
+        queue.dequeue();
+        queue.dequeue();
+        queue.dequeue();
+        assertEquals(0, queue.size());
+    }
 }
