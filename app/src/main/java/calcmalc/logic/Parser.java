@@ -50,21 +50,20 @@ public class Parser {
                 openingParenthesisCounter++;
             }
 
-            if (token.getKey().matches(end)) {
-                if ("\\)".equals(end)) {
-                    // process the closing paren in case of function arguments
-                    tokens.dequeue();
-                    shuntingYardParse(token);
-                    if (openingParenthesisCounter > 1) {
-                        openingParenthesisCounter--;
-                        continue;
-                    }
-                }
+            if (token.getKey().matches(end) && !end.equals("\\)")) {
                 break;
             }
 
             tokens.dequeue();
             shuntingYardParse(token);
+
+            if (token.getKey().matches(end) && end.equals("\\)")) {
+                if (openingParenthesisCounter <= 1) {
+                    break;
+                } else {
+                    openingParenthesisCounter--;
+                }
+            }
         }
 
         return popRemainingTokens();
