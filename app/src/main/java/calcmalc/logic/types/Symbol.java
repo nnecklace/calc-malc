@@ -30,4 +30,8 @@ public class Symbol implements Token {
     public boolean isEmpty() {
         return false;
     } 
+
+    public boolean isAssignment() {
+        return false;
+    }
 }

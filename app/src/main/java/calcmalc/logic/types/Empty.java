@@ -30,4 +30,8 @@ public class Empty implements Token {
     public boolean isEmpty() {
         return true;
     }
+
+    public boolean isAssignment() {
+        return false;
+    }
 }

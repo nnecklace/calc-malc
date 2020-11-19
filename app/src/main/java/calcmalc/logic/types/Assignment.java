@@ -1,9 +1,9 @@
 package calcmalc.logic.types;
 
-public class Numeric implements Token {
+public class Assignment implements Token {
     private String key;
 
-    public Numeric(String key) {
+    public Assignment(String key) {
         this.key = key;
     }
 
@@ -12,7 +12,7 @@ public class Numeric implements Token {
     }
 
     public int getPrecedence() {
-        return 100;
+        return 0;
     }
 
     public boolean isOperator() {
@@ -20,7 +20,7 @@ public class Numeric implements Token {
     }
 
     public boolean isNumber() {
-        return true;
+        return false;
     }
 
     public boolean isFunction() {
@@ -32,6 +32,6 @@ public class Numeric implements Token {
     } 
 
     public boolean isAssignment() {
-        return false;
+        return true;
     }
 }
