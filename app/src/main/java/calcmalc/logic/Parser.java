@@ -57,6 +57,7 @@ public class Parser {
             tokens.dequeue();
             shuntingYardParse(token);
 
+            // make sure to process the last closing parenthesis
             if (token.getKey().matches(end) && end.equals("\\)")) {
                 if (openingParenthesisCounter <= 1) {
                     break;
