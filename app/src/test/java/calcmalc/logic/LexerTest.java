@@ -21,7 +21,7 @@ public class LexerTest {
     public void testLexingSymbols() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("sqrt(1)");
-        assertTrue(tokens.get(0).isFunction());
+        assertTrue(tokens.get(0).isSymbol());
         assertTrue(tokens.get(1).isEmpty());
         assertTrue(tokens.get(2).isNumber());
         assertTrue(tokens.get(3).isEmpty());
@@ -57,12 +57,22 @@ public class LexerTest {
     public void testLexingFunctionArguments() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Listable<Token> tokens = lexer.lex("max(2,3)");
-        assertTrue(tokens.get(0).isFunction());
+        assertTrue(tokens.get(0).isSymbol());
         assertTrue(tokens.get(1).isEmpty());
         assertTrue(tokens.get(2).isNumber());
         assertTrue(tokens.get(3).isEmpty());
         assertTrue(tokens.get(4).isNumber());
         assertTrue(tokens.get(5).isEmpty());
+    }
+
+    @Test 
+    public void testLexingVariableAssignments() throws LexerException {
+        Lexer lexer = new Lexer();
+        Listable<Token> tokens = lexer.lex("x=2:");
+        assertTrue(tokens.get(0).isSymbol());
+        assertTrue(tokens.get(1).isAssignment());
+        assertTrue(tokens.get(2).isNumber());
+        assertTrue(tokens.get(3).isEmpty());
     }
 
     @Test

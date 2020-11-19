@@ -63,6 +63,14 @@ public class ParserTest {
     }
 
     @Test
+    public void testFunctionWithInnerFunctionsParsingSimple() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("sin(max(2,4))")));
+        parser.parse();
+        assertEquals("42maxsin", parser.printTree());
+    }
+
+    @Test
     public void testFunctionWithInnerFunctionsParsing() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("sin(max(min(2,5),sqrt(1))+2+2)")));
@@ -122,5 +130,85 @@ public class ParserTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("2*(-10)/4")));
         parser.parse();
         assertEquals("210$*4/", parser.printTree());
+    }
+
+    @Test
+    public void testParseNegativeNumberSum() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("-100+(-100)")));
+        parser.parse();
+        assertEquals("100$100$+", parser.printTree());
+    }
+
+    @Test
+    public void testParseVariableAssignment() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:")));
+        parser.parse();
+        assertEquals("x2=", parser.printTree());
+    }
+
+    @Test
+    public void testParseVariableAssignmentAndExpression() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:2+2")));
+        parser.parse();
+        assertEquals("x2=22+", parser.printTree());
+    }
+
+    @Test
+    public void testParseExpressionInVariable() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2+2:")));
+        parser.parse();
+        assertEquals("x22+=", parser.printTree());
+    }
+
+    @Test
+    public void testParseComplicatedExpressionInVariable() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2*(2*(2+2)*(1+(4+4*(10+1)))+(10*(5+(2+3)))):")));
+        parser.parse();
+        assertEquals("x2222+*144101+*++*10523++*+*=", parser.printTree());
+    }
+
+    @Test
+    public void testParseFunctionExpressionInVariable() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=sin(2+2):")));
+        parser.parse();
+        assertEquals("x22+sin=", parser.printTree());
+    }
+
+    @Test
+    public void testParseMultipleVariables() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:y=2:z=4")));
+        parser.parse();
+        assertEquals("x2=y2=z4=", parser.printTree());
+    }
+
+    @Test
+    public void testParseMultipleVariablesAndUse() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:y=2:2+x+y")));
+        parser.parse();
+        assertEquals("x2=y2=2x+y+", parser.printTree());
+    }
+
+    @Test
+    public void testParseVariableAsFunctionParameter() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:sqrt(x)")));
+        parser.parse();
+        assertEquals("x2=xsqrt", parser.printTree());
+    }
+
+    @Test
+    public void testParseAbsFunctionWithNegativeSum() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(-100+(-100))")));
+        parser.parse();
+        assertEquals("100$100$+abs", parser.printTree());
     }
 }

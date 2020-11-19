@@ -24,17 +24,19 @@ public class Lexer {
                 } else {
                     tokens.push(new Operator(c));
                 }
-            } else if (c.matches("[0-9]")) {
+            } else if (c.matches("[0-9]")) { // only accept integers at the moment
                 StringBuilder number = new StringBuilder();
                 number.append(c);
                 i = scan(expression, number, i, "[0-9]");
                 tokens.push(new Numeric(number.toString()));
+            } else if (c.matches("=")) {
+                tokens.push(new Assignment("="));
             } else if (c.matches("[_a-zA-Z]")) {
                 StringBuilder symbol = new StringBuilder();
                 symbol.append(c);
                 i = scan(expression, symbol, i, "[_a-zA-Z]");
                 tokens.push(new Symbol(symbol.toString()));
-            } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",")) {
+            } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",") || c.matches(":")) {
                 tokens.push(new Empty(c));
             } else {
                 throw new LexerException("Unknown character");

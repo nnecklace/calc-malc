@@ -8,6 +8,7 @@ import calcmalc.structures.Queue;
 
 public class Evaluator {
     private HashMap<String, Integer> config = new HashMap<>();
+    private HashMap<String, Double> symbolTable = new HashMap<>();
 
     public Evaluator() { 
         config.put("+", 2);
@@ -29,16 +30,24 @@ public class Evaluator {
     }
 
     private void checkArguments(String symbol, int argumentsCount) {
-        if (config.get(symbol) != argumentsCount) {
-            if (config.get(symbol) != -1) {
+        if (config.containsKey(symbol)) {
+            if (config.get(symbol) != argumentsCount && config.get(symbol) != -1) {
                 throw new IllegalArgumentException("Wrong number of arguments " + symbol);
             }
         }
     }
 
-    public <N extends Number> double evaluateFunction(String symbol, Queue<N> arguments) throws Exception {
-        checkArguments(symbol, arguments.size());
-        switch (symbol) {
+    private Double checkSymbolTable(String token) throws Exception {
+        if (symbolTable.containsKey(token)) {
+            return symbolTable.get(token);
+        }
+
+        throw new Exception("Unknown Symbol " + token);
+    }
+
+    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws Exception {
+        checkArguments(token, arguments.size());
+        switch (token) {
             case "*":
                 return arguments.dequeue().doubleValue() * arguments.dequeue().doubleValue();
             case "+":
@@ -76,13 +85,21 @@ public class Evaluator {
                     Math.min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments)) :
                     Math.min(arguments.dequeue().doubleValue(), Double.MAX_VALUE);
             default:
-                throw new Exception("Unknown symbol");
+                return checkSymbolTable(token);
         }
     }
 
-    public Number evaluate(ASTNode node) throws Exception {
+    public Double evaluate(ASTNode node) throws Exception {
         if (node.token().isNumber()) {
-            return Integer.parseInt(node.token().getKey());
+            return Double.parseDouble(node.token().getKey());
+        }
+
+        if (node.token().isAssignment()) {
+            ASTNode symbol = node.getChildren().getLast();
+            node.getChildren().remove(node.getChildren().size());
+            Number value = evaluate(node.getChildren().get(0));
+            symbolTable.put(symbol.token().getKey(), value.doubleValue());
+            return 0.0;
         }
 
         Queue<Number> arguments = new Queue<>(new List<>());

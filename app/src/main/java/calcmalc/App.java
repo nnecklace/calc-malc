@@ -8,6 +8,8 @@ import calcmalc.structures.Listable;
 import calcmalc.structures.Stack;
 import calcmalc.structures.Queue;
 import calcmalc.logic.types.Token;
+import calcmalc.exceptions.LexerException;
+import calcmalc.logic.Evaluator;
 import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
 import java.text.ParseException;
@@ -18,19 +20,23 @@ public class App {
         return "Hello World!";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println(new App().getGreeting());
         Scanner input = new Scanner(System.in);
         Lexer lexer = new Lexer();
+        Evaluator evaluator = new Evaluator();
 
         while (input.hasNextLine()) {
             String line = input.nextLine().replaceAll("\\s", "");
 
             try {
                 Listable<Token> tokens = lexer.lex(line);
-                Parser parser = new Parser(new Queue<Token>(tokens));
-                Stack<ASTNode> nodes = parser.parse();
-                System.out.println(parser.printTree());
+                Parser parser = new Parser(new Queue<>(tokens));
+                Queue<ASTNode> nodes = new Queue<>(parser.parse().asList());
+                //System.out.println(parser.printTree());
+                while (!nodes.isEmpty()) {
+                    System.out.println(evaluator.evaluate(nodes.dequeue()));
+                }
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
             }

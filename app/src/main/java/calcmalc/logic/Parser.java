@@ -41,14 +41,32 @@ public class Parser {
      * @return stack of nodes that represent the functions arguments
      * @throws ParseException on illegal input
      */
-    public Stack<ASTNode> parseFunction() throws ParseException {
+    public Stack<ASTNode> parseUntil(String end) throws ParseException {
+        int openingParenthesisCounter = 0;
         while (!tokens.isEmpty()) {
-            Token token = tokens.dequeue();
-            shuntingYardParse(token);
-            if (token.isEmpty() && token.getKey().equals(")")) {
+            Token token = tokens.peek();
+            
+            if (token.getKey().equals("(")) {
+                openingParenthesisCounter++;
+            }
+
+            if (token.getKey().matches(end)) {
+                if ("\\)".equals(end)) {
+                    // process the closing paren in case of function arguments
+                    tokens.dequeue();
+                    shuntingYardParse(token);
+                    if (openingParenthesisCounter > 1) {
+                        openingParenthesisCounter--;
+                        continue;
+                    }
+                }
                 break;
             }
+
+            tokens.dequeue();
+            shuntingYardParse(token);
         }
+
         return popRemainingTokens();
     }
 
@@ -77,14 +95,37 @@ public class Parser {
     private void shuntingYardParse(Token token) throws ParseException {
         if (token.isNumber()) {
             nodes.push(new ASTNode(token));
-        } else if (token.isFunction()) {
+        } else if (token.isSymbol()) {
             // This is currently where we diverge from the standard algorithm
             // Here we recursively parse the function and its arguments
             operators.push(token);
             ASTNode root = new ASTNode(token);
             Parser parser = new Parser(tokens);
-            Stack<ASTNode> children = parser.parseFunction();
+            Stack<ASTNode> children = new Stack<>(new List<>()); 
+
+            if (!tokens.isEmpty()) {
+                if (tokens.peek().isAssignment()) {
+                    children = parser.parseUntil("\\=");
+                } else if (tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
+                    children = parser.parseUntil("\\)");
+                } else {
+                    children = parser.parseUntil("[^_a-zA-Z]");
+                }
+            }
+
             root.setChildren(children.asList());
+            functions.push(root);
+        } else if (token.isAssignment()) {
+            operators.pop();
+            operators.push(token);
+
+            ASTNode root = new ASTNode(token);
+            Parser parser = new Parser(tokens);
+            Stack<ASTNode> children = parser.parseUntil(":");
+
+            root.setChildren(children.asList());
+            root.addChild(functions.pop());
+
             functions.push(root);
         } else if (token.isOperator()) {
             while (
@@ -105,11 +146,11 @@ public class Parser {
                     addOperatorNode(operator);
                 }
 
-                if (operators.isEmpty() || !operators.peek().getKey().equals("(")) {
+                if ((!token.getKey().equals(",") && !token.getKey().equals(":")) && (operators.isEmpty() || !operators.peek().getKey().equals("("))) {
                     throw new ParseException("Syntax error missing parenthesis! 2", 0);
                 }
 
-                if (!token.getKey().equals(",")) {
+                if (!token.getKey().equals(",") && !token.getKey().equals(":")) {
                     operators.pop();
                 }
             }
@@ -123,7 +164,7 @@ public class Parser {
      * If token is a function we pop the top function from the function stack and add it to the tree
      */
     private void addOperatorNode(Token operator) {
-        if (operator.isFunction()) {
+        if (operator.isSymbol() || operator.isAssignment()) {
             nodes.push(functions.pop());
         } else {
             ASTNode node = new ASTNode(operator);
@@ -143,8 +184,14 @@ public class Parser {
      * @return The RPN form of the tree structure
      */
     public String printTree() {
-        ASTNode root = nodes.pop();
-        return dfs(root);
+        String output = "";
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        while (!nodeQue.isEmpty()) {
+            ASTNode root = nodeQue.dequeue();
+            output += dfs(root);
+            System.out.println();
+        }
+        return output;
     } 
 
     /**
@@ -158,7 +205,7 @@ public class Parser {
         }
 
         String branches = "";
-
+        
         while (!node.getChildren().isEmpty()) {
             branches += dfs(node.getChildren().getLast());
             node.getChildren().remove(node.getChildren().size());
