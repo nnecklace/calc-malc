@@ -5,6 +5,7 @@ import java.util.HashMap;
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.List;
 import calcmalc.structures.Queue;
+import calcmalc.exceptions.EvaluatorException;
 
 public class Evaluator {
     private HashMap<String, Integer> config = new HashMap<>();
@@ -37,15 +38,15 @@ public class Evaluator {
         }
     }
 
-    private Double checkSymbolTable(String token) throws Exception {
+    private Double checkSymbolTable(String token) throws EvaluatorException {
         if (symbolTable.containsKey(token)) {
             return symbolTable.get(token);
         }
 
-        throw new Exception("Unknown Symbol " + token);
+        throw new EvaluatorException("Unknown Symbol " + token);
     }
 
-    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws Exception {
+    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
