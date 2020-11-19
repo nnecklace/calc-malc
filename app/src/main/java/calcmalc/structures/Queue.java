@@ -26,6 +26,10 @@ public class Queue<T> {
         head++;
     }
 
+    public T peek() {
+        return list.get(tail);
+    }
+
     /**
      * Method pulls element from the end of the queue. The element will also be removed when pulled
      * @return T the generic element at the end of the queue or null
@@ -71,5 +75,9 @@ public class Queue<T> {
      */
     public int size() {
         return head - tail;
+    }
+
+    public Listable<T> asList() {
+        return list;
     }
 }
