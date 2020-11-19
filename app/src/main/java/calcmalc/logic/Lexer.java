@@ -2,8 +2,8 @@ package calcmalc.logic;
 
 import calcmalc.structures.List;
 import calcmalc.structures.Listable;
+import calcmalc.exceptions.LexerException;
 import calcmalc.logic.types.*;
-import java.text.ParseException;
 
 public class Lexer {
     /**
@@ -12,8 +12,7 @@ public class Lexer {
      * @return List of lexical tokens representing the given symbols in the input
      * @throws ParseException if expression contains invalid characters
      */
-    public Listable<Token> lex(String expression) throws ParseException {
-        // TODO: Throw lexer exception
+    public Listable<Token> lex(String expression) throws LexerException {
         Listable<Token> tokens = new List<>();
         for (int i = 0; i < expression.length(); ++i) {
             String c = Character.toString(expression.charAt(i));
@@ -32,7 +31,7 @@ public class Lexer {
             } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",")) {
                 tokens.push(new Empty(c));
             } else {
-                throw new ParseException("Unknown character", 0);
+                throw new LexerException("Unknown character");
             }
         }
 
