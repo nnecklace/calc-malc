@@ -23,7 +23,7 @@ public class Empty implements Token {
         return false;
     }
 
-    public boolean isFunction() {
+    public boolean isSymbol() {
         return false;
     }
 

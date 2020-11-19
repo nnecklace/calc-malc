@@ -23,7 +23,7 @@ public class Symbol implements Token {
         return false;
     }
 
-    public boolean isFunction() {
+    public boolean isSymbol() {
         return true;
     }
 

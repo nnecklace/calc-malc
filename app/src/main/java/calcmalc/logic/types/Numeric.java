@@ -23,7 +23,7 @@ public class Numeric implements Token {
         return true;
     }
 
-    public boolean isFunction() {
+    public boolean isSymbol() {
         return false;
     }
 

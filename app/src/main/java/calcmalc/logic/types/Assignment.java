@@ -23,7 +23,7 @@ public class Assignment implements Token {
         return false;
     }
 
-    public boolean isFunction() {
+    public boolean isSymbol() {
         return false;
     }
 

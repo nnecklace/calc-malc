@@ -12,7 +12,15 @@ public class Operator implements Token {
     }
 
     public int getPrecedence() {
-        if (key.equals("*") || key.equals("/")) {
+        if (key.equals("$")) {
+            return 4;
+        }
+
+        if (key.equals("^")) {
+            return 3;
+        }
+
+        if (key.equals("*") || key.equals("/") || key.equals("%")) {
             return 2;
         }
 
@@ -27,7 +35,7 @@ public class Operator implements Token {
         return false;
     }
 
-    public boolean isFunction() {
+    public boolean isSymbol() {
         return false;
     }
 
