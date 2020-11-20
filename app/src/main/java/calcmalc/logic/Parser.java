@@ -91,9 +91,15 @@ public class Parser {
         return nodes;
     }
 
-    // This the main algorithm of the program, explaining it is rather difficult
-    // Wikipedia however has a very good and simple explanation of the algorithm
-    // https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+    /**
+     * Parses each token at a time and performs the given action per token
+     * This the main algorithm of the program, explaining it is rather difficult
+     * Wikipedia however has a very good and simple explanation of the algorithm
+     * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+     * We have modified the algorithm to accept variables and functions with parameters
+     * @param token The token to parse
+     * @throws ParseException if parenthesis don't match
+     */
     private void shuntingYardParse(Token token) throws ParseException {
         if (token.isNumber()) {
             nodes.push(new ASTNode(token));
