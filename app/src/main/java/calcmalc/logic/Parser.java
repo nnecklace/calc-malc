@@ -112,12 +112,8 @@ public class Parser {
             Stack<ASTNode> children = new Stack<>(new List<>()); 
 
             if (!tokens.isEmpty()) {
-                if (tokens.peek().isAssignment()) {
-                    children = parser.parseUntil("\\=");
-                } else if (tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
+                if (tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
                     children = parser.parseUntil("\\)");
-                } else {
-                    children = parser.parseUntil("[^_a-zA-Z]");
                 }
             }
 
