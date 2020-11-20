@@ -9,6 +9,8 @@ I just wanted to make sure my parser and evaluator work as expected, and that's 
 
 Also started writing the testing and implemenation documents. Still work in progres. I need to do better performance testing and acutally make some graph for the performance testing results.
 
+The main part of the project is about done at this point. Need to fix some issues, like the about mentioned things.
+
 Next I will fix bugs and cleanup the code a little bit, also need to create a hashtable data structure. Need to create a simple UI for the project and do proper testing. I should somehow figure out how to generate 10^6 inputs document to feed to my program. Ah! Also need to remove that dumb manual size limit for my lists. And I also need to make my project accept floating point numbers, currently only integers are supported.
 
 Unfortunately, I don't think I will have enough time to implement functions for my project. I do have a vague idea how it could be done, but time is limited and need to focus on more important things, like testing and documentation, and UI development.
