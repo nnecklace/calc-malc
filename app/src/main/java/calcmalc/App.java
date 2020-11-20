@@ -5,10 +5,8 @@ package calcmalc;
 
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.Listable;
-import calcmalc.structures.Stack;
 import calcmalc.structures.Queue;
 import calcmalc.logic.types.Token;
-import calcmalc.exceptions.LexerException;
 import calcmalc.logic.Evaluator;
 import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
@@ -17,7 +15,12 @@ import java.util.Scanner;
 
 public class App {
     public String getGreeting() {
-        return "Hello World!";
+        return      "  _____      _        __  __       _      \n"
+                  +"/ _____|    | |      |  \\/  |     | |     \n"
+                +"| |     __ _| | ___  | \\  / | __ _| | ___  \n"
+                +"| |    / _` | |/ __| | |\\/| |/ _` | |/ __| \n"
+                +"| |___| (_| | | (__  | |  | | (_| | | (__  \n"
+                +"\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
     }
 
     public static void main(String[] args) throws Exception {
@@ -33,7 +36,7 @@ public class App {
                 Listable<Token> tokens = lexer.lex(line);
                 Parser parser = new Parser(new Queue<>(tokens));
                 Queue<ASTNode> nodes = new Queue<>(parser.parse().asList());
-                //System.out.println(parser.printTree());
+
                 while (!nodes.isEmpty()) {
                     System.out.println(evaluator.evaluate(nodes.dequeue()));
                 }
