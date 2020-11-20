@@ -39,8 +39,8 @@ public class Lexer {
             } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",") || c.matches(":")) {
                 tokens.push(new Empty(c));
             } else {
-                String errorAt = String.format("%" + (i+1) + "s", "^");
-                throw new LexerException("Unknown character " + c + " at position " + (i+1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
+                String errorAt = String.format("%" + (i + 1) + "s", "^");
+                throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
             }
         }
 
