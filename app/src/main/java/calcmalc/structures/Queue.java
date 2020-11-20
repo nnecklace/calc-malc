@@ -76,8 +76,4 @@ public class Queue<T> {
     public int size() {
         return head - tail;
     }
-
-    public Listable<T> asList() {
-        return list;
-    }
 }
