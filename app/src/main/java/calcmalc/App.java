@@ -7,6 +7,8 @@ import calcmalc.structures.ASTNode;
 import calcmalc.structures.Listable;
 import calcmalc.structures.Queue;
 import calcmalc.logic.types.Token;
+import calcmalc.exceptions.EvaluatorException;
+import calcmalc.exceptions.LexerException;
 import calcmalc.logic.Evaluator;
 import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
@@ -40,7 +42,7 @@ public class App {
                 while (!nodes.isEmpty()) {
                     System.out.println(evaluator.evaluate(nodes.dequeue()));
                 }
-            } catch (ParseException e) {
+            } catch (ParseException | LexerException | EvaluatorException e) {
                 System.out.println(e.getMessage());
             }
             System.out.println();
