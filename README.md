@@ -7,6 +7,16 @@
 
 [Week report 3](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-3.md)
 
+[Week report 4](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-4.md)
+
+## Documents
+
+[Definitions](https://github.com/nnecklace/calc-malc/blob/main/docs/definitions.md)
+
+[Testing](https://github.com/nnecklace/calc-malc/blob/main/docs/testing.md)
+
+[Implementation](https://github.com/nnecklace/calc-malc/blob/main/docs/implementation.md)
+
 ## Overview 
 
 Faculty: TKT
