@@ -57,7 +57,9 @@ public class Parser {
             tokens.dequeue();
             shuntingYardParse(token);
 
-            // make sure to process the last closing parenthesis
+            // make sure to process the last closing parenthesis.
+            // when processing function parameters, we process up until and including the last parenthesis
+            // normally we only process until the last token that matches the given terminator (end) string
             if (token.getKey().matches(end) && end.equals("\\)")) {
                 if (openingParenthesisCounter <= 1) {
                     break;
@@ -137,7 +139,7 @@ public class Parser {
                 addOperatorNode(operator);
             }
             operators.push(token);
-        } else if (token.isEmpty()) {
+        } else {
             if (token.getKey().equals("(")) {
                 operators.push(token);
             } else {
@@ -146,7 +148,7 @@ public class Parser {
                     addOperatorNode(operator);
                 }
 
-                if ((!token.getKey().equals(",") && !token.getKey().equals(":")) && (operators.isEmpty() || !operators.peek().getKey().equals("("))) {
+                if (!token.getKey().equals(",") && !token.getKey().equals(":") && operators.isEmpty()) {
                     throw new ParseException("Syntax error missing parenthesis! 2", 0);
                 }
 
@@ -171,8 +173,13 @@ public class Parser {
             if ("$".equals(operator.getKey())) {
                 node.addChild(nodes.pop());
             } else {
-                node.addChild(nodes.pop());
-                node.addChild(nodes.pop());
+                if (!nodes.isEmpty()) {
+                    node.addChild(nodes.pop());
+                }
+
+                if (!nodes.isEmpty()) {
+                    node.addChild(nodes.pop());
+                }
             }
 
             nodes.push(node);

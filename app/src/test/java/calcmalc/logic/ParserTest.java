@@ -211,4 +211,106 @@ public class ParserTest {
         parser.parse();
         assertEquals("100$100$+abs", parser.printTree());
     }
+
+    @Test
+    public void testParseThrowsExceptionOnMisMatchedParenthesis() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("())")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseThrowsExceptionOnMisMatchedParenthesis2() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("(,):)")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseThrowsExceptionOnMisMatchedParenthesis3() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("+,:)")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseInputOfParens() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("()")));
+        parser.parse();
+        assertEquals("", parser.printTree());
+    }
+
+    @Test
+    public void testParseInputOfComaAndStop() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex(",:")));
+        parser.parse();
+        assertEquals("", parser.printTree());
+    }
+
+    @Test
+    public void testParseInputOfOnlyEmptyTokens() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("(,):")));
+        parser.parse();
+        assertEquals("", parser.printTree());
+    }
+
+    @Test
+    public void testParseInputWithSingleOperator() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("+")));
+        parser.parse();
+        assertEquals("+", parser.printTree());
+    }
+
+    @Test
+    public void testParseInputWithSingleOperatorAndEmptyTokens() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("+,:")));
+        parser.parse();
+        assertEquals("+", parser.printTree());
+    }
+
+    @Test
+    public void testParseInputWithParenAndEmptyTokens() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("(,)")));
+        parser.parse();
+        assertEquals("", parser.printTree());
+    }
+
+    @Test
+    public void testParseThrowsOnSingleClosingParen() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex(")")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseThrowsOnMisMatchedParensInFunctions() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("sqrt())")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseThrowsOnMisMatchedParensInFunctions2() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("sqrt(()")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
 }

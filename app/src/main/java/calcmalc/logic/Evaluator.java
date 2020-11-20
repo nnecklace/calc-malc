@@ -31,10 +31,8 @@ public class Evaluator {
     }
 
     private void checkArguments(String symbol, int argumentsCount) {
-        if (config.containsKey(symbol)) {
-            if (config.get(symbol) != argumentsCount && config.get(symbol) != -1) {
-                throw new IllegalArgumentException("Wrong number of arguments " + symbol);
-            }
+        if (config.containsKey(symbol) && config.get(symbol) != argumentsCount && config.get(symbol) != -1) {
+            throw new IllegalArgumentException("Wrong number of arguments " + symbol);
         }
     }
 
@@ -90,7 +88,7 @@ public class Evaluator {
         }
     }
 
-    public Double evaluate(ASTNode node) throws Exception {
+    public Number evaluate(ASTNode node) throws Exception {
         if (node.token().isNumber()) {
             return Double.parseDouble(node.token().getKey());
         }
