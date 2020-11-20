@@ -192,3 +192,7 @@ Some examples with intermediate stages:
      / \          / \        / \
     2   2        2   2      2   2 
 ```
+
+## References
+
+TODO
