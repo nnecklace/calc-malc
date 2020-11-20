@@ -93,6 +93,7 @@ public class Evaluator {
             return Double.parseDouble(node.token().getKey());
         }
 
+        // TODO: Move to own function
         if (node.token().isAssignment()) {
             ASTNode symbol = node.getChildren().getLast();
             node.getChildren().remove(node.getChildren().size());
