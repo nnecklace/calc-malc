@@ -150,7 +150,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        assertEquals((Double)0.0, evaluator.evaluate(nodes.pop()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
     }
 
     @Test
@@ -160,7 +160,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)4.0, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -171,8 +171,8 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
+        assertEquals("<assignment:y>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)9.0, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -183,7 +183,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)2.0, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -194,7 +194,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)0.6931471805599453, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -205,7 +205,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)1.0, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -216,7 +216,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)0.9092974268256817, evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -227,7 +227,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)(-0.4161468365471424), evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -238,7 +238,7 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
         assertEquals((Double)(-2.185039863261519), evaluator.evaluate(nodeQue.dequeue()));
     }
 
@@ -304,6 +304,36 @@ public class EvaluatorTest {
 
     @Test
     public void testEvaluateAbsFunction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(-100+(-100))")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        assertEquals((Double)200.0, evaluator.evaluate(nodeQue.dequeue()));
+    }
+
+    @Test
+    public void testEvaluatePrecedence() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("-2%2*2+2^2")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        assertEquals((Double)4.0, evaluator.evaluate(nodeQue.dequeue()));
+    }
+
+    @Test
+    public void testEvaluatePrecedence2() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("3*2^2")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        assertEquals((Double)12.0, evaluator.evaluate(nodeQue.dequeue()));
+    }
+
+    @Test
+    public void testEvaluateNestedUnaryParams() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(-100+(-100))")));
         Evaluator evaluator = new Evaluator();

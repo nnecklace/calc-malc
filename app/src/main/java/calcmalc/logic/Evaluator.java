@@ -88,18 +88,27 @@ public class Evaluator {
         }
     }
 
-    public Number evaluate(ASTNode node) throws Exception {
-        if (node.token().isNumber()) {
-            return Double.parseDouble(node.token().getKey());
+    public String evaluateAssignment(ASTNode node) throws EvaluatorException {
+        ASTNode symbol = node.getChildren().getLast();
+        
+        if (!symbol.token().isSymbol()) {
+            throw new EvaluatorException("Can assign value to non-symbol " + symbol);
         }
 
-        // TODO: Move to own function
+        node.getChildren().remove(node.getChildren().size());
+        Number value = evaluate(node.getChildren().get(0));
+        symbolTable.put(symbol.token().getKey(), value.doubleValue());
+
+        return "<assignment:" + symbol.token().getKey() + ">";
+    }
+
+    public Number evaluate(ASTNode node) throws EvaluatorException {
         if (node.token().isAssignment()) {
-            ASTNode symbol = node.getChildren().getLast();
-            node.getChildren().remove(node.getChildren().size());
-            Number value = evaluate(node.getChildren().get(0));
-            symbolTable.put(symbol.token().getKey(), value.doubleValue());
-            return 0.0;
+            throw new EvaluatorException("Can't assign values in expressions, values must be assigned before or after expressions");
+        }
+
+        if (node.token().isNumber()) {
+            return Double.parseDouble(node.token().getKey());
         }
 
         Queue<Number> arguments = new Queue<>(new List<>());
