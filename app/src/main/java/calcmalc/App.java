@@ -12,6 +12,8 @@ import calcmalc.exceptions.LexerException;
 import calcmalc.logic.Evaluator;
 import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
+
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Scanner;
 
@@ -30,7 +32,7 @@ public class App {
         Scanner input = new Scanner(System.in);
         Lexer lexer = new Lexer();
         Evaluator evaluator = new Evaluator();
-
+        DecimalFormat df = new DecimalFormat("0.###");
         while (input.hasNextLine()) {
             String line = input.nextLine().replaceAll("\\s", "");
 
@@ -40,7 +42,11 @@ public class App {
                 Queue<ASTNode> nodes = new Queue<>(parser.parse().asList());
 
                 while (!nodes.isEmpty()) {
-                    System.out.println(evaluator.evaluate(nodes.dequeue()));
+                    if (nodes.peek().token().isAssignment()) {
+                        System.out.println(evaluator.evaluateAssignment(nodes.dequeue()));
+                    } else {
+                        System.out.println(df.format(evaluator.evaluate(nodes.dequeue())));
+                    }
                 }
             } catch (ParseException | LexerException | EvaluatorException e) {
                 System.out.println(e.getMessage());
