@@ -1,44 +1,45 @@
 package calcmalc.logic;
 
-import java.util.HashMap;
-
 import calcmalc.structures.ASTNode;
+import calcmalc.structures.HashTable;
 import calcmalc.structures.List;
 import calcmalc.structures.Queue;
 import calcmalc.exceptions.EvaluatorException;
 
 public class Evaluator {
-    private HashMap<String, Integer> config = new HashMap<>();
-    private HashMap<String, Double> symbolTable = new HashMap<>();
+    private HashTable<String, Integer> config = new HashTable<>();
+    private HashTable<String, Double> symbolTable = new HashTable<>();
 
     public Evaluator() { 
-        config.put("+", 2);
-        config.put("-", 2);
-        config.put("*", 2);
-        config.put("/", 2);
-        config.put("^", 2);
-        config.put("%", 2);
-        config.put("$", 1);
-        config.put("sqrt", 1);
-        config.put("log", 1);
-        config.put("ln", 1);
-        config.put("abs", 1);
-        config.put("cos", 1);
-        config.put("sin", 1);
-        config.put("tan", 1);
-        config.put("max", -1);
-        config.put("min", -1);
+        config.placeOrUpdate("+", 2);
+        config.placeOrUpdate("-", 2);
+        config.placeOrUpdate("*", 2);
+        config.placeOrUpdate("/", 2);
+        config.placeOrUpdate("^", 2);
+        config.placeOrUpdate("%", 2);
+        config.placeOrUpdate("$", 1);
+        config.placeOrUpdate("sqrt", 1);
+        config.placeOrUpdate("log", 1);
+        config.placeOrUpdate("ln", 1);
+        config.placeOrUpdate("abs", 1);
+        config.placeOrUpdate("cos", 1);
+        config.placeOrUpdate("sin", 1);
+        config.placeOrUpdate("tan", 1);
+        config.placeOrUpdate("max", -1);
+        config.placeOrUpdate("min", -1);
     }
 
     private void checkArguments(String symbol, int argumentsCount) {
-        if (config.containsKey(symbol) && config.get(symbol) != argumentsCount && config.get(symbol) != -1) {
+        Integer value = config.get(symbol);
+        if (value != null && value != argumentsCount && value != -1) {
             throw new IllegalArgumentException("Wrong number of arguments " + symbol);
         }
     }
 
     private Double checkSymbolTable(String token) throws EvaluatorException {
-        if (symbolTable.containsKey(token)) {
-            return symbolTable.get(token);
+        Double symbol = symbolTable.get(token);
+        if (symbol != null) {
+            return symbol;
         }
 
         throw new EvaluatorException("Unknown Symbol " + token);
@@ -68,7 +69,7 @@ public class Evaluator {
             case "log":
                 return Math.log(arguments.dequeue().doubleValue()) / Math.log(2);
             case "abs":
-                return Math.abs(arguments.dequeue().doubleValue());
+                return abs(arguments.dequeue().doubleValue());
             case "cos":
                 return Math.cos(arguments.dequeue().doubleValue());
             case "sin":
@@ -77,27 +78,39 @@ public class Evaluator {
                 return Math.tan(arguments.dequeue().doubleValue());
             case "max":
                 return arguments.size() > 1 ? 
-                    Math.max(arguments.dequeue().doubleValue(), evaluateFunction("max", arguments)) :
-                    Math.max(arguments.dequeue().doubleValue(), 0.0);
+                    max(arguments.dequeue().doubleValue(), evaluateFunction("max", arguments)) :
+                    max(arguments.dequeue().doubleValue(), 0.0);
             case "min":
                 return arguments.size() > 1 ?
-                    Math.min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments)) :
-                    Math.min(arguments.dequeue().doubleValue(), Double.MAX_VALUE);
+                    min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments)) :
+                    min(arguments.dequeue().doubleValue(), Double.MAX_VALUE);
             default:
                 return checkSymbolTable(token);
         }
     }
 
+    private double max(double n, double m) {
+        return n > m ? n : m;
+    }
+
+    private double min(double n, double m) {
+        return n < m ? n : m;
+    }
+
+    private double abs(double n) {
+        return n > 0 ? n : -n;
+    }
+
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
         ASTNode symbol = node.getChildren().getLast();
-        
-        if (!symbol.token().isSymbol()) {
-            throw new EvaluatorException("Can assign value to non-symbol " + symbol);
+
+        if (symbol == null) {
+            throw new EvaluatorException("Seems like you tried to assign value to non-symbol");
         }
 
         node.getChildren().remove(node.getChildren().size());
         Number value = evaluate(node.getChildren().get(0));
-        symbolTable.put(symbol.token().getKey(), value.doubleValue());
+        symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
 
         return "<assignment:" + symbol.token().getKey() + ">";
     }

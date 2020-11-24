@@ -1,6 +1,8 @@
 package calcmalc.logic;
 
 import org.junit.Test;
+
+import calcmalc.exceptions.EvaluatorException;
 import calcmalc.logic.types.Token;
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.Stack;
@@ -313,6 +315,16 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateAbsWithPositiveFunction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(100)")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        assertEquals((Double)100.0, evaluator.evaluate(nodeQue.dequeue()));
+    }
+
+    @Test
     public void testEvaluatePrecedence() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("-2%2*2+2^2")));
@@ -362,6 +374,30 @@ public class EvaluatorTest {
         Stack<ASTNode> nodes = parser.parse();
         Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
         Exception exception = assertThrows(Exception.class, () -> {
+            evaluator.evaluate(nodeQue.dequeue());
+        });
+    }
+
+    @Test
+    public void testEvaluateThrowsExceptionIfNonSymbolAssignment() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2=4:")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        Exception exception = assertThrows(EvaluatorException.class, () -> {
+            evaluator.evaluateAssignment(nodeQue.dequeue());
+        });
+    }
+
+    @Test
+    public void testEvaluateThrowsExceptionIfNonAssignmentInExpression() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2+x=4*2")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
+        Exception exception = assertThrows(EvaluatorException.class, () -> {
             evaluator.evaluate(nodeQue.dequeue());
         });
     }
