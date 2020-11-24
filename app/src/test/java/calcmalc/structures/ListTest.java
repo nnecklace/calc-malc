@@ -138,20 +138,45 @@ public class ListTest {
     }
 
     @Test
-    public void testIsFull() {
+    public void testSetInsertsValueAtIndex() {
         Listable<Integer> list = new List<>();
-        for (int i = 0; i < 10000000; i++) {
-            list.push(i);
-        }
+        list.set(2, 2);
+        assertEquals((Integer)2, list.get(2));
+    }
 
-        assertTrue(list.isFull());
+    @Test
+    public void testSetReplacesValueAtIndex() {
+        Listable<Integer> list = new List<>();
+        list.push(1);
+        list.push(5);
+        list.push(7);
+        assertEquals((Integer)7, list.get(2));
+        list.set(2, 2);
+        assertEquals((Integer)2, list.get(2));
+    }
 
-        Integer last = list.getLast();
+    @Test
+    public void testSetDeterminesNewSizeOfList() {
+        Listable<Integer> list = new List<>();
+        list.set(0, 1);
+        assertEquals(1, list.size());
+        list.set(5, 5);
+        assertEquals(6, list.size());
+    }
 
-        list.push(-1);
-        list.push(-2);
-        list.push(-3);
+    @Test
+    public void testSetGrowsTheListSize() {
+        Listable<Integer> list = new List<>();
+        list.set(10, 1);
+        assertEquals(16, list.getSpace());
+    }
 
-        assertEquals(last, list.getLast());
+    @Test
+    public void testSetThrowsOnIllegalIndex() {
+        Listable<Integer> list = new List<>();
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            list.set(-1, 2);
+        });
     }
 }

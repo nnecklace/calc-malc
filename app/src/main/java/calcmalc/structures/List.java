@@ -1,7 +1,5 @@
 package calcmalc.structures;
 
-import calcmalc.structures.Listable;
-
 /**
  * List data structure. This is the same as javas ArrayList
  * All operations are done in constant time O(1) apart from the grow function which is only called when the size of the list is a power of 2
@@ -11,14 +9,11 @@ public class List<T> implements Listable<T> {
     private T[] list;
     private int head;
     private int size;
-    private boolean isFull;
-    private static final int MAX_SIZE = 10000000;
 
     public List() {
-        size = 8;
+        size = 8; // start at 8, usually start at 1 but can be started on any other power of 2
         list = (T[]) new Object[size]; // should not be done, but Java doesn't support generic arrays
         head = 0;
-        isFull = false;
     }
 
     /**
@@ -32,6 +27,25 @@ public class List<T> implements Listable<T> {
         }
 
         return list[index];
+    }
+
+    /**
+     * Method for setting values at any index in the list
+     * @param index to be placed
+     * @param value to be inserted
+     */
+    public void set(int index, T value) {
+        if (index >= 0) {
+            if (index > size) {
+                grow(index);
+            }
+            list[index] = value;
+            if (index >= head) {
+                head = index + 1;
+            }
+        } else {
+            throw new IllegalArgumentException("Index out of range");
+        }
     }
     
     /**
@@ -81,10 +95,6 @@ public class List<T> implements Listable<T> {
      * @param element The element to push to the end of the list
      */
     public void push(T element) {
-        if (isFull) {
-            return;
-        }
-
         if (head == size) {
             grow();
         }
@@ -93,14 +103,18 @@ public class List<T> implements Listable<T> {
     }
 
     /**
-     * Method increases the size of the list by doubling it.
-     * Method creates a new list and copies the elements from the old list to the new list, and discards the old list.
+     * Method is same as {@link grow} but calls it with default parameter 
      */
     private void grow() {
-        if (size * 2 > MAX_SIZE) {
-            size = MAX_SIZE;
-            isFull = true;
-        } else {
+        grow(size + 1);
+    }
+
+    /**
+     * Method increases the size of the list by doubling it until it is larger than the new requested size.
+     * Method creates a new list and copies the elements from the old list to the new list, and discards the old list.
+     */
+    private void grow(int newSize) {
+        while (newSize > size) {
             size *= 2;
         }
 
@@ -111,15 +125,6 @@ public class List<T> implements Listable<T> {
         }
 
         list = copy;
-    }
-
-    /**
-     * Method getter for isFull property which indicates if list is completely full meaning used up all memory that it can use
-     * This could ideally be removed and let users set their own memory limits
-     * @return isFull property
-     */
-    public boolean isFull() {
-        return isFull;
     }
 
     /**
