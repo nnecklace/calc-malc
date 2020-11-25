@@ -28,12 +28,17 @@ public class App {
                + "\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         System.out.println(new App().getGreeting());
+        run();
+    }
+
+    public static void run() {
         Scanner input = new Scanner(System.in);
         Lexer lexer = new Lexer();
         Evaluator evaluator = new Evaluator();
         DecimalFormat df = new DecimalFormat("0.###");
+        String output = "";
         while (input.hasNextLine()) {
             String line = input.nextLine().replaceAll("\\s", "");
 
@@ -43,15 +48,17 @@ public class App {
                 Stack<ASTNode> nodes = parser.parse();
                 while (!nodes.isEmpty()) {
                     if (nodes.peek().token().isAssignment()) {
-                        System.out.println(evaluator.evaluateAssignment(nodes.pop()));
+                        output = evaluator.evaluateAssignment(nodes.pop());
                     } else {
-                        System.out.println(df.format(evaluator.evaluate(nodes.pop())));
+                        output = df.format(evaluator.evaluate(nodes.pop()));
                     }
                 }
-            } catch (ParseException | LexerException | EvaluatorException e) {
-                System.out.println(e.getMessage());
+            } catch (LexerException | ParseException | EvaluatorException e) {
+                System.err.println(e.getMessage());
             }
             System.out.println();
         }
+        // Only print the last result
+        System.out.println(output);
     }
 }

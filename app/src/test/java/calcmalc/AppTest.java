@@ -6,9 +6,87 @@ package calcmalc;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.text.ParseException;
+
+import org.junit.After;
+import org.junit.Before;
+
 public class AppTest {
-    @Test public void testAppHasAGreeting() {
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+    private final PrintStream originalErr = System.err;
+    private final InputStream originalIn = System.in;
+    
+    @Before
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
+    }
+    
+    @After
+    public void restoreStreams() {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+        System.setIn(originalIn);
+    }
+
+    @Test 
+    public void testAppHasAGreeting() {
         App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
+        ByteArrayInputStream in = new ByteArrayInputStream(classUnderTest.getGreeting().getBytes());
+        System.setIn(in);
+        classUnderTest.main(null);
+        assertNotNull("app should have a greeting", outContent.toString().trim());
+    }
+
+    @Test
+    public void testAssignmentIsPrinted() {
+        ByteArrayInputStream in = new ByteArrayInputStream("x=2:".getBytes());
+        System.setIn(in);
+        App.run();
+        assertEquals("<assignment:x>", outContent.toString().trim());
+    }
+
+    @Test
+    public void testExpressionResultIsPrinted() {
+        ByteArrayInputStream in = new ByteArrayInputStream("2+2+2".getBytes());
+        System.setIn(in);
+        App.run();
+        assertEquals("6", outContent.toString().trim());
+    }
+
+    @Test
+    public void testMultiLineExpressionResultIsPrinted() {
+        String expr = "x = 2 : \ny = 5 :\n2 * ( x + y )";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.run();
+
+        assertEquals("14", outContent.toString().trim());
+    }
+
+    @Test
+    public void testParseExceptionIsThrown() throws Exception {
+        String expr = "2 = x : x + 2";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.run();
+
+        assertEquals("Syntax error can't assign value to non-symbol", errContent.toString().trim());
+    }
+
+    @Test
+    public void testLexerExceptionIsThrown() throws Exception {
+        String expr = "2+2+2@*5";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.run();
+
+        assertEquals("Unknown character @ at position 6 in expression 2+2+2@*5\n2+2+2@*5\n     ^", errContent.toString().trim());
     }
 }
