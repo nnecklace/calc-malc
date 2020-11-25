@@ -24,10 +24,10 @@ public class Lexer {
                 } else {
                     tokens.push(new Operator(c));
                 }
-            } else if (c.matches("[0-9]")) { // only accept integers at the moment
+            } else if (c.matches("[.0-9]")) {
                 StringBuilder number = new StringBuilder();
                 number.append(c);
-                i = scan(expression, number, i, "[0-9]");
+                i = scan(expression, number, i, "[.0-9]");
                 tokens.push(new Numeric(number.toString()));
             } else if (c.matches("=")) {
                 tokens.push(new Assignment("="));

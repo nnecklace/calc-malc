@@ -19,6 +19,15 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseSimpleInputFloats() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("1.123+1.999")));
+        parser.parse();
+
+        assertEquals("1.1231.999+", parser.printTree());
+    }    
+    
+    @Test
     public void testParseShortMultipleOperators() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("2*2+6+4-10/2")));
@@ -38,6 +47,15 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseSimpleWithParensAndFloats() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2.9*(2.9999+2.123123)")));
+        parser.parse();
+
+        assertEquals("2.92.99992.123123+*", parser.printTree());
+    }
+
+    @Test
     public void testParseManyOperatorsAndOneParen() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("2*(2+2+6+8-10)/3*2")));
@@ -49,9 +67,9 @@ public class ParserTest {
     @Test
     public void testDeeplyNestedParens() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
-        Parser parser = new Parser(new Queue<Token>(lexer.lex("2*(2*(2+2)*(1+(4+4*(10+1)))+(10*(5+(2+3))))")));
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2*(2*(2+2)*(1+(4+4*(10.919+1)))+(10*(5+(2+3))))")));
         parser.parse();
-        assertEquals("2222+*144101+*++*10523++*+*", parser.printTree());
+        assertEquals("2222+*14410.9191+*++*10523++*+*", parser.printTree());
     }
 
     @Test

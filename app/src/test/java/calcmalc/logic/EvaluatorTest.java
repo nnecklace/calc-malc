@@ -246,6 +246,69 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateFloatAddition() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2+2.2")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(4.2), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateFloatSubtraction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("6.2-2.2")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(4.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMaxWithFloats() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("max(6.2,2.2,1.999,.25,0.1,10.10)")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(10.10), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMaxWithFloatsAndInts() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("max(6.2,2,1.999,.25,100,12,100.1)")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(100.1), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMinWithFloatsAndInts() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("min(6.2,2,1.999,.25,100,12,100.1)")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(0.25), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMinWithNegative() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("min(-100)")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(-100.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMaxWithNoArguments() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("max()")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(0.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
     public void testEvaluateModuloOperator() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("8%2")));

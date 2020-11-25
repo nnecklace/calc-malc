@@ -77,13 +77,21 @@ public class Evaluator {
             case "tan":
                 return Math.tan(arguments.dequeue().doubleValue());
             case "max":
-                return arguments.size() > 1 ? 
-                    max(arguments.dequeue().doubleValue(), evaluateFunction("max", arguments)) :
-                    max(arguments.dequeue().doubleValue(), 0.0);
+                if (arguments.size() == 0) {
+                    return 0.0;
+                } else if (arguments.size() == 1) {
+                    return arguments.dequeue().doubleValue();
+                } else {
+                    return max(arguments.dequeue().doubleValue(), evaluateFunction("max", arguments));
+                }
             case "min":
-                return arguments.size() > 1 ?
-                    min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments)) :
-                    min(arguments.dequeue().doubleValue(), Double.MAX_VALUE);
+                if (arguments.size() == 0) {
+                    return 0.0;
+                } else if (arguments.size() == 1) {
+                    return arguments.dequeue().doubleValue();
+                } else {
+                    return min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments));
+                }
             default:
                 return checkSymbolTable(token);
         }
