@@ -240,6 +240,24 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseThrowsExceptionOnIllegalAssignment() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("2=5:")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
+    public void testParseThrowsExceptionOnIllegalAssignment2() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("+=5:")));
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse();
+        });
+    }
+
+    @Test
     public void testParseInputOfParens() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("()")));

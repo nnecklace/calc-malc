@@ -50,17 +50,17 @@ public class Parser {
                 openingParenthesisCounter++;
             }
 
-            if (token.getKey().matches(end) && !end.equals("\\)")) {
-                break;
-            }
-
             tokens.dequeue();
             shuntingYardParse(token);
 
             // make sure to process the last closing parenthesis.
             // when processing function parameters, we process up until and including the last parenthesis
             // normally we only process until the last token that matches the given terminator (end) string
-            if (token.getKey().matches(end) && end.equals("\\)")) {
+            if (token.getKey().matches(end)) {
+                if (!end.equals("\\)")) {
+                    break;
+                }
+
                 if (openingParenthesisCounter <= 1) {
                     break;
                 } else {
@@ -111,15 +111,17 @@ public class Parser {
             Parser parser = new Parser(tokens);
             Stack<ASTNode> children = new Stack<>(new List<>()); 
 
-            if (!tokens.isEmpty()) {
-                if (tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
-                    children = parser.parseUntil("\\)");
-                }
+            if (!tokens.isEmpty() && tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
+                children = parser.parseUntil("\\)");
             }
 
             root.setChildren(children.asList());
             functions.push(root);
         } else if (token.isAssignment()) {
+            if (operators.isEmpty() || !operators.peek().isSymbol()) {
+                throw new ParseException("Syntax error can't assign value to non-symbol ", 0);
+            }
+
             operators.pop();
             operators.push(token);
 
@@ -194,12 +196,13 @@ public class Parser {
      */
     public String printTree() {
         String output = "";
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        while (!nodeQue.isEmpty()) {
-            ASTNode root = nodeQue.dequeue();
+
+        while (!nodes.isEmpty()) {
+            ASTNode root = nodes.pop();
             output += dfs(root);
             System.out.println();
         }
+
         return output;
     } 
 

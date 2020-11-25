@@ -6,6 +6,7 @@ package calcmalc;
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.Listable;
 import calcmalc.structures.Queue;
+import calcmalc.structures.Stack;
 import calcmalc.logic.types.Token;
 import calcmalc.exceptions.EvaluatorException;
 import calcmalc.exceptions.LexerException;
@@ -39,13 +40,12 @@ public class App {
             try {
                 Listable<Token> tokens = lexer.lex(line);
                 Parser parser = new Parser(new Queue<>(tokens));
-                Queue<ASTNode> nodes = new Queue<>(parser.parse().asList());
-
+                Stack<ASTNode> nodes = parser.parse();
                 while (!nodes.isEmpty()) {
                     if (nodes.peek().token().isAssignment()) {
-                        System.out.println(evaluator.evaluateAssignment(nodes.dequeue()));
+                        System.out.println(evaluator.evaluateAssignment(nodes.pop()));
                     } else {
-                        System.out.println(df.format(evaluator.evaluate(nodes.dequeue())));
+                        System.out.println(df.format(evaluator.evaluate(nodes.pop())));
                     }
                 }
             } catch (ParseException | LexerException | EvaluatorException e) {

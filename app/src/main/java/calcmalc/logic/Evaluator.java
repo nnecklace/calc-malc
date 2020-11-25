@@ -104,10 +104,6 @@ public class Evaluator {
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
         ASTNode symbol = node.getChildren().getLast();
 
-        if (symbol == null) {
-            throw new EvaluatorException("Seems like you tried to assign value to non-symbol");
-        }
-
         node.getChildren().remove(node.getChildren().size());
         Number value = evaluate(node.getChildren().get(0));
         symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());

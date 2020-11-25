@@ -161,9 +161,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:2+x")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)4.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)4.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -172,10 +171,9 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:y=5:2+x+y")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals("<assignment:y>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)9.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals("<assignment:y>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)9.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -184,9 +182,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=4:sqrt(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)2.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)2.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -195,9 +192,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:ln(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)0.6931471805599453, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)0.6931471805599453, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -206,9 +202,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:log(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)1.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)1.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -217,9 +212,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:sin(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)0.9092974268256817, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)0.9092974268256817, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -228,9 +222,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:cos(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)(-0.4161468365471424), evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)(-0.4161468365471424), evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -239,9 +232,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:tan(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodeQue.dequeue()));
-        assertEquals((Double)(-2.185039863261519), evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals("<assignment:x>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)(-2.185039863261519), evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -250,8 +242,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("2^8")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)(256.0), evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)(256.0), evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -260,8 +251,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("8%2")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)0.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)0.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -270,8 +260,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("max(10,50)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)50.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)50.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -280,8 +269,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("max(10,50,100,250,2,1,-100)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)250.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)250.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -290,8 +278,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("min(2,7)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)2.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)2.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -300,8 +287,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("min(2,7,20,100,2,1,-100,0,200)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)(-100.0), evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)(-100.0), evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -310,8 +296,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(-100+(-100))")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)200.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)200.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -320,8 +305,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(100)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)100.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)100.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -330,8 +314,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("-2%2*2+2^2")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)4.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)4.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -340,8 +323,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("3*2^2")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)12.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)12.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -350,8 +332,7 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(-100+(-100))")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        assertEquals((Double)200.0, evaluator.evaluate(nodeQue.dequeue()));
+        assertEquals((Double)200.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -360,9 +341,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(x)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
         Exception exception = assertThrows(Exception.class, () -> {
-            evaluator.evaluate(nodeQue.dequeue());
+            evaluator.evaluate(nodes.pop());
         });
     }
 
@@ -372,21 +352,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("abs(2,2)")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
         Exception exception = assertThrows(Exception.class, () -> {
-            evaluator.evaluate(nodeQue.dequeue());
-        });
-    }
-
-    @Test
-    public void testEvaluateThrowsExceptionIfNonSymbolAssignment() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser(new Queue<Token>(lexer.lex("2=4:")));
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
-        Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluateAssignment(nodeQue.dequeue());
+            evaluator.evaluate(nodes.pop());
         });
     }
 
@@ -396,9 +363,8 @@ public class EvaluatorTest {
         Parser parser = new Parser(new Queue<Token>(lexer.lex("2+x=4*2")));
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse();
-        Queue<ASTNode> nodeQue = new Queue<>(nodes.asList());
         Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluate(nodeQue.dequeue());
+            evaluator.evaluate(nodes.pop());
         });
     }
 }
