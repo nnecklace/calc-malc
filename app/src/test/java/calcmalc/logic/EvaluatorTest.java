@@ -309,6 +309,15 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateMinWithNoArguments() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("min()")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals((Double)(0.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
     public void testEvaluateModuloOperator() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("8%2")));

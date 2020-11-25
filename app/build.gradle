@@ -54,6 +54,12 @@ test {
   }
 }
 
+task repl(type: JavaExec) {
+  standardInput = System.in
+  main = "calcmalc.App"
+  classpath = sourceSets.main.runtimeClasspath
+  args = ["repl"]
+}
 
 application {
     // Define the main class for the application.

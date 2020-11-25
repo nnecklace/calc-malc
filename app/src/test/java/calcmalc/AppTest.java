@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.text.ParseException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,19 +36,35 @@ public class AppTest {
     }
 
     @Test 
-    public void testAppHasAGreeting() {
+    public void testAppHasAGreeting() throws IOException {
         App classUnderTest = new App();
         ByteArrayInputStream in = new ByteArrayInputStream(classUnderTest.getGreeting().getBytes());
         System.setIn(in);
-        classUnderTest.main(null);
+        classUnderTest.main(new String[0]);
         assertNotNull("app should have a greeting", outContent.toString().trim());
+    }
+
+    @Test
+    public void testThatReplStartsWithReplCommand() throws IOException {
+        App classUnderTest = new App();
+        ByteArrayInputStream in = new ByteArrayInputStream("2+2".getBytes());
+        System.setIn(in);
+        classUnderTest.main(new String[]{"repl"});
+        assertTrue(outContent.toString().contains("4"));
+    }
+
+    @Test
+    public void testMultiLineExpressionResultIsPrinted() throws IOException {
+        App classUnderTest = new App();
+        classUnderTest.main(new String[]{"test_input_2.txt"});
+        assertEquals("14", outContent.toString().trim());
     }
 
     @Test
     public void testAssignmentIsPrinted() {
         ByteArrayInputStream in = new ByteArrayInputStream("x=2:".getBytes());
         System.setIn(in);
-        App.run();
+        App.repl();
         assertEquals("<assignment:x>", outContent.toString().trim());
     }
 
@@ -56,18 +72,8 @@ public class AppTest {
     public void testExpressionResultIsPrinted() {
         ByteArrayInputStream in = new ByteArrayInputStream("2+2+2".getBytes());
         System.setIn(in);
-        App.run();
+        App.repl();
         assertEquals("6", outContent.toString().trim());
-    }
-
-    @Test
-    public void testMultiLineExpressionResultIsPrinted() {
-        String expr = "x = 2 : \ny = 5 :\n2 * ( x + y )";
-        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
-        System.setIn(in);
-        App.run();
-
-        assertEquals("14", outContent.toString().trim());
     }
 
     @Test
@@ -75,7 +81,7 @@ public class AppTest {
         String expr = "2 = x : x + 2";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
         System.setIn(in);
-        App.run();
+        App.repl();
 
         assertEquals("Syntax error can't assign value to non-symbol", errContent.toString().trim());
     }
@@ -85,8 +91,28 @@ public class AppTest {
         String expr = "2+2+2@*5";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
         System.setIn(in);
-        App.run();
+        App.repl();
 
         assertEquals("Unknown character @ at position 6 in expression 2+2+2@*5\n2+2+2@*5\n     ^", errContent.toString().trim());
+    }
+
+    @Test
+    public void testFormatOutPutToInteger() {
+        String expr = "2.5 + 2.5";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("5", outContent.toString().trim());
+    }
+
+    @Test
+    public void testFormatOutPutToDouble() {
+        String expr = "2.5 + 2.1";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("4.6", outContent.toString().trim());
     }
 }

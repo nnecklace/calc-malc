@@ -14,51 +14,101 @@ import calcmalc.logic.Evaluator;
 import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
 
-import java.text.DecimalFormat;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Scanner;
 
 public class App {
+    private static Evaluator evaluator = new Evaluator();
+    private static Lexer lexer = new Lexer();
+
+    /**
+     * Mehthod renders ascii greeting message
+     */
     public String getGreeting() {
-        return      "  _____      _        __  __       _      \n"
-                 + "/ _____|    | |      |  \\/  |     | |     \n"
-               + "| |     __ _| | ___  | \\  / | __ _| | ___  \n"
-               + "| |    / _` | |/ __| | |\\/| |/ _` | |/ __| \n"
-               + "| |___| (_| | | (__  | |  | | (_| | | (__  \n"
-               + "\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
+        return "  _____      _        __  __       _      \n" + "/ _____|    | |      |  \\/  |     | |     \n"
+                + "| |     __ _| | ___  | \\  / | __ _| | ___  \n" + "| |    / _` | |/ __| | |\\/| |/ _` | |/ __| \n"
+                + "| |___| (_| | | (__  | |  | | (_| | | (__  \n" + "\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
-        run();
-    }
-
-    public static void run() {
-        Scanner input = new Scanner(System.in);
-        Lexer lexer = new Lexer();
-        Evaluator evaluator = new Evaluator();
-        DecimalFormat df = new DecimalFormat("0.###");
-        String output = "";
-        while (input.hasNextLine()) {
-            String line = input.nextLine().replaceAll("\\s", "");
-
-            try {
-                Listable<Token> tokens = lexer.lex(line);
-                Parser parser = new Parser(new Queue<>(tokens));
-                Stack<ASTNode> nodes = parser.parse();
-                while (!nodes.isEmpty()) {
-                    if (nodes.peek().token().isAssignment()) {
-                        output = evaluator.evaluateAssignment(nodes.pop());
-                    } else {
-                        output = df.format(evaluator.evaluate(nodes.pop()));
-                    }
-                }
-            } catch (LexerException | ParseException | EvaluatorException e) {
-                System.err.println(e.getMessage());
+    /**
+     * Main entry point for the algorithm
+     * Accepts either an argument of repl, which starts the repl
+     * Or file name, which contains a valid input to evaluate
+     */
+    public static void main(String[] args) throws IOException {
+        if (args.length > 0) {
+            if ("repl".equals(args[0].trim())) {
+                System.out.println(new App().getGreeting());
+                repl();
+            } else {
+                read(Paths.get(args[0]));
             }
-            System.out.println();
+        } 
+    }
+
+    /**
+     * Formats output according to the number passed in. 
+     * If number can be represented as an integer output an integer
+     * else output as float
+     * @param n the number to format
+     * @return formated number
+     */
+    public static String format(Number n) {
+        if (n.doubleValue() % 1 == 0) {
+            return "" + (n.longValue());
         }
-        // Only print the last result
-        System.out.println(output);
+
+        return "" + n.doubleValue();
+    }
+
+    /**
+     * Reads an inteprets the file passed to calcmalc
+     * @param file path to the file
+     * @throws IOException
+     */
+    public static void read(Path file) throws IOException {
+        String content = Files.readString(file, StandardCharsets.UTF_8);
+        interpret(content.replaceAll("\\s", ""));
+    }
+
+    /**
+     * Interprets and evaluates one line at a time and outputs a value once no lines remain
+     * @param input the line to interpret
+     */
+    private static void interpret(String input) {
+        String output = "";
+        try {
+            Listable<Token> tokens = lexer.lex(input);
+            Parser parser = new Parser(new Queue<>(tokens));
+            Stack<ASTNode> nodes = parser.parse();
+            while (!nodes.isEmpty()) {
+                if (nodes.peek().token().isAssignment()) {
+                    output = evaluator.evaluateAssignment(nodes.pop());
+                } else {
+                    output = format(evaluator.evaluate(nodes.pop()));
+                }
+            }
+            System.out.println(output);
+        } catch (LexerException | ParseException | EvaluatorException e) {
+            System.err.println(e.getMessage());
+        }
+        System.out.println();
+    }
+
+    /**
+     * Method starts the repl
+     * Repl runs as long as user wants it too
+     */
+    public static void repl() {
+        Scanner input = new Scanner(System.in);
+
+        while (input.hasNextLine()) {
+            interpret(input.nextLine().replaceAll("\\s", ""));
+        }
     }
 }
