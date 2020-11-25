@@ -35,7 +35,11 @@ gradle 6.7
 
 ## Commands
 
-Run the project `./gradlew run`
+Run the project with a test file `./gradlew run --args='test_input_2.txt'`
+
+Make sure all the test files are located in the app directory!
+
+Run the repl, i.e., interactive environment `./gradlew repl`
 
 Run unit tests `./gradlew test`
 
