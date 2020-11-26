@@ -54,6 +54,20 @@ public class StackTest {
     }
 
     @Test
+    public void testStackSizeIsDynamic() {
+        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        assertEquals(3, stack.size());
+        stack.pop();
+        stack.pop();
+        assertEquals(1, stack.size());
+        stack.push(5);
+        assertEquals(2, stack.size());
+    }
+
+    @Test
     public void testStackPoppedEmpty() {
         Stack<Integer> stack = new Stack<>(new List<Integer>());
         assertNull(stack.pop());

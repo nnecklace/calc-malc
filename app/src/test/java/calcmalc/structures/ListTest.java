@@ -124,6 +124,23 @@ public class ListTest {
     }
 
     @Test
+    public void testListSetToPowerOfTwo() {
+        Listable<Integer> list = new List<>();
+        list.push(1); // head = 0
+        list.push(1); // head = 1
+        list.push(1); // hjead = 2
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.set(8,2);
+        assertEquals(9, list.size());
+        assertEquals((Integer)2, list.get(8));
+        assertEquals(16, list.getSpace());
+    }
+
+    @Test
     public void testEnsureSizeStaysSameEvenAfterRemoving() {
         Listable<Integer> list = new List<>();
         list.push(1);
