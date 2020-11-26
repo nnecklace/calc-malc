@@ -35,31 +35,18 @@ public class List<T> implements Listable<T> {
      * @param value to be inserted
      */
     public void set(int index, T value) {
-        if (index >= 0) {
-            if (index > size) {
-                grow(index);
-            }
+        if (index >= 0 && index <= head) {
             list[index] = value;
-            if (index >= head) {
-                head = index + 1;
+
+            if (index == head) {
+                head++; 
             }
+
         } else {
             throw new IllegalArgumentException("Index out of range");
         }
     }
     
-    /**
-     * Method gets the last element from the list
-     * @return T the last element in the list or null if the list is empty
-     */
-    public T getLast() {
-        if (head == 0) {
-            return null;
-        }
-
-        return list[head - 1];
-    }
-
     /**
      * Method getter for size property
      * @return size property
@@ -77,15 +64,21 @@ public class List<T> implements Listable<T> {
     }
 
     /**
-     * Method "removes" element at the given index. Removes implies that the element will be null
+     * Method removes element at the given index and creates new array 
      * @param index index of the element to be removed
      */
-    public void remove(int index) {
-        if (index < size && index >= 0) {
-            list[index] = null;
-            if (index == head) {
-                head--;
+    public T remove(int index) {
+        if (index < head && index >= 0) {
+            T el = list[index];
+            int shiftSize = head - index - 1;
+            if (shiftSize > 0) {
+                System.arraycopy(list, index + 1, list, index, shiftSize);
             }
+            list[--head] = null;
+
+            return el;
+        } else {
+            throw new IllegalArgumentException("Index out of range");
         }
     }
 
@@ -103,20 +96,11 @@ public class List<T> implements Listable<T> {
     }
 
     /**
-     * Method is same as {@link grow} but calls it with default parameter 
-     */
-    private void grow() {
-        grow(size + 1);
-    }
-
-    /**
      * Method increases the size of the list by doubling it until it is larger than the new requested size.
      * Method creates a new list and copies the elements from the old list to the new list, and discards the old list.
      */
-    private void grow(int newSize) {
-        while (newSize > size) {
-            size *= 2;
-        }
+    private void grow() {
+        size *= 2;
 
         T[] copy = (T[]) new Object[size];
 
@@ -129,7 +113,7 @@ public class List<T> implements Listable<T> {
 
     /**
      * Boolean function to check wheather lis is empty or not
-     * @return true if head is at position 0 meaning that the list is empty
+     * @return true if there are no elements in the list
      */
     public boolean isEmpty() {
         return head == 0;

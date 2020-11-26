@@ -47,9 +47,9 @@ public class QueueTest {
         Queue<Integer> queue = new Queue<>(new List<Integer>());
         queue.enqueue(1);
         queue.enqueue(2);
-        queue.enqueue(3);
+        queue.enqueue(3);// h = 3
         assertEquals(3, queue.size());
-        queue.dequeue();
+        queue.dequeue(); // h =3 t =1
         assertEquals(2, queue.size());
         queue.enqueue(3);
         queue.enqueue(3);

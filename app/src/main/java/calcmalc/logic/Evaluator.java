@@ -110,9 +110,10 @@ public class Evaluator {
     }
 
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
-        ASTNode symbol = node.getChildren().getLast();
+        int lastIndex = node.getChildren().size() - 1;
+        ASTNode symbol = node.getChildren().get(lastIndex);
 
-        node.getChildren().remove(node.getChildren().size());
+        node.getChildren().remove(lastIndex);
         Number value = evaluate(node.getChildren().get(0));
         symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
 
@@ -131,8 +132,9 @@ public class Evaluator {
         Queue<Number> arguments = new Queue<>(new List<>());
         
         while (!node.getChildren().isEmpty()) {
-            arguments.enqueue(evaluate(node.getChildren().getLast()));
-            node.getChildren().remove(node.getChildren().size());
+            int lastIndex = node.getChildren().size() - 1;
+            arguments.enqueue(evaluate(node.getChildren().get(lastIndex)));
+            node.getChildren().remove(lastIndex);
         }
 
         return evaluateFunction(node.token().getKey(), arguments);

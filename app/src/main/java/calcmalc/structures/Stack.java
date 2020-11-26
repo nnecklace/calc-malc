@@ -25,14 +25,16 @@ public class Stack<T> {
      * @return the popped or top element
      */
     public T pop() {
-        T top = list.getLast();
+        int head = list.size() - 1;
 
-        if (top == null) {
+        if (head < 0) {
             return null;
         }
 
-        int head = list.size();
+        T top = list.get(head);
+
         list.remove(head);
+
         return top;
     }
 
@@ -41,7 +43,7 @@ public class Stack<T> {
      * @return T the top element or null if stack is empty
      */
     public T peek() {
-        return list.getLast();
+        return list.get(list.size() - 1);
     }
 
     public Listable<T> asList() {
@@ -53,6 +55,6 @@ public class Stack<T> {
      * @return true if empty, otherwise false
      */
     public boolean isEmpty() {
-        return list.getLast() == null;
+        return list.isEmpty();
     }
 }

@@ -5,8 +5,7 @@ public interface Listable<T> {
     public void set(int index, T value);
     public int size();
     public int getSpace();
-    public T getLast();
     public void push(T element);
-    public void remove(int index);
+    public T remove(int index);
     public boolean isEmpty();
 }

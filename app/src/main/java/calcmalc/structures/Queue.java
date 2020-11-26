@@ -31,7 +31,7 @@ public class Queue<T> {
     }
 
     /**
-     * Method pulls element from the end of the queue. The element will also be removed when pulled
+     * Method pulls element from the end of the queue. The element is not removed from the underlying list
      * @return T the generic element at the end of the queue or null
      */
     public T dequeue() {
@@ -40,8 +40,9 @@ public class Queue<T> {
         }
 
         T rear = list.get(tail);
-        list.remove(tail);
+
         tail++;
+
         return rear;
     }
 

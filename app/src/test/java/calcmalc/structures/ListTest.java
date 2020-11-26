@@ -54,64 +54,20 @@ public class ListTest {
     }
 
     @Test
-    public void testGetLastAlwaysGetsLatestEntry() {
-        Listable<Integer> list = new List<>();
-        Random r = new Random(1337);
-        for (int i = 0; i < 1e6; ++i) {
-            list.push(r.nextInt(500));
-        }
-
-        Integer last = -1;
-
-        list.push(last);
-
-        assertEquals(list.getLast(), last);
-
-        for (int i = 0; i < 1e4; ++i) {
-            list.push(r.nextInt(100));
-        }
-
-        last = -100;
-
-        list.push(last);
-
-        assertEquals(list.getLast(), last);
-    }
-
-    @Test
-    public void testRemoveElementsFromList() {
-        Listable<Integer> list = new List<>();
-        Random r = new Random(1337);
-        for (int i = 0; i < 1e6; ++i) {
-            list.push(r.nextInt(500));
-        }
-        ArrayList<Integer> indexes = new ArrayList<>();
-
-        for (int i = 1; i <= 100; ++i) {
-            indexes.add(r.nextInt(1000000));
-        }
-
-        for (Integer i : indexes) {
-            assertNotNull(list.get(i));
-        }
-
-        for (Integer i : indexes) {
-            list.remove(i);
-        }
-
-        for (Integer i : indexes) {
-            assertNull(list.get(i));
-        }
-    }
-
-    @Test
     public void testRemoveElementAtIncorrectIndex() {
         Listable<Integer> list = new List<>();
-        assertEquals(list.size(), 0);
-        list.remove(-1);
-        assertEquals(list.size(), 0);
-        list.remove(8);
-        assertEquals(list.size(), 0);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            list.remove(-1);
+        });
+    }
+
+    @Test
+    public void testRemoveElementAtIncorrectIndex2() {
+        Listable<Integer> list = new List<>();
+        list.push(1);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            list.remove(1);
+        });
     }
 
     @Test
@@ -132,16 +88,10 @@ public class ListTest {
     }
 
     @Test
-    public void testGetLastOnEmptyList() {
-        Listable<Integer> list = new List<>();
-        assertNull(list.getLast());
-    }
-
-    @Test
     public void testSetInsertsValueAtIndex() {
         Listable<Integer> list = new List<>();
-        list.set(2, 2);
-        assertEquals((Integer)2, list.get(2));
+        list.set(0, 2);
+        assertEquals((Integer)2, list.get(0));
     }
 
     @Test
@@ -156,18 +106,45 @@ public class ListTest {
     }
 
     @Test
-    public void testSetDeterminesNewSizeOfList() {
+    public void testListShouldBeEmptyWhenRemoingInReverse() {
         Listable<Integer> list = new List<>();
-        list.set(0, 1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        assertEquals(4, list.size());
+        list.remove(0);
+        assertEquals(3, list.size());
+        list.remove(1);
+        assertEquals(2, list.size());
+        list.remove(1);
         assertEquals(1, list.size());
-        list.set(5, 5);
-        assertEquals(6, list.size());
+        list.remove(0);
+        assertEquals(0, list.size());
     }
 
     @Test
-    public void testSetGrowsTheListSize() {
+    public void testEnsureSizeStaysSameEvenAfterRemoving() {
         Listable<Integer> list = new List<>();
-        list.set(10, 1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        list.push(1);
+        assertEquals(16, list.getSpace());
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
+        list.remove(0);
         assertEquals(16, list.getSpace());
     }
 
@@ -177,6 +154,17 @@ public class ListTest {
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             list.set(-1, 2);
+        });
+    }
+
+    @Test
+    public void testSetThrowsOnIllegalIndex2() {
+        Listable<Integer> list = new List<>();
+
+        list.push(1);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            list.set(2, 2);
         });
     }
 }

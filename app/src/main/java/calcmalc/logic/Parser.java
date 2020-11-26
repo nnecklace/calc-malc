@@ -219,8 +219,9 @@ public class Parser {
         String branches = "";
         
         while (!node.getChildren().isEmpty()) {
-            branches += dfs(node.getChildren().getLast());
-            node.getChildren().remove(node.getChildren().size());
+            int lastIndex = node.getChildren().size() - 1;
+            branches += dfs(node.getChildren().get(lastIndex));
+            node.getChildren().remove(lastIndex);
         }
 
         return (branches += node.token().getKey());
