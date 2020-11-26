@@ -40,7 +40,7 @@ return tokens
 The code is a bit ugly looking at the moment, the `readUntil`, or `scan` as it is called in the project, is a bit ulgy and probably needs to be refactored at some point. Other than that, the lexer should be quite clear and easy to understand. One thing to notice in the lexer is the use of the $ symbol. In mathematics some operations can be made unarymeaning there is only one argumnent. In this case CalcMalc recognises inputs like `-1+1` where `-1` is a ununaryrator. unarunary will be turned into a $ symbol.
 
 
-### Parser
+### Parser
 
 Time complexity: `O(n)` where n is the size of the input.
 Space complexity: `O(n)` where n is the size of the input.
