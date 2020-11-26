@@ -26,6 +26,10 @@ public class Queue<T> {
         head++;
     }
 
+    /**
+     * Checks the next element in the queue to dequeue
+     * @return the next element in the queue
+     */
     public T peek() {
         return list.get(tail);
     }
@@ -39,11 +43,7 @@ public class Queue<T> {
             return null;
         }
 
-        T rear = list.get(tail);
-
-        tail++;
-
-        return rear;
+        return list.get(tail++);
     }
 
     /**

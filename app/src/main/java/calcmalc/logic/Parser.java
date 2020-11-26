@@ -115,7 +115,7 @@ public class Parser {
                 children = parser.parseUntil("\\)");
             }
 
-            root.setChildren(children.asList());
+            root.setChildren(children);
             functions.push(root);
         } else if (token.isAssignment()) {
             if (operators.isEmpty() || !operators.peek().isSymbol()) {
@@ -129,7 +129,7 @@ public class Parser {
             Parser parser = new Parser(tokens);
             Stack<ASTNode> children = parser.parseUntil(":");
 
-            root.setChildren(children.asList());
+            root.setChildren(children);
             root.addChild(functions.pop());
 
             functions.push(root);
@@ -178,11 +178,13 @@ public class Parser {
                 node.addChild(nodes.pop());
             } else {
                 if (!nodes.isEmpty()) {
-                    node.addChild(nodes.pop());
+                    ASTNode c = nodes.pop();
+                    node.addChild(c);
                 }
 
                 if (!nodes.isEmpty()) {
-                    node.addChild(nodes.pop());
+                    ASTNode c = nodes.pop();
+                    node.addChild(c);
                 }
             }
 
@@ -219,9 +221,7 @@ public class Parser {
         String branches = "";
         
         while (!node.getChildren().isEmpty()) {
-            int lastIndex = node.getChildren().size() - 1;
-            branches += dfs(node.getChildren().get(lastIndex));
-            node.getChildren().remove(lastIndex);
+            branches += dfs(node.getChildren().pop());
         }
 
         return (branches += node.token().getKey());

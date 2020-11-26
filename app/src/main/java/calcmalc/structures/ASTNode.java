@@ -4,11 +4,11 @@ import calcmalc.logic.types.Token;
 
 public class ASTNode {
     private Token token;
-    private Listable<ASTNode> children;
+    private Stack<ASTNode> children;
 
     public ASTNode(Token token) {
         this.token = token;
-        this.children = new List<>();
+        this.children = new Stack<>(new List<>());
     }
 
     /**
@@ -31,7 +31,7 @@ public class ASTNode {
      * Setter for children property
      * @param children the children of this node
      */
-    public void setChildren(Listable<ASTNode> children) {
+    public void setChildren(Stack<ASTNode> children) {
         this.children = children;
     }
 
@@ -39,7 +39,7 @@ public class ASTNode {
      * Getter for the children property
      * @return the nodes current children
      */
-    public Listable<ASTNode> getChildren() {
+    public Stack<ASTNode> getChildren() {
         return children;
     }
 }

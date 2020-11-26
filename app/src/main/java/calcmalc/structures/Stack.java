@@ -7,9 +7,11 @@ package calcmalc.structures;
  */
 public class Stack<T> {
     private Listable<T> list;
+    private int top;
 
     public Stack(Listable<T> list) {
         this.list = list;
+        this.top = 0;
     }
 
     /**
@@ -17,7 +19,7 @@ public class Stack<T> {
      * @param element to be pushed onto the top
      */
     public void push(T element) {
-        list.push(element);
+        list.set(top++, element);
     }
 
     /**
@@ -25,17 +27,11 @@ public class Stack<T> {
      * @return the popped or top element
      */
     public T pop() {
-        int head = list.size() - 1;
-
-        if (head < 0) {
+        if (top == 0) {
             return null;
         }
 
-        T top = list.get(head);
-
-        list.remove(head);
-
-        return top;
+        return list.get(--top);
     }
 
     /**
@@ -43,11 +39,7 @@ public class Stack<T> {
      * @return T the top element or null if stack is empty
      */
     public T peek() {
-        return list.get(list.size() - 1);
-    }
-
-    public Listable<T> asList() {
-        return list;
+        return list.get(top - 1);
     }
 
     /**
@@ -55,6 +47,14 @@ public class Stack<T> {
      * @return true if empty, otherwise false
      */
     public boolean isEmpty() {
-        return list.isEmpty();
+        return top == 0;
+    }
+
+    /**
+     * Method returns top pointer of the stack
+     * @return the current top index of the stack
+     */
+    public int size() {
+        return top;
     }
 }

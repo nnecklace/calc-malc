@@ -36,12 +36,14 @@ public class List<T> implements Listable<T> {
      */
     public void set(int index, T value) {
         if (index >= 0 && index <= head) {
-            list[index] = value;
-
             if (index == head) {
+                if (index == size) {
+                    grow();
+                }
                 head++; 
             }
 
+            list[index] = value;
         } else {
             throw new IllegalArgumentException("Index out of range");
         }
@@ -64,6 +66,7 @@ public class List<T> implements Listable<T> {
     }
 
     /**
+     * TODO: Check if method is needed
      * Method removes element at the given index and creates new array 
      * @param index index of the element to be removed
      */
