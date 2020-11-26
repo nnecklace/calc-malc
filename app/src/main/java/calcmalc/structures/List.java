@@ -95,7 +95,7 @@ public class List<T> implements Listable<T> {
      * @param element The element to push to the end of the list
      */
     public void push(T element) {
-        if (head == size) {
+        if ((head + 1) == size) {
             grow();
         }
 
