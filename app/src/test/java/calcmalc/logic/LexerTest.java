@@ -94,6 +94,21 @@ public class LexerTest {
         assertTrue(tokens.get(3).isEmpty());
     }
 
+    @Test 
+    public void testLexingLongVariableChain() throws LexerException {
+        Lexer lexer = new Lexer();
+        Listable<Token> tokens = lexer.lex("a=1:b=2:c=3:d=4:e=5:f=6:g=7:h=8:i=9:");
+        assertEquals("a", tokens.get(0).getKey());
+        assertEquals("b", tokens.get(4).getKey());
+        assertEquals("c", tokens.get(8).getKey());
+        assertEquals("d", tokens.get(12).getKey());
+        assertEquals("e", tokens.get(16).getKey());
+        assertEquals("f", tokens.get(20).getKey());
+        assertEquals("g", tokens.get(24).getKey());
+        assertEquals("h", tokens.get(28).getKey());
+        assertEquals("i", tokens.get(32).getKey());
+    }
+
     @Test
     public void testLexThrowsOnUnknownCharacter() {
         Lexer lexer = new Lexer();

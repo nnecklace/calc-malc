@@ -147,6 +147,20 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateComplicatedExpressionsWithVariables() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("a=1:b=2:c=5:d=8:e=15:(b+b)*(c-a+d)/(b*b*b)+e*c")));
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse();
+        assertEquals("<assignment:a>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals("<assignment:b>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals("<assignment:c>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals("<assignment:d>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals("<assignment:e>", evaluator.evaluateAssignment(nodes.pop()));
+        assertEquals((Double)81.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
     public void testEvaluateVariableAssignment() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:")));

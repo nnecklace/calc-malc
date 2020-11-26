@@ -215,6 +215,22 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseMultipleVariablesAndUse2() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("a=1:b=2:c=3:d=4:e=5:f=6:g=7:a+b+c+d+e+f+g")));
+        parser.parse();
+        assertEquals("a1=b2=c3=d4=e5=f6=g7=ab+c+d+e+f+g+", parser.printTree());
+    }
+
+    @Test
+    public void testParseMultipleVariablesAndUse3() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser(new Queue<Token>(lexer.lex("a=1:b=2:c=5:d=8:(b+b)*(c-a+d)")));
+        parser.parse();
+        assertEquals("a1=b2=c5=d8=bb+ca-d+*", parser.printTree());
+    }
+
+    @Test
     public void testParseVariableAsFunctionParameter() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser(new Queue<Token>(lexer.lex("x=2:sqrt(x)")));
