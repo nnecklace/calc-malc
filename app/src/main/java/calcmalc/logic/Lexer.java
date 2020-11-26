@@ -18,7 +18,7 @@ public class Lexer {
             String c = Character.toString(expression.charAt(i));
             if (c.matches("\\+|\\*|/|\\-|\\^|\\%")) {
                 // check if operator is unary - operator
-                if ("-".equals(c) && (tokens.isEmpty() || !tokens.getLast().isNumber())) {
+                if ("-".equals(c) && (tokens.isEmpty() || (!tokens.getLast().isNumber() && !tokens.getLast().isSymbol()))) {
                     // unary minus operator
                     tokens.push(new Operator("$"));
                 } else {
