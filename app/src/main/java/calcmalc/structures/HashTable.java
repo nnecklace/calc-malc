@@ -5,8 +5,8 @@ package calcmalc.structures;
  * All operations are done in amortized constant time time O(1) or O(m) where m is the number of entries in an index
  * @param <K, V> the generic types to be contained in the hashtable
  */
-public class HashTable<K,V> {
-    private List<HashTableEntry<K,V>>[] values;
+public class HashTable<K, V> {
+    private List<HashTableEntry<K, V>>[] values;
     private int size;
 
     public HashTable() {
@@ -46,7 +46,7 @@ public class HashTable<K,V> {
     public void placeOrUpdate(K key, V value) {
         int index = calculateIndex(key);
 
-        HashTableEntry<K,V> entry = find(key);
+        HashTableEntry<K, V> entry = find(key);
 
         if (entry == null) {
             values[index].push(new HashTableEntry<>(key, value, key.hashCode()));
@@ -60,13 +60,13 @@ public class HashTable<K,V> {
      * @param key entry to find
      * @return Null if not found or the actual entry
      */
-    private HashTableEntry<K,V> find(K key) {
+    private HashTableEntry<K, V> find(K key) {
         int index = calculateIndex(key);
 
-        List<HashTableEntry<K,V>> entries = values[index];
+        List<HashTableEntry<K, V>> entries = values[index];
 
         for (int i = 0; i < entries.size(); ++i) {
-            HashTableEntry<K,V> entry = entries.get(i);
+            HashTableEntry<K, V> entry = entries.get(i);
             // Nullpointer possible ?
             if (entry.hashCode() == key.hashCode() && entry.getKey().equals(key)) {
                 return entry;
@@ -82,7 +82,7 @@ public class HashTable<K,V> {
      * @return the entry value or null if not found
      */
     public V get(K key) {
-        HashTableEntry<K,V> entry = find(key);
+        HashTableEntry<K, V> entry = find(key);
 
         if (entry == null) {
             return null;

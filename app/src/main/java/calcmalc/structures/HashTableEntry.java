@@ -4,7 +4,7 @@ package calcmalc.structures;
  * Generic container class for HashTable
  * @param <K,V> key value pair to store in the HashTable
  */
-public class HashTableEntry<K,V> {
+public class HashTableEntry<K, V> {
     private V value;
     private K key;
     private int hash;
