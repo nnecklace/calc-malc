@@ -195,4 +195,10 @@ Some examples with intermediate stages:
 
 ## References
 
-TODO
+[Tirakirja](https://raw.githubusercontent.com/pllk/tirakirja/master/tirakirja.pdf)
+
+[JDK Soure code](https://hg.openjdk.java.net/jdk8/jdk8/jdk)
+
+[Shunting Yard](https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
+
+[Writing a programming language](https://www.youtube.com/watch?v=9-EYWLbmiG0&t=2052s)
