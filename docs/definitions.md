@@ -53,7 +53,7 @@ sqrt((2+2)*2+c*log(y))
 
 ## Time and space complexity
 
-It is difficult to estimate the time and space complexity for this project. Ideal, and realistic, time complexity at all stages should be `O(n)`. Shunting Yard is `O(n)` algorithm and tree traversals are `O(|V|+|E|)` which we can reduce to `O(n)`. Space complexity is tough to estimate, realistically the space complexity will be `O(n^4)`. `O(n)` for the stack, `O(n)` for the queue, `O(n)` for the AST, and `O(n)` for the input list. `O(n)*O(n)*O(n)*O(n) = O(n^4)`
+It is difficult to estimate the time and space complexity for this project. Ideal, and realistic, time complexity at all stages should be `O(n)`. Shunting Yard is `O(n)` algorithm and tree traversals are `O(|V|+|E|)` which we can reduce to `O(n)`. Space complexity is tough to estimate, realistically the space complexity will be `O(4n) <=> O(n)`. `O(n)` for the stack, `O(n)` for the queue, `O(n)` for the AST, and `O(n)` for the input list. `O(n)+O(n)+O(n)+O(n) = O(n)`
 
 
 ## References
