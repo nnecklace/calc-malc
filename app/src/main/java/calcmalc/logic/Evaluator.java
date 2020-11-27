@@ -29,10 +29,10 @@ public class Evaluator {
         config.placeOrUpdate("min", -1);
     }
 
-    private void checkArguments(String symbol, int argumentsCount) {
+    private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = config.get(symbol);
         if (value != null && value != argumentsCount && value != -1) {
-            throw new IllegalArgumentException("Wrong number of arguments " + symbol);
+            throw new EvaluatorException("Wrong number of arguments " + symbol);
         }
     }
 
