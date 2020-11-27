@@ -29,6 +29,12 @@ public class Evaluator {
         config.placeOrUpdate("min", -1);
     }
 
+    /**
+     * Method checks that the given symbol (function) has the correct amount of arguments
+     * @param symbol the symbol to check
+     * @param argumentsCount the given number of arguments given to the symbol
+     * @throws EvaluatorException
+     */
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = config.get(symbol);
         if (value != null && value != argumentsCount && value != -1) {
@@ -36,6 +42,12 @@ public class Evaluator {
         }
     }
 
+    /**
+     * Checks if the given symbol has been defined during runtime
+     * @param token The token to check for
+     * @return the value associated with the symbol
+     * @throws EvaluatorException
+     */
     private Double checkSymbolTable(String token) throws EvaluatorException {
         Double symbol = symbolTable.get(token);
         if (symbol != null) {
@@ -45,6 +57,14 @@ public class Evaluator {
         throw new EvaluatorException("Unknown Symbol " + token);
     }
 
+    /**
+     * Method tries to evaluate the given token, be it a function or variable symbol
+     * @param <N> Let n be any java Number type
+     * @param token the token to be evaluated
+     * @param arguments the queue of arguments for the token
+     * @return Whatever result the symbol represents wuth the given arguments
+     * @throws EvaluatorException
+     */
     public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
         checkArguments(token, arguments.size());
         switch (token) {
@@ -97,18 +117,41 @@ public class Evaluator {
         }
     }
 
+    /**
+     * A basic max function that returns the maximum value of the arguments
+     * @param n left number
+     * @param m right number
+     * @return the greater of the two
+     */
     private double max(double n, double m) {
         return n > m ? n : m;
     }
 
+    /**
+     * A basic min function that returns the minimum value of the arguments
+     * @param n left number
+     * @param m right number
+     * @return the lesser of the two
+     */
     private double min(double n, double m) {
         return n < m ? n : m;
     }
 
+    /**
+     * A method that returns the absolute value of the argument passed
+     * @param n the number to absolute
+     * @return the absolute value of the argument
+     */
     private double abs(double n) {
         return n > 0 ? n : -n;
     }
 
+    /**
+     * Method evaluates an assignment ASTNode and returns a string representation of the variable that was created
+     * @param node any assignment node
+     * @return string representation of the variable. E.g., x=2 => <assignment:x>
+     * @throws EvaluatorException
+     */
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
         ASTNode symbol = node.getChildren().pop();
 
@@ -118,6 +161,17 @@ public class Evaluator {
         return "<assignment:" + symbol.token().getKey() + ">";
     }
 
+    /**
+     * Method evaluates a given AST tree structure and returns the result of the expression the tree represents.
+     *      +
+     *     / \    ==>   5
+     *    2   3
+     * All leaves in the tree should, and must, be a value. Meaning that all leaves are either variables or numbers.
+     * Post order traversal is used when traversing the tree.
+     * @param node the root node of the AST tree
+     * @return The result of the expression the AST tree represents.
+     * @throws EvaluatorException
+     */
     public Number evaluate(ASTNode node) throws EvaluatorException {
         if (node.token().isAssignment()) {
             throw new EvaluatorException("Can't assign values in expressions, values must be assigned before or after expressions");
