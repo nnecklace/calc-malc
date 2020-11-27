@@ -22,7 +22,7 @@ public class StackTest {
 
         Integer top = stack.peek();
 
-        assertEquals(top, (Integer)10);
+        assertEquals(top, (Integer) 10);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class StackTest {
         stack.push(5);
         stack.push(6);
 
-        assertEquals(stack.peek(), (Integer)6);
+        assertEquals(stack.peek(), (Integer) 6);
     }
 
     @Test
@@ -44,11 +44,11 @@ public class StackTest {
         stack.push(1);
         stack.push(2);
         stack.push(3);
-        assertEquals(stack.peek(), (Integer)3);
+        assertEquals(stack.peek(), (Integer) 3);
         stack.pop();
-        assertEquals(stack.peek(), (Integer)2);
+        assertEquals(stack.peek(), (Integer) 2);
         stack.pop();
-        assertEquals(stack.peek(), (Integer)1);
+        assertEquals(stack.peek(), (Integer) 1);
         stack.pop();
         assertEquals(stack.peek(), null);
     }

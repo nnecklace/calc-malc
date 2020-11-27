@@ -74,7 +74,7 @@ public class HashTableTest {
             }
         }
 
-        assertEquals(0,failCount);
+        assertEquals(0, failCount);
     }
 
     @Test

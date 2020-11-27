@@ -1,7 +1,5 @@
 package calcmalc.structures;
 
-import java.util.Random;
-import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -16,7 +14,7 @@ public class ListTest {
     public void testElementCanBePushedToList() {
         Listable<Integer> list = new List<>();
         list.push(1);
-        assertEquals(list.get(0), (Integer)1);
+        assertEquals(list.get(0), (Integer) 1);
     }
 
     @Test
@@ -26,10 +24,10 @@ public class ListTest {
         list.push(2);
         list.push(3);
         list.push(4);
-        assertEquals(list.get(0), (Integer)1);
-        assertEquals(list.get(1), (Integer)2);
-        assertEquals(list.get(2), (Integer)3);
-        assertEquals(list.get(3), (Integer)4);
+        assertEquals(list.get(0), (Integer) 1);
+        assertEquals(list.get(1), (Integer) 2);
+        assertEquals(list.get(2), (Integer) 3);
+        assertEquals(list.get(3), (Integer) 4);
     }
 
     @Test
@@ -81,8 +79,8 @@ public class ListTest {
         assertNull(i);
         i = list.get(3);
         assertNull(i);
-        assertEquals((Integer)1, list.get(0));
-        assertEquals((Integer)2, list.get(1));
+        assertEquals((Integer) 1, list.get(0));
+        assertEquals((Integer) 2, list.get(1));
         i = list.get(8);
         assertNull(i);
     }
@@ -91,7 +89,7 @@ public class ListTest {
     public void testSetInsertsValueAtIndex() {
         Listable<Integer> list = new List<>();
         list.set(0, 2);
-        assertEquals((Integer)2, list.get(0));
+        assertEquals((Integer) 2, list.get(0));
     }
 
     @Test
@@ -100,9 +98,9 @@ public class ListTest {
         list.push(1);
         list.push(5);
         list.push(7);
-        assertEquals((Integer)7, list.get(2));
+        assertEquals((Integer) 7, list.get(2));
         list.set(2, 2);
-        assertEquals((Integer)2, list.get(2));
+        assertEquals((Integer) 2, list.get(2));
     }
 
     @Test
@@ -134,9 +132,9 @@ public class ListTest {
         list.push(1);
         list.push(1);
         list.push(1);
-        list.set(8,2);
+        list.set(8, 2);
         assertEquals(9, list.size());
-        assertEquals((Integer)2, list.get(8));
+        assertEquals((Integer) 2, list.get(8));
         assertEquals(16, list.getSpace());
     }
 
