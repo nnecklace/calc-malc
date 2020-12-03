@@ -10,6 +10,9 @@ public class List<T> implements Listable<T> {
     private int head;
     private int size;
 
+    /**
+     * Constructor for list data structure
+     */
     public List() {
         size = 8; // start at 8, usually start at 1 but can be started on any other power of 2
         list = (T[]) new Object[size]; // should not be done, but Java doesn't support generic arrays

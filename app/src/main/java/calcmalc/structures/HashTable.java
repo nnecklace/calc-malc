@@ -3,12 +3,16 @@ package calcmalc.structures;
 /**
  * Hash table data structure. This resembles java HashMap data structure.
  * All operations are done in amortized constant time time O(1) or O(m) where m is the number of entries in an index
- * @param <K, V> the generic types to be contained in the hashtable
+ * @param <K> the generic key to be contained in the hashtable
+ * @param <V> the generic value to be contained in the hashtable
  */
 public class HashTable<K, V> {
     private List<HashTableEntry<K, V>>[] values;
     private int size;
 
+    /**
+     * Constructor for HashTable data structure
+     */
     public HashTable() {
         // size should be some power of 2, so the index can be calculated easier
         // size - 1 in binary will be all zeros up until the bit which size represents

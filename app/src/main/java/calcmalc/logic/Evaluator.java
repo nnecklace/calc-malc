@@ -6,10 +6,17 @@ import calcmalc.structures.List;
 import calcmalc.structures.Queue;
 import calcmalc.exceptions.EvaluatorException;
 
+/**
+ * @author nnecklace
+ */
 public class Evaluator {
     private HashTable<String, Integer> config = new HashTable<>();
     private HashTable<String, Double> symbolTable = new HashTable<>();
 
+    /**
+     * Constructor for the Evaluator
+     * Constructor initializes the config table with built in functions and operators
+     */
     public Evaluator() { 
         config.placeOrUpdate("+", 2);
         config.placeOrUpdate("-", 2);
@@ -33,7 +40,7 @@ public class Evaluator {
      * Method checks that the given symbol (function) has the correct amount of arguments
      * @param symbol the symbol to check
      * @param argumentsCount the given number of arguments given to the symbol
-     * @throws EvaluatorException
+     * @throws EvaluatorException if wrong number of arguments
      */
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = config.get(symbol);
@@ -46,7 +53,7 @@ public class Evaluator {
      * Checks if the given symbol has been defined during runtime
      * @param token The token to check for
      * @return the value associated with the symbol
-     * @throws EvaluatorException
+     * @throws EvaluatorException if symbol is unknown
      */
     private Double checkSymbolTable(String token) throws EvaluatorException {
         Double symbol = symbolTable.get(token);
@@ -63,9 +70,10 @@ public class Evaluator {
      * @param token the token to be evaluated
      * @param arguments the queue of arguments for the token
      * @return Whatever result the symbol represents wuth the given arguments
-     * @throws EvaluatorException
+     * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
     public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
+        // TODO: Catch divide by zero
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
@@ -149,8 +157,8 @@ public class Evaluator {
     /**
      * Method evaluates an assignment ASTNode and returns a string representation of the variable that was created
      * @param node any assignment node
-     * @return string representation of the variable. E.g., x=2 => <assignment:x>
-     * @throws EvaluatorException
+     * @return string representation of the variable. E.g., x=2 => {@literal <}assignment:x{@literal >}
+     * @throws EvaluatorException if assignment cannot be evaluated
      */
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
         ASTNode symbol = node.getChildren().pop();
@@ -170,7 +178,7 @@ public class Evaluator {
      * Post order traversal is used when traversing the tree.
      * @param node the root node of the AST tree
      * @return The result of the expression the AST tree represents.
-     * @throws EvaluatorException
+     * @throws EvaluatorException if evaluation fails
      */
     public Number evaluate(ASTNode node) throws EvaluatorException {
         if (node.token().isAssignment()) {

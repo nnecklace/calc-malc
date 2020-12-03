@@ -2,13 +2,20 @@ package calcmalc.structures;
 
 /**
  * Generic container class for HashTable
- * @param <K,V> key value pair to store in the HashTable
+ * @param <K> key of the pair to store in the HashTable
+ * @param <V> value of the pair to store in the HashTable
  */
 public class HashTableEntry<K, V> {
     private V value;
     private K key;
     private int hash;
 
+    /**
+     * Constructor for a HashTableEntry element 
+     * @param key the key associated with the entry
+     * @param value  the value associated with the entry
+     * @param hash the hashcode for the entry
+     */
     public HashTableEntry(K key, V value, int hash) {
         this.key = key;
         this.value = value;

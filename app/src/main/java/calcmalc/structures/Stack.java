@@ -9,6 +9,10 @@ public class Stack<T> {
     private Listable<T> list;
     private int top;
 
+    /**
+     * Constructor for stack data structure
+     * @param list the underlying list which stack is built upon. List may contain values already
+     */
     public Stack(Listable<T> list) {
         this.list = list;
         this.top = 0;

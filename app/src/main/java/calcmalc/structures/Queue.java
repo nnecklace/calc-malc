@@ -11,6 +11,10 @@ public class Queue<T> {
     private int head;
     private int tail;
 
+    /**
+     * Constructor for queue data structure
+     * @param list the  underlying list the is built upon.
+     */
     public Queue(Listable<T> list) {
         this.list = list;
         this.tail = 0;

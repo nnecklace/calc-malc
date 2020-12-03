@@ -5,12 +5,17 @@ import calcmalc.structures.Listable;
 import calcmalc.exceptions.LexerException;
 import calcmalc.logic.types.*;
 
+/**
+ * Lexical analysis class. Class reads character from the input and gives them  values (tokens)
+ * For the parser
+ * @author nnecklace
+ */
 public class Lexer {
     /**
      * Function lexes, gives each character a token, the given arthemetic expression
      * @param expression the string representing the arthemetic expression we want to lex
      * @return List of lexical tokens representing the given symbols in the input
-     * @throws ParseException if expression contains invalid characters
+     * @throws LexerException if expression contains invalid characters
      */
     public Listable<Token> lex(String expression) throws LexerException {
         Listable<Token> tokens = new List<>();

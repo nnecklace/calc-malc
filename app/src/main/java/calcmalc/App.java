@@ -22,12 +22,16 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Scanner;
 
+/**
+ * @author nnecklace
+ */
 public class App {
     private static Evaluator evaluator = new Evaluator();
     private static Lexer lexer = new Lexer();
 
     /**
-     * Mehthod renders ascii greeting message
+     * Method renders ascii greeting message
+     * @return greeting message
      */
     public String getGreeting() {
         return "  _____      _        __  __       _      \n" + "/ _____|    | |      |  \\/  |     | |     \n"
@@ -39,6 +43,8 @@ public class App {
      * Main entry point for the algorithm
      * Accepts either an argument of repl, which starts the repl
      * Or file name, which contains a valid input to evaluate
+     * @param args IO params to read, array can be empty
+     * @throws IOException if file cannot be read
      */
     public static void main(String[] args) throws IOException {
         if (args.length > 0) {
@@ -69,7 +75,7 @@ public class App {
     /**
      * Reads an inteprets the file passed to calcmalc
      * @param file path to the file
-     * @throws IOException
+     * @throws IOException if the file cannot be read
      */
     public static void read(Path file) throws IOException {
         String content = Files.readString(file, StandardCharsets.UTF_8);

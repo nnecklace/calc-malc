@@ -1,8 +1,17 @@
 package calcmalc.logic.types;
 
+/**
+ * @author nnecklace
+ */
 public class TypeBuilder {
     private TypeBuilder() {}
 
+    /**
+     * Builds tokens representing the key that was read by the lexer
+     * @param type the token type
+     * @param key the key that was read by the lexer
+     * @return Token mathcing the key
+     */
     public static Token buildToken(Types type, String key) {
         Token token = new Token(type, key);
 

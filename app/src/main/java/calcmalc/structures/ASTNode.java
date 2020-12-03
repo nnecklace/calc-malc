@@ -2,10 +2,17 @@ package calcmalc.structures;
 
 import calcmalc.logic.types.Token;
 
+/**
+ * @author nnecklace
+ */
 public class ASTNode {
     private Token token;
     private Stack<ASTNode> children;
 
+    /**
+     * Constructor for ASTNode
+     * @param token the token the node contains
+     */
     public ASTNode(Token token) {
         this.token = token;
         this.children = new Stack<>(new List<>());

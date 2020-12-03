@@ -16,13 +16,16 @@ public class Parser {
     private Stack<ASTNode> functions = new Stack<>(new List<>());
     private Queue<Token> tokens;
 
+    /**
+     * Constructor for parser. Parser takes queue of tokens since we will call it recursively.
+     * @param tokens the list of tokens to parse
+     */
     public Parser(Queue<Token> tokens) {
         this.tokens = tokens;
     }
 
     /**
      * Method accepts list of tokens for the arthemetic expression
-     * @param input the expression to be converted
      * @return stack of nodes with the top of the stack being root node
      * @throws ParseException if illegal input
      */
@@ -36,8 +39,7 @@ public class Parser {
 
     /**
      * Parses functions and its arguments
-     * @param tokens List of tokens, ideally this should contain arguments for the function
-     * @param from indicating where to start parsing from
+     * @param end the String to read until
      * @return stack of nodes that represent the functions arguments
      * @throws ParseException on illegal input
      */
