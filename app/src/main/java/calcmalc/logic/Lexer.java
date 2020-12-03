@@ -21,24 +21,24 @@ public class Lexer {
                 int lastIndex = tokens.size() - 1;
                 if ("-".equals(c) && (tokens.isEmpty() || (!tokens.get(lastIndex).isNumber() && !tokens.get(lastIndex).isSymbol()))) {
                     // unary minus operator
-                    tokens.push(new Operator("$"));
+                    tokens.push(TypeBuilder.buildToken(Types.OPERATOR, "$"));
                 } else {
-                    tokens.push(new Operator(c));
+                    tokens.push(TypeBuilder.buildToken(Types.OPERATOR, c));
                 }
             } else if (c.matches("[.0-9]")) {
                 StringBuilder number = new StringBuilder();
                 number.append(c);
                 i = scan(expression, number, i, "[.0-9]");
-                tokens.push(new Numeric(number.toString()));
+                tokens.push(TypeBuilder.buildToken(Types.NUMERIC, number.toString()));
             } else if (c.matches("=")) {
-                tokens.push(new Assignment("="));
+                tokens.push(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
             } else if (c.matches("[_a-zA-Z]")) {
                 StringBuilder symbol = new StringBuilder();
                 symbol.append(c);
                 i = scan(expression, symbol, i, "[_a-zA-Z]");
-                tokens.push(new Symbol(symbol.toString()));
+                tokens.push(TypeBuilder.buildToken(Types.SYMBOL, symbol.toString()));
             } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",") || c.matches(":")) {
-                tokens.push(new Empty(c));
+                tokens.push(TypeBuilder.buildToken(Types.EMPTY, c));
             } else {
                 String errorAt = String.format("%" + (i + 1) + "s", "^");
                 throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
