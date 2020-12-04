@@ -56,7 +56,7 @@ public class AppTest {
     @Test
     public void testMultiLineExpressionResultIsPrinted() throws IOException {
         App classUnderTest = new App();
-        classUnderTest.main(new String[]{"test_input_2.txt"});
+        classUnderTest.main(new String[]{"src/inputs/test_input_2.txt"});
         assertEquals("14", outContent.toString().trim());
     }
 

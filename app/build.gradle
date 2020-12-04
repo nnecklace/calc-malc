@@ -12,6 +12,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'checkstyle'
+    id 'java-library'
 }
 
 jacoco {
@@ -73,7 +74,27 @@ task repl(type: JavaExec) {
   args = ["repl"]
 }
 
+task performance(type: JavaExec) {
+    main = 'calcmalc.performance.PerformanceTest'
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs '-Xss512m' 
+}
+
 application {
     // Define the main class for the application.
     mainClass = 'calcmalc.App'
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(15)
+    }
+}
+
+jar {
+  manifest { 
+    attributes 'Main-Class': 'calcmalc.App'
+  }
+}
+
+version = '1.0.0'
