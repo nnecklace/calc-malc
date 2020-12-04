@@ -37,7 +37,7 @@ tokens = []
 return tokens
 ```
 
-The code is a bit ugly looking at the moment, the `readUntil`, or `scan` as it is called in the project, is a bit ulgy and probably needs to be refactored at some point. Other than that, the lexer should be quite clear and easy to understand. One thing to notice in the lexer is the use of the $ symbol. In mathematics some operations can be made unarymeaning there is only one argumnent. In this case CalcMalc recognises inputs like `-1+1` where `-1` is a ununaryrator. unarunary will be turned into a $ symbol.
+The code is a bit ugly looking at the moment, the `readUntil`, or `scan` as it is called in the project, is a bit ulgy and probably needs to be refactored at some point. Other than that, the lexer should be quite clear and easy to understand. One thing to notice in the lexer is the use of the $ symbol. In mathematics some operations can be made unarymeaning there is only one argumnent. In this case CalcMalc recognises inputs like `-1+1` where `-1` is a unary. Unary operator (-) will be turned into a $ symbol.
 
 
 ### Parser
@@ -192,6 +192,44 @@ Some examples with intermediate stages:
      / \          / \        / \
     2   2        2   2      2   2 
 ```
+
+## Improvements
+
+### Functions
+Currently CalcMalc doesn't support custom functions like initially planned. Major setback from the original idea. Originally CalcMalc was supposed to support custom functions, e.g., 
+```
+x = 2:
+
+y(a,b) = a+b*x:
+
+sqrt(y(2,2))
+```
+This was, however, left unimplemented due to time constraints. Next release of CalcMalc will have functions.
+
+### Loops
+Initially there was a plan to implement loops into CalcMalc, but was quickly left out of the implementation phase, mostly due to the fact that I had no idea how to implement it.
+
+Loops would have looked something like this, e.g.,
+
+```
+x = 5:
+
+sum = 0:
+
+loop x  > 0:
+    sum = sum + sqrt(x):
+    x = x - 1:
+
+sum
+```
+
+### Recursion
+
+Currently CalcMalc uses lots of recursive calls. This requires a lot of stack space for the algorithm, which is not ideal. I would like to try an limit the amount of recursive calls in the algorithm.
+
+Evaluator uses dfs (depth first search) when evaluating the AST's. Dfs could  easily be made with an iterative solution, instead of a recursive one.
+
+Parser also uses recursion when parsing function params and variable assignments. This was mostly due to the fact that the parser couldn't share the nodes already parsed between variables and function params. In this case recursion seemed like a good solution since the parsers stacks and output queue were guaranteed to be empty when creating new instances of the parser.
 
 ## References
 
