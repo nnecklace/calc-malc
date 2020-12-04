@@ -73,4 +73,30 @@ public class StackTest {
         assertNull(stack.pop());
     }
 
+    @Test
+    public void testStackIsGivenNonEmptyList() {
+        List<Integer> l = new List<>();
+        l.push(1);
+        l.push(2);
+        l.push(3);
+        Stack<Integer> stack = new Stack<>(l);
+        assertEquals((Integer) 3, stack.pop());
+    }
+
+    @Test
+    public void testStackIsGivenNonEmptyList2() {
+        List<Integer> l = new List<>();
+        l.push(1);
+        l.push(2);
+        l.push(3);
+        l.push(4);
+        l.push(5);
+        l.push(6);
+        l.push(7);
+        l.push(8);
+        Stack<Integer> stack = new Stack<>(l);
+        assertEquals(8, stack.size());
+        assertEquals((Integer) 8, stack.peek());
+    }
+
 }

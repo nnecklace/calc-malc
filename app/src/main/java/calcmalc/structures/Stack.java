@@ -15,7 +15,7 @@ public class Stack<T> {
      */
     public Stack(Listable<T> list) {
         this.list = list;
-        this.top = 0;
+        this.top = list.size();
     }
 
     /**
