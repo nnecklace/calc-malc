@@ -11,6 +11,8 @@
 
 [Week report 5](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-5.md)
 
+[Week report 6](https://github.com/nnecklace/calc-malc/blob/main/docs/reports/week-6.md)
+
 ## Documents
 
 [Definitions](https://github.com/nnecklace/calc-malc/blob/main/docs/definitions.md)
