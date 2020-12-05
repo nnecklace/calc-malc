@@ -54,7 +54,7 @@ public class Lexer {
     }
 
     /**
-     * Method reads all character until it can no longer match the following character with the givin regex.
+     * Method reads all characters until it can no longer match the following character with the givin regex.
      * Perhaps a bit needlessly complicated function
      * @param expression the String expression the algoritm is going to evaluate
      * @param tokenName the token name, all the characters that match the regex will be append to this token name

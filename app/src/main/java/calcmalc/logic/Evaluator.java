@@ -69,7 +69,7 @@ public class Evaluator {
      * @param <N> Let n be any java Number type
      * @param token the token to be evaluated
      * @param arguments the queue of arguments for the token
-     * @return Whatever result the symbol represents wuth the given arguments
+     * @return Whatever result the symbol represents with the given arguments
      * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
     public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
