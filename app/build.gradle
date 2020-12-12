@@ -13,6 +13,7 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'java-library'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
 jacoco {
@@ -26,9 +27,14 @@ jacocoTestReport {
     }
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: '**/performance/*')
+            fileTree(dir: it, exclude: ['**/performance/*', '**/ui/*'])
         }))
     }
+}
+
+javafx {
+    version = "15.0.1"
+    modules = [ 'javafx.controls' ]
 }
 
 configurations {
@@ -48,6 +54,16 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
+    // here starts JavaFX
+    implementation 'org.openjfx:javafx:15'
+
+    compile 'org.openjfx:javafx-base:15'
+    compile 'org.openjfx:javafx-graphics:15'
+    compile 'org.openjfx:javafx-controls:15'
+    compile 'org.openjfx:javafx-fxml:15'
+    compile 'org.openjfx:javafx-swing:15'
+    compile 'org.openjfx:javafx-media:15'
+    compile 'org.openjfx:javafx-web:15'
 }
 
 run {

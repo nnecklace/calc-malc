@@ -58,6 +58,10 @@ public class Token {
         return type == Types.EMPTY;
     }
 
+    public boolean isFunction() {
+        return type == Types.FUNCTION;
+    }
+
     /**
      * Getter for class precedence level
      * @return precedence level
@@ -72,6 +76,10 @@ public class Token {
      */
     public void setPrecedence(int precedence) {
         this.precedence = precedence;
+    }
+
+    public void setType(Types type) {
+        this.type = type;
     }
 
     /**

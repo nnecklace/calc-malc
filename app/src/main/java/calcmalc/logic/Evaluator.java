@@ -2,9 +2,9 @@ package calcmalc.logic;
 
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.HashTable;
-import calcmalc.structures.List;
 import calcmalc.structures.Queue;
 import calcmalc.exceptions.EvaluatorException;
+import calcmalc.logic.types.Token;
 
 /**
  * @author nnecklace
@@ -12,6 +12,21 @@ import calcmalc.exceptions.EvaluatorException;
 public class Evaluator {
     private HashTable<String, Integer> config = new HashTable<>();
     private HashTable<String, Double> symbolTable = new HashTable<>();
+    private HashTable<String, ASTNode> customFunctionTable = new HashTable<>();
+    private HashTable<String, FunctionArgumentPair> customFunctionArguments = new HashTable<>();
+    private String context;
+
+    private class FunctionArgumentPair {
+        String first;
+        String second;
+        int argumentCount() {
+            if (second != null) {
+                return 2;
+            }
+
+            return 1;
+        }
+    }
 
     /**
      * Constructor for the Evaluator
@@ -44,22 +59,49 @@ public class Evaluator {
      */
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = config.get(symbol);
-        if (value != null && value != argumentsCount && value != -1) {
+        if ((value != null && value != argumentsCount && value != -1)) {
             throw new EvaluatorException("Wrong number of arguments " + symbol);
         }
     }
 
     /**
-     * Checks if the given symbol has been defined during runtime
+     * Checks if the given symbol (variable) has been defined during runtime
      * @param token The token to check for
      * @return the value associated with the symbol
      * @throws EvaluatorException if symbol is unknown
      */
-    private Double checkSymbolTable(String token) throws EvaluatorException {
-        Double symbol = symbolTable.get(token);
-        if (symbol != null) {
-            return symbol;
+    private <N extends Number> double checkSymbolAndFunctionTable(String token, Queue<N> arguments) throws EvaluatorException {
+        Double symbolValue = null;
+        if (context != null) {
+            symbolValue = symbolTable.get(context + "_" + token);
         }
+
+        if (symbolValue == null) {
+            symbolValue = symbolTable.get(token);
+        }
+
+        if (symbolValue != null) {
+            return symbolValue;
+        }
+
+        ASTNode node = customFunctionTable.get(token);
+
+        if (node != null) {
+            FunctionArgumentPair argumentPair = customFunctionArguments.get(token);
+
+            symbolTable.placeOrUpdate(token + "_" + argumentPair.first, arguments.dequeue().doubleValue());
+
+            if (argumentPair.second != null) {
+                symbolTable.placeOrUpdate(token + "_" + argumentPair.second, arguments.dequeue().doubleValue());
+            }
+
+            context = token;
+            Double result = (double) evaluate(node);
+            context = null;
+
+            return result;
+        }
+
 
         throw new EvaluatorException("Unknown Symbol " + token);
     }
@@ -73,7 +115,6 @@ public class Evaluator {
      * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
     public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
-        // TODO: Catch divide by zero
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
@@ -81,7 +122,7 @@ public class Evaluator {
             case "+":
                 return arguments.dequeue().doubleValue() + arguments.dequeue().doubleValue();
             case "/":
-                return arguments.dequeue().doubleValue() / arguments.dequeue().doubleValue(); // java will throw divide by zero exception, no need to do it ourselves
+                return arguments.dequeue().doubleValue() / arguments.dequeue().doubleValue(); 
             case "-":
                 return arguments.dequeue().doubleValue() - arguments.dequeue().doubleValue();
             case "$":
@@ -105,23 +146,22 @@ public class Evaluator {
             case "tan":
                 return Math.tan(arguments.dequeue().doubleValue());
             case "max":
-                if (arguments.size() == 0) {
-                    return 0.0;
-                } else if (arguments.size() == 1) {
-                    return arguments.dequeue().doubleValue();
-                } else {
-                    return max(arguments.dequeue().doubleValue(), evaluateFunction("max", arguments));
-                }
+                return minOrMax("max", arguments);
             case "min":
-                if (arguments.size() == 0) {
-                    return 0.0;
-                } else if (arguments.size() == 1) {
-                    return arguments.dequeue().doubleValue();
-                } else {
-                    return min(arguments.dequeue().doubleValue(), evaluateFunction("min", arguments));
-                }
+                return minOrMax("min", arguments);
             default:
-                return checkSymbolTable(token);
+                return checkSymbolAndFunctionTable(token, arguments);
+        }
+    }
+
+    private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) throws EvaluatorException {
+        if (arguments.size() == 1) {
+            return arguments.dequeue().doubleValue();
+        } else {
+            if (minOrMax.equals("min")) {
+                return min(arguments.dequeue().doubleValue(), minOrMax("min", arguments));
+            }
+            return max(arguments.dequeue().doubleValue(), minOrMax("max", arguments));
         }
     }
 
@@ -161,10 +201,44 @@ public class Evaluator {
      * @throws EvaluatorException if assignment cannot be evaluated
      */
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
-        ASTNode symbol = node.getChildren().pop();
+        ASTNode symbol = node.children().get(node.children().size() - 1);
 
-        Number value = evaluate(node.getChildren().pop());
-        symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
+        if (!symbol.token().isFunction() && !symbol.token().isSymbol()) {
+            throw new EvaluatorException("Assignment error: Can't assign variable to non-symbol or non-function");
+        }
+
+        if (symbol.token().isFunction()) {
+            FunctionArgumentPair argumentPair = new FunctionArgumentPair();
+
+            int size = symbol.children().size();
+
+            if (size > 2) {
+                throw new EvaluatorException("Custom function can only be given max two arguments");
+            }
+
+            Token firstArg = symbol.children().get(size - 1).token();
+            argumentPair.first = firstArg.getKey();
+
+            Token secondArg = null;
+
+            if (size - 2 == 0) {
+                secondArg = symbol.children().get(size - 2).token(); 
+                argumentPair.second = secondArg.getKey();
+            }
+
+            if (!firstArg.isSymbol() || (secondArg != null && !secondArg.isSymbol())) {
+                throw new EvaluatorException("Custom function arguments have to be symbols");
+            }
+
+            config.placeOrUpdate(symbol.token().getKey(), argumentPair.argumentCount()); 
+            customFunctionTable.placeOrUpdate(symbol.token().getKey(), node.children().get(node.children().size() - 2));
+            customFunctionArguments.placeOrUpdate(symbol.token().getKey(), argumentPair);
+
+        } else {
+            Number value = evaluate(node.children().get(node.children().size() - 2));
+            symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
+        }
+
 
         return "<assignment:" + symbol.token().getKey() + ">";
     }
@@ -189,10 +263,10 @@ public class Evaluator {
             return Double.parseDouble(node.token().getKey());
         }
 
-        Queue<Number> arguments = new Queue<>(new List<>());
+        Queue<Number> arguments = new Queue<>();
         
-        while (!node.getChildren().isEmpty()) {
-            arguments.enqueue(evaluate(node.getChildren().pop()));
+        for (int i = node.children().size() - 1; i >= 0; --i) {
+            arguments.enqueue(evaluate(node.children().get(i))); // O(1) since functions or operators can have 1 or 2 arguments
         }
 
         return evaluateFunction(node.token().getKey(), arguments);

@@ -22,7 +22,7 @@ public class PerformanceTest {
         }
 
         public void addTime(Long time) {
-            times.push(time);
+            times.append(time);
         }
 
         public double getAverage() {

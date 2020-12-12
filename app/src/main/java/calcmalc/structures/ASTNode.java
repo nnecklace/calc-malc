@@ -7,7 +7,7 @@ import calcmalc.logic.types.Token;
  */
 public class ASTNode {
     private Token token;
-    private Stack<ASTNode> children;
+    private List<ASTNode> children;
 
     /**
      * Constructor for ASTNode
@@ -15,7 +15,7 @@ public class ASTNode {
      */
     public ASTNode(Token token) {
         this.token = token;
-        this.children = new Stack<>(new List<>());
+        this.children = new List<>();
     }
 
     /**
@@ -31,22 +31,14 @@ public class ASTNode {
      * @param child to be added to this node
      */
     public void addChild(ASTNode child) {
-        this.children.push(child);
-    }
-
-    /**
-     * Setter for children property
-     * @param children the children of this node
-     */
-    public void setChildren(Stack<ASTNode> children) {
-        this.children = children;
+        this.children.append(child);
     }
 
     /**
      * Getter for the children property
      * @return the nodes current children
      */
-    public Stack<ASTNode> getChildren() {
+    public List<ASTNode> children() {
         return children;
     }
 }

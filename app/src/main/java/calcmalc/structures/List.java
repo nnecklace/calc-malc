@@ -5,7 +5,7 @@ package calcmalc.structures;
  * All operations are done in constant time O(1) apart from the grow function which is only called when the size of the list is a power of 2
  * @param <T> the generic type to be contained in the list
  */
-public class List<T> implements Listable<T> {
+public class List<T> {
     private T[] list;
     private int head;
     private int size;
@@ -25,8 +25,8 @@ public class List<T> implements Listable<T> {
      * @return T the generic element at the given position of the list or null if index is negitive or above the current size of the list
      */
     public T get(int index) {
-        if (index >= size || index < 0) {
-            return null;
+        if (index >= head || index < 0) {
+            throw new IllegalArgumentException("Index out of range");
         }
 
         return list[index];
@@ -93,7 +93,7 @@ public class List<T> implements Listable<T> {
      * If head has reached the end of the list, the list size will be increased.
      * @param element The element to push to the end of the list
      */
-    public void push(T element) {
+    public void append(T element) {
         if ((head + 1) == size) {
             grow();
         }
@@ -122,6 +122,6 @@ public class List<T> implements Listable<T> {
      * @return true if there are no elements in the list
      */
     public boolean isEmpty() {
-        return head == 0;
+        return size() == 0;
     }
 }

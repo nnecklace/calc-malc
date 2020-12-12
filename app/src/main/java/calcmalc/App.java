@@ -4,10 +4,8 @@
 package calcmalc;
 
 import calcmalc.structures.ASTNode;
-import calcmalc.structures.Listable;
-import calcmalc.structures.Queue;
 import calcmalc.structures.Stack;
-import calcmalc.logic.types.Token;
+import calcmalc.ui.UI;
 import calcmalc.exceptions.EvaluatorException;
 import calcmalc.exceptions.LexerException;
 import calcmalc.logic.Evaluator;
@@ -28,6 +26,7 @@ import java.util.Scanner;
 public class App {
     private static Evaluator evaluator = new Evaluator();
     private static Lexer lexer = new Lexer();
+    private static Parser parser = new Parser();
 
     /**
      * Method renders ascii greeting message
@@ -54,7 +53,8 @@ public class App {
             } else {
                 read(Paths.get(args[0]));
             }
-        } 
+        }
+        //new UI().run();
     }
 
     /**
@@ -89,19 +89,22 @@ public class App {
     private static void interpret(String input) {
         String output = "";
         try {
-            Listable<Token> tokens = lexer.lex(input);
-            Parser parser = new Parser(new Queue<>(tokens));
-            Stack<ASTNode> nodes = parser.parse();
-            while (!nodes.isEmpty()) {
-                if (nodes.peek().token().isAssignment()) {
-                    output = evaluator.evaluateAssignment(nodes.pop());
-                } else {
-                    output = format(evaluator.evaluate(nodes.pop()));
-                }
+            Stack<ASTNode> nodes = parser.parse(
+                lexer.lex(input)
+            );
+
+            while (!parser.variables().isEmpty()) {
+                output = evaluator.evaluateAssignment(parser.variables().dequeue());
             }
+
+            while (!nodes.isEmpty()) {
+                output = format(evaluator.evaluate(nodes.pop()));
+            }
+
             System.out.println(output);
-        } catch (LexerException | ParseException | EvaluatorException e) {
+        } catch (LexerException | ParseException | EvaluatorException | ArithmeticException e) {
             System.err.println(e.getMessage());
+            parser = new Parser();
         }
         System.out.println();
     }
@@ -116,5 +119,7 @@ public class App {
         while (input.hasNextLine()) {
             interpret(input.nextLine().replaceAll("\\s", ""));
         }
+
+        input.close();
     }
 }

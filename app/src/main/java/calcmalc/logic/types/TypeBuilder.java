@@ -16,13 +16,16 @@ public class TypeBuilder {
         Token token = new Token(type, key);
 
         switch (type) {
+            case ASSIGNMENT:
+                token.setPrecedence(0);
+                break;
             case SYMBOL:
                 token.setPrecedence(4);
                 break;
             case OPERATOR:
-                if (key.equals("$")) {
+                if (key.equals("^")) {
                     token.setPrecedence(4);
-                } else if (key.equals("^")) {
+                } else if (key.equals("$")) {
                     token.setPrecedence(3);
                 } else if (key.equals("*") || key.equals("/") || key.equals("%")) {
                     token.setPrecedence(2);

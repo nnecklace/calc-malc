@@ -1,7 +1,7 @@
 package calcmalc.logic;
 
 import calcmalc.structures.List;
-import calcmalc.structures.Listable;
+import calcmalc.structures.Queue;
 import calcmalc.exceptions.LexerException;
 import calcmalc.logic.types.*;
 
@@ -17,33 +17,38 @@ public class Lexer {
      * @return List of lexical tokens representing the given symbols in the input
      * @throws LexerException if expression contains invalid characters
      */
-    public Listable<Token> lex(String expression) throws LexerException {
-        Listable<Token> tokens = new List<>();
+    public Queue<Token> lex(String expression) throws LexerException {
+        Queue<Token> tokens = new Queue<>();
         for (int i = 0; i < expression.length(); ++i) {
             String c = Character.toString(expression.charAt(i));
             if (c.matches("\\+|\\*|/|\\-|\\^|\\%")) {
                 // check if operator is unary - operator
-                int lastIndex = tokens.size() - 1;
-                if ("-".equals(c) && (tokens.isEmpty() || (!tokens.get(lastIndex).isNumber() && !tokens.get(lastIndex).isSymbol()))) {
+                // ,-100
+                // -x
+                // (-100)
+                if ("-".equals(c) && (tokens.isEmpty() || tokens.peekLast().getKey().equals("(") || tokens.peekLast().getKey().equals(","))) {
                     // unary minus operator
-                    tokens.push(TypeBuilder.buildToken(Types.OPERATOR, "$"));
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
                 } else {
-                    tokens.push(TypeBuilder.buildToken(Types.OPERATOR, c));
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, c));
                 }
             } else if (c.matches("[.0-9]")) {
                 StringBuilder number = new StringBuilder();
                 number.append(c);
                 i = scan(expression, number, i, "[.0-9]");
-                tokens.push(TypeBuilder.buildToken(Types.NUMERIC, number.toString()));
+                tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, number.toString()));
             } else if (c.matches("=")) {
-                tokens.push(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
+                tokens.enqueue(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
             } else if (c.matches("[_a-zA-Z]")) {
                 StringBuilder symbol = new StringBuilder();
                 symbol.append(c);
                 i = scan(expression, symbol, i, "[_a-zA-Z]");
-                tokens.push(TypeBuilder.buildToken(Types.SYMBOL, symbol.toString()));
+                tokens.enqueue(TypeBuilder.buildToken(Types.SYMBOL, symbol.toString()));
             } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",") || c.matches(":")) {
-                tokens.push(TypeBuilder.buildToken(Types.EMPTY, c));
+                if (c.matches("\\(") && !tokens.isEmpty() && tokens.peekLast().isSymbol()) {
+                    tokens.peekLast().setType(Types.FUNCTION);
+                }
+                tokens.enqueue(TypeBuilder.buildToken(Types.EMPTY, c));
             } else {
                 String errorAt = String.format("%" + (i + 1) + "s", "^");
                 throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);

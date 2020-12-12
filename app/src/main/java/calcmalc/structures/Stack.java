@@ -6,16 +6,15 @@ package calcmalc.structures;
  * @param <T> the generic type to be contained in the stack
  */
 public class Stack<T> {
-    private Listable<T> list;
+    private List<T> list;
     private int top;
 
     /**
      * Constructor for stack data structure
-     * @param list the underlying list which stack is built upon. List may contain values already
      */
-    public Stack(Listable<T> list) {
-        this.list = list;
-        this.top = list.size();
+    public Stack() {
+        this.list = new List<>();
+        this.top = 0;
     }
 
     /**
@@ -43,6 +42,10 @@ public class Stack<T> {
      * @return T the top element or null if stack is empty
      */
     public T peek() {
+        if (top == 0) {
+            return null;
+        }
+
         return list.get(top - 1);
     }
 

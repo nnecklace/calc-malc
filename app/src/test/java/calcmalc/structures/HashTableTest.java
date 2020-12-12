@@ -62,7 +62,7 @@ public class HashTableTest {
             String generatedString = new String(array, Charset.forName("UTF-8"));
             h.placeOrUpdate(generatedString, i);
             map.put(generatedString, i);
-            list.push(generatedString);
+            list.append(generatedString);
         }
 
         int failCount = 0;

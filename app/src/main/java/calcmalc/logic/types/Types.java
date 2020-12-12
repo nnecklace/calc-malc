@@ -23,5 +23,6 @@ public enum Types {
     /**
      * Symbol type, e.g. {@code max() min() log() etc.}
      */
-    SYMBOL
+    SYMBOL,
+    FUNCTION
 }

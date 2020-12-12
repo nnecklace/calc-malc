@@ -7,35 +7,39 @@ package calcmalc.structures;
  * @param <T> the generic type to be contained in the queue
  */
 public class Queue<T> {
-    private Listable<T> list;
-    private int head;
-    private int tail;
-
-    /**
-     * Constructor for queue data structure
-     * @param list the  underlying list the is built upon.
-     */
-    public Queue(Listable<T> list) {
-        this.list = list;
-        this.tail = 0;
-        this.head = list.size();
-    }
+    private QueueNode<T> head;
+    private QueueNode<T> tail;
+    private int size = 0;
 
     /**
      * Method adds element to the "head" or start of the queue
      * @param element The generic element to be added
      */
     public void enqueue(T element) {
-        list.push(element);
-        head++;
+        QueueNode<T> next = new QueueNode<>(element);
+        if (head == null) {
+            head = tail = next;
+        } else {
+            if (size == 1) {
+                head.next(next);
+            } else {
+                tail.next(next);
+            }
+            tail = next;
+        }
+        size++;
     }
 
     /**
      * Checks the next element in the queue to dequeue
      * @return the next element in the queue
      */
-    public T peek() {
-        return list.get(tail);
+    public T peekFirst() {
+        return head != null ? head.getValue() : null;
+    }
+
+    public T peekLast() {
+        return tail != null ? tail.getValue() : null;
     }
 
     /**
@@ -43,27 +47,19 @@ public class Queue<T> {
      * @return T the generic element at the end of the queue or null
      */
     public T dequeue() {
-        if (tail == head) {
-            return null;
+        if (head != null) {
+            size--;
+            T current = head.getValue();
+            head = head.getNext();
+
+            if (size == 0) {
+                tail = null;
+            } 
+
+            return current;
         }
 
-        return list.get(tail++);
-    }
-
-    /**
-     * Method getter for head property
-     * @return head property
-     */
-    public int getHead() {
-        return head;
-    }
-
-    /**
-     * Method getter for tail property
-     * @return tail property
-     */
-    public int getTail() {
-        return tail;
+        return null;
     }
 
     /**
@@ -71,7 +67,7 @@ public class Queue<T> {
      * @return true if empty, otherwise false
      */
     public boolean isEmpty() {
-        return head == tail;
+        return size() == 0;
     }
 
     /**
@@ -79,6 +75,6 @@ public class Queue<T> {
      * @return size (#elements) of the queue
      */
     public int size() {
-        return head - tail;
+        return size;
     }
 }

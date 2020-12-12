@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 public class StackTest {
     @Test
     public void testStackCanBePushed() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
 
         Integer a = 5;
 
@@ -17,7 +17,7 @@ public class StackTest {
     
     @Test
     public void testStackCanBePeeked() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
         stack.push(10);
 
         Integer top = stack.peek();
@@ -27,7 +27,7 @@ public class StackTest {
 
     @Test
     public void testStackCanBePushedMultipleTimes() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
         stack.push(1);
         stack.push(2);
         stack.push(3);
@@ -40,7 +40,7 @@ public class StackTest {
 
     @Test
     public void testStackCanBePopped() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
         stack.push(1);
         stack.push(2);
         stack.push(3);
@@ -55,7 +55,7 @@ public class StackTest {
 
     @Test
     public void testStackSizeIsDynamic() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
         stack.push(1);
         stack.push(2);
         stack.push(3);
@@ -69,34 +69,15 @@ public class StackTest {
 
     @Test
     public void testStackPoppedEmpty() {
-        Stack<Integer> stack = new Stack<>(new List<Integer>());
+        Stack<Integer> stack = new Stack<>();
         assertNull(stack.pop());
     }
 
     @Test
-    public void testStackIsGivenNonEmptyList() {
-        List<Integer> l = new List<>();
-        l.push(1);
-        l.push(2);
-        l.push(3);
-        Stack<Integer> stack = new Stack<>(l);
-        assertEquals((Integer) 3, stack.pop());
+    public void testStackCanBePeekedWhenEmpty() {
+        Stack<Integer> stack = new Stack<>();
+        assertNull(stack.peek());
+        stack.push(0);
+        assertEquals((Integer)0, stack.peek());
     }
-
-    @Test
-    public void testStackIsGivenNonEmptyList2() {
-        List<Integer> l = new List<>();
-        l.push(1);
-        l.push(2);
-        l.push(3);
-        l.push(4);
-        l.push(5);
-        l.push(6);
-        l.push(7);
-        l.push(8);
-        Stack<Integer> stack = new Stack<>(l);
-        assertEquals(8, stack.size());
-        assertEquals((Integer) 8, stack.peek());
-    }
-
 }

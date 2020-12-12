@@ -53,7 +53,7 @@ public class HashTable<K, V> {
         HashTableEntry<K, V> entry = find(key);
 
         if (entry == null) {
-            values[index].push(new HashTableEntry<>(key, value, key.hashCode()));
+            values[index].append(new HashTableEntry<>(key, value, key.hashCode()));
         } else {
             entry.setValue(value);
         }

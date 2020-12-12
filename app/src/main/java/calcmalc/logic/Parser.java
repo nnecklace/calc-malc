@@ -3,7 +3,6 @@ package calcmalc.logic;
 import calcmalc.structures.Stack;
 import calcmalc.structures.Queue;
 import calcmalc.structures.ASTNode;
-import calcmalc.structures.List;
 import calcmalc.logic.types.Token;
 import java.text.ParseException;
 
@@ -11,86 +10,64 @@ import java.text.ParseException;
  * Parser for the Shunting Yard algoritm. Main objective of the class is to convert expressions into RPN (reverse polish notation)
  */
 public class Parser {
-    private Stack<Token> operators = new Stack<>(new List<>());
-    private Stack<ASTNode> nodes = new Stack<>(new List<>());
-    private Stack<ASTNode> functions = new Stack<>(new List<>());
-    private Queue<Token> tokens;
+    private Stack<Token> operators = new Stack<>();
+    private Stack<ASTNode> nodes = new Stack<>();
+    private Queue<ASTNode> variables = new Queue<>();
+    private Stack<Integer> functionArity = new Stack<>();
 
-    /**
-     * Constructor for parser. Parser takes queue of tokens since we will call it recursively.
-     * @param tokens the list of tokens to parse
-     */
-    public Parser(Queue<Token> tokens) {
-        this.tokens = tokens;
-    }
+    private int assignmentCount = 0;
 
     /**
      * Method accepts list of tokens for the arthemetic expression
      * @return stack of nodes with the top of the stack being root node
      * @throws ParseException if illegal input
      */
-    public Stack<ASTNode> parse() throws ParseException {
+    public Stack<ASTNode> parse(Queue<Token> tokens) throws ParseException {
+        // TODO: Needed?
+        assignmentCount = 0;
+
         while (!tokens.isEmpty()) {
-            Token token = tokens.dequeue();
-            shuntingYardParse(token);
-        }
-        return popRemainingTokens();
-    }
-
-    /**
-     * Parses functions and its arguments
-     * @param end the String to read until
-     * @return stack of nodes that represent the functions arguments
-     * @throws ParseException on illegal input
-     */
-    public Stack<ASTNode> parseUntil(String end) throws ParseException {
-        int openingParenthesisCounter = 0;
-        while (!tokens.isEmpty()) {
-            Token token = tokens.peek();
-            
-            if (token.getKey().equals("(")) {
-                openingParenthesisCounter++;
-            }
-
-            tokens.dequeue();
-            shuntingYardParse(token);
-
-            // make sure to process the last closing parenthesis.
-            // when processing function parameters, we process up until and including the last parenthesis
-            // normally we only process until the last token that matches the given terminator (end) string
-            if (token.getKey().matches(end)) {
-                if (!end.equals("\\)")) {
-                    break;
-                }
-
-                if (openingParenthesisCounter <= 1) {
-                    break;
-                } else {
-                    openingParenthesisCounter--;
-                }
-            }
+            shuntingYardParse(tokens.dequeue());
         }
 
-        return popRemainingTokens();
-    }
+        if (assignmentCount > 0) {
+            throw new ParseException("Syntax error: Missing variable delimitter", 0);
+        }
 
-    /**
-     * Pops all the remaining operators from the operator stack and creates ast nodes of them
-     * @return stack of ast nodes, ideally should only return one root node but incase of function arguments or variables it will return many nodes
-     * @throws ParseException
-     */
-    private Stack<ASTNode> popRemainingTokens() throws ParseException {
         while (!operators.isEmpty()) {
             Token operator = operators.pop();
 
             if (operator.getKey().equals("(")) {
-                throw new ParseException("Syntax error missing parenthesis 1", 0);
+                throw new ParseException("Syntax error: Missing parenthesis 1", 0);
             }
 
             addOperatorNode(operator);
         }
 
         return nodes;
+    }
+
+    private void tryIncFunctionArity(Token token) {
+        if ((token.isNumber() || 
+             token.isSymbol() || 
+             token.isOperator() || 
+             token.isFunction() || 
+             token.getKey().equals("(")) && 
+             !functionArity.isEmpty() && 
+             functionArity.peek() == 0) 
+        {
+            functionArity.push(functionArity.pop() + 1);
+        }
+    }
+
+    private void popUntil(String tokenKey, int precedence) throws ParseException {
+        while (
+                !operators.isEmpty() && 
+                !operators.peek().getKey().equals(tokenKey) &&
+                operators.peek().getPrecedence() >= precedence
+        ) {
+            addOperatorNode(operators.pop());
+        }
     }
 
     /**
@@ -102,96 +79,109 @@ public class Parser {
      * @param token The token to parse
      * @throws ParseException if parenthesis don't match
      */
-    private void shuntingYardParse(Token token) throws ParseException {
-        if (token.isNumber()) {
-            nodes.push(new ASTNode(token));
-        } else if (token.isSymbol()) {
-            // This is currently where we diverge from the standard algorithm
-            // Here we recursively parse the function and its arguments
-            operators.push(token);
-            ASTNode root = new ASTNode(token);
-            Parser parser = new Parser(tokens);
-            Stack<ASTNode> children = new Stack<>(new List<>()); 
+    private void shuntingYardParse(Token token) throws ParseException { 
+        tryIncFunctionArity(token);
 
-            if (!tokens.isEmpty() && tokens.peek().isEmpty() && tokens.peek().getKey().equals("(")) {
-                children = parser.parseUntil("\\)");
-            }
+        if (token.isNumber() || token.isSymbol()) {
+            nodes.push(new ASTNode(token)); 
 
-            root.setChildren(children);
-            functions.push(root);
-        } else if (token.isAssignment()) {
-            if (operators.isEmpty() || !operators.peek().isSymbol()) {
-                throw new ParseException("Syntax error can't assign value to non-symbol ", 0);
-            }
-
-            operators.pop();
+        } else if (token.isFunction()) {
             operators.push(token);
 
-            ASTNode root = new ASTNode(token);
-            Parser parser = new Parser(tokens);
-            Stack<ASTNode> children = parser.parseUntil(":");
-
-            root.setChildren(children);
-            root.addChild(functions.pop());
-
-            functions.push(root);
-        } else if (token.isOperator()) {
-            while (
-                    !operators.isEmpty() && 
-                    !operators.peek().getKey().equals("(") && 
-                    operators.peek().getPrecedence() >= token.getPrecedence()
-            ) {
-                Token operator = operators.pop();
-                addOperatorNode(operator);
+        } else if (token.isOperator() || token.isAssignment()) {
+            if (token.isAssignment()) {
+                assignmentCount++;
             }
+
+            popUntil("(", token.getPrecedence());
             operators.push(token);
-        } else {
-            if (token.getKey().equals("(")) {
-                operators.push(token);
+
+        } else if (token.getKey().equals("(")) {
+            if (!operators.isEmpty() && operators.peek().isFunction()) {
+                functionArity.push(0);
+            }
+
+            operators.push(token);
+        } else if (token.getKey().equals(")")) {
+            popUntil("(", 0);
+
+            if (operators.isEmpty()) {
+                throw new ParseException("Syntax error missing parenthesis! 2", 0);
             } else {
-                while (!operators.isEmpty() && !operators.peek().getKey().equals("(")) {
-                    Token operator = operators.pop();
-                    addOperatorNode(operator);
-                }
+                operators.pop();
+            }
 
-                if (!token.getKey().equals(",") && !token.getKey().equals(":") && operators.isEmpty()) {
-                    throw new ParseException("Syntax error missing parenthesis! 2", 0);
-                }
+            if (!operators.isEmpty() && operators.peek().isFunction()) {
+                addOperatorNode(operators.pop());
+            }
 
-                if (!token.getKey().equals(",") && !token.getKey().equals(":")) {
-                    operators.pop();
-                }
+        } else if (token.getKey().equals(",")) {
+            popUntil("(", 0);
+
+            if (functionArity.isEmpty() || functionArity.peek() == 0) {
+                throw new ParseException("Syntax error: Illegal use of comma", 0);
+            }
+
+            functionArity.push(functionArity.pop() + 1);
+
+        } else { // variable delimitter
+            popUntil("=", 0);
+            assignmentCount--;
+
+            if (operators.isEmpty()) {
+                throw new ParseException("Syntax error: Assignment for variable delimitter missing", 0);
+            } else {
+                addOperatorNode(operators.pop());
+                variables.enqueue(nodes.pop());
             }
         }
     }
 
     /**
      * Add nodes to the abstract syntax tree
-     * @param operator to add to the tree, 
-     * if operator is a mathematical operator we pop the previously added nodes since they will be the numbers for the operator
-     * If token is a function we pop the top function from the function stack and add it to the tree
+     * 
+     * @param operator to add to the tree, if operator is a mathematical operator we
+     *                 pop the previously added nodes since they will be the numbers
+     *                 for the operator If token is a function we pop the top
+     *                 function from the function stack and add it to the tree
+     * @throws ParseException
      */
-    private void addOperatorNode(Token operator) {
-        if (operator.isSymbol() || operator.isAssignment()) {
-            nodes.push(functions.pop());
-        } else {
-            ASTNode node = new ASTNode(operator);
-            if ("$".equals(operator.getKey())) {
-                node.addChild(nodes.pop());
-            } else {
-                if (!nodes.isEmpty()) {
-                    ASTNode c = nodes.pop();
-                    node.addChild(c);
-                }
+    private void addOperatorNode(Token operator) throws ParseException {
+        ASTNode node = new ASTNode(operator);
+        if (operator.getKey().equals("$") && !nodes.isEmpty()) {
+            node.addChild(nodes.pop());
 
-                if (!nodes.isEmpty()) {
-                    ASTNode c = nodes.pop();
-                    node.addChild(c);
-                }
+        } else if (operator.isFunction()) {
+            Integer argCount = functionArity.pop();
+
+            if (argCount == 0) {
+                throw new ParseException("Parse error: functions must have arguments, use variables instead in cases where no arguments are needed", 1);
             }
 
-            nodes.push(node);
+            while (argCount > 0 && !nodes.isEmpty()) {
+                node.addChild(nodes.pop());
+                argCount--;
+            }
+
+            if (argCount > 0) {
+                throw new ParseException("Parse error: function was expected to have more arguments than available", 1);
+            }
+
+        } else {
+            ASTNode firstChild = nodes.pop();
+            ASTNode secondChild = nodes.pop();
+
+            if (firstChild != null) {
+                node.addChild(firstChild);
+            }
+
+            if (secondChild != null) {
+                node.addChild(secondChild);
+            }
+
         }
+
+        nodes.push(node);
     }
 
     /**
@@ -201,10 +191,14 @@ public class Parser {
     public String printTree() {
         String output = "";
 
+        while (!variables.isEmpty()) {
+            ASTNode root = variables.dequeue();
+            output += depthFirstSearch(root);
+        }
+
         while (!nodes.isEmpty()) {
             ASTNode root = nodes.pop();
-            output += dfs(root);
-            System.out.println();
+            output += depthFirstSearch(root);
         }
 
         return output;
@@ -215,17 +209,21 @@ public class Parser {
      * @param node root node of the tree
      * @return String representing the node and its position in RPN normal form
      */
-    private String dfs(ASTNode node) {
+    private String depthFirstSearch(ASTNode node) {
         if (node.token().isNumber()) {
             return node.token().getKey();
         }
 
         String branches = "";
         
-        while (!node.getChildren().isEmpty()) {
-            branches += dfs(node.getChildren().pop());
+        for (int i = node.children().size() - 1; i >= 0; --i) {
+            branches += depthFirstSearch(node.children().get(i));
         }
 
         return (branches += node.token().getKey());
+    }
+
+    public Queue<ASTNode> variables() {
+        return this.variables;
     }
 }

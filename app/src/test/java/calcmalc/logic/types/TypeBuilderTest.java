@@ -13,7 +13,7 @@ public class TypeBuilderTest {
         Token actual4 = TypeBuilder.buildToken(Types.OPERATOR, "^");
         assertEquals(2, actual1.getPrecedence());
         assertEquals(1, actual2.getPrecedence());
-        assertEquals(4, actual3.getPrecedence());
-        assertEquals(3, actual4.getPrecedence());
+        assertEquals(3, actual3.getPrecedence());
+        assertEquals(4, actual4.getPrecedence());
     }
 }

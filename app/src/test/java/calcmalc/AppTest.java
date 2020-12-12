@@ -77,13 +77,13 @@ public class AppTest {
     }
 
     @Test
-    public void testParseExceptionIsThrown() throws Exception {
+    public void testEvaluatorExceptionIsThrown() throws Exception {
         String expr = "2 = x : x + 2";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
         System.setIn(in);
         App.repl();
 
-        assertEquals("Syntax error can't assign value to non-symbol", errContent.toString().trim());
+        assertEquals("Assignment error: Can't assign variable to non-symbol or non-function", errContent.toString().trim());
     }
 
     @Test
