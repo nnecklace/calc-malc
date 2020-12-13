@@ -17,7 +17,6 @@ public class Lexer {
     public Lexer() {
         // ideally we would regex match in this case but since it is not allowed in this course we will resort to doing it this way
         alphabet.placeOrUpdate('_', true);
-       // size         abcdefghijklmnopqrstuvwxyz 
         for (char ch: "abcdefghijklmnopqrstuvwxyz".toCharArray()) {
             alphabet.placeOrUpdate(ch, true);
             ch -= 32; // make uppercase

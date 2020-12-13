@@ -70,7 +70,11 @@ public class LexerTest {
     @Test 
     public void testLexingOperators() throws LexerException {
         Lexer lexer = new Lexer();
-        Queue<Token> tokens = lexer.lex("2+2*5/5-1");
+        Queue<Token> tokens = lexer.lex("2+2*5/5-1^2%10");
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isOperator());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isOperator());
         assertTrue(tokens.dequeue().isNumber());
         assertTrue(tokens.dequeue().isOperator());
         assertTrue(tokens.dequeue().isNumber());

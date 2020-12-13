@@ -368,10 +368,21 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("=:"));
+        Exception exception = assertThrows(EvaluatorException.class, () -> {
+            evaluator.evaluate(parser.variables().dequeue());
+        });
+    }
+
+    @Test
+    public void testEvaluateFailsOnEmptyAssignment2() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
         // custom(x,+)=2+x:custom(2,2) send to parser
         // custom(x,())=2+x:custom(2,2) send to parser
         // test composition
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("=:"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=:"));
         Exception exception = assertThrows(EvaluatorException.class, () -> {
             evaluator.evaluate(parser.variables().dequeue());
         });

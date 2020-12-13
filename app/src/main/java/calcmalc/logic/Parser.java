@@ -37,7 +37,7 @@ public class Parser {
         while (!operators.isEmpty()) {
             Token operator = operators.pop();
 
-            if (operator.getKey().equals("(")) {
+            if (operator.isOpenParenthesis()) {
                 throw new ParseException("Syntax error: Missing parenthesis 1", 0);
             }
 
@@ -52,7 +52,7 @@ public class Parser {
              token.isSymbol() || 
              token.isOperator() || 
              token.isFunction() || 
-             token.getKey().equals("(")) && 
+             token.isOpenParenthesis()) && 
              !functionArity.isEmpty() && 
              functionArity.peek() == 0) 
         {
@@ -82,58 +82,63 @@ public class Parser {
     private void shuntingYardParse(Token token) throws ParseException { 
         tryIncFunctionArity(token);
 
-        if (token.isNumber() || token.isSymbol()) {
-            nodes.push(new ASTNode(token)); 
+        switch (token.getType()) {
+            case NUMERIC:
+            case SYMBOL:
+                nodes.push(new ASTNode(token)); 
+                break;
+            case FUNCTION:
+                operators.push(token);
+                break;
+            case OPERATOR:
+            case ASSIGNMENT:
+                if (token.isAssignment()) {
+                    assignmentCount++;
+                }
 
-        } else if (token.isFunction()) {
-            operators.push(token);
+                popUntil("(", token.getPrecedence());
+                operators.push(token);
+                break;
+            case OPEN_PARENTHESIS:
+                if (!operators.isEmpty() && operators.peek().isFunction()) {
+                    functionArity.push(0);
+                }
 
-        } else if (token.isOperator() || token.isAssignment()) {
-            if (token.isAssignment()) {
-                assignmentCount++;
-            }
+                operators.push(token);
+                break;
+            case CLOSING_PARENTHESIS:
+                popUntil("(", 0);
 
-            popUntil("(", token.getPrecedence());
-            operators.push(token);
-
-        } else if (token.getKey().equals("(")) {
-            if (!operators.isEmpty() && operators.peek().isFunction()) {
-                functionArity.push(0);
-            }
-
-            operators.push(token);
-        } else if (token.getKey().equals(")")) {
-            popUntil("(", 0);
-
-            if (operators.isEmpty()) {
-                throw new ParseException("Syntax error missing parenthesis! 2", 0);
-            } else {
+                if (operators.isEmpty()) {
+                    throw new ParseException("Syntax error missing parenthesis! 2", 0);
+                } 
+                
                 operators.pop();
-            }
 
-            if (!operators.isEmpty() && operators.peek().isFunction()) {
-                addOperatorNode(operators.pop());
-            }
+                if (!operators.isEmpty() && operators.peek().isFunction()) {
+                    addOperatorNode(operators.pop());
+                } 
+                break;
+            case COMMA:
+                popUntil("(", 0);
 
-        } else if (token.getKey().equals(",")) {
-            popUntil("(", 0);
+                if (functionArity.isEmpty() || functionArity.peek() == 0) {
+                    throw new ParseException("Syntax error: Illegal use of comma", 0);
+                }
 
-            if (functionArity.isEmpty() || functionArity.peek() == 0) {
-                throw new ParseException("Syntax error: Illegal use of comma", 0);
-            }
+                functionArity.push(functionArity.pop() + 1); 
+                break;
+            case VARIABLE_DELIMITER:
+                popUntil("=", 0);
+                assignmentCount--;
 
-            functionArity.push(functionArity.pop() + 1);
+                if (operators.isEmpty()) {
+                    throw new ParseException("Syntax error: Assignment for variable delimitter missing", 0);
+                } 
 
-        } else { // variable delimitter
-            popUntil("=", 0);
-            assignmentCount--;
-
-            if (operators.isEmpty()) {
-                throw new ParseException("Syntax error: Assignment for variable delimitter missing", 0);
-            } else {
                 addOperatorNode(operators.pop());
                 variables.enqueue(nodes.pop());
-            }
+                break;
         }
     }
 

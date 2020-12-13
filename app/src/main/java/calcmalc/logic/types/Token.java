@@ -94,6 +94,10 @@ public class Token {
         this.type = type;
     }
 
+    public Types getType() {
+        return type;
+    }
+
     /**
      * Getter for class key property
      * @return the key property

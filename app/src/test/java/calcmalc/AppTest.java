@@ -87,6 +87,26 @@ public class AppTest {
     }
 
     @Test
+    public void testEvaluatorExceptionIsThrownOnIllegalAssignment() throws Exception {
+        String expr = "=:";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("Assignment error: Assignment operator should have a symbol to assign and a value to assign too", errContent.toString().trim());
+    }
+
+    @Test
+    public void testNumberFormatExceptionIsThrownOnIllegalNumber() throws Exception {
+        String expr = "2.2.2.2";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("Number was formatted incorrectly: multiple points", errContent.toString().trim());
+    }
+
+    @Test
     public void testLexerExceptionIsThrown() throws Exception {
         String expr = "2+2+2@*5";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
