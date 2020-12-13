@@ -9,10 +9,6 @@ public enum Types {
      */
     ASSIGNMENT,
     /**
-     * Empty type, e.g. {@code , () :}
-     */
-    EMPTY,
-    /**
      * Numeric type, e.g. {@code 1 2 3 4 5 6}
      */
     NUMERIC,
@@ -24,5 +20,9 @@ public enum Types {
      * Symbol type, e.g. {@code max() min() log() etc.}
      */
     SYMBOL,
-    FUNCTION
+    FUNCTION,
+    OPEN_PARENTHESIS,
+    CLOSING_PARENTHESIS,
+    VARIABLE_DELIMITER,
+    COMMA
 }

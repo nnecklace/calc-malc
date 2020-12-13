@@ -31,9 +31,9 @@ public class LexerTest {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("sqrt(1)");
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
     }
 
     @Test
@@ -41,9 +41,9 @@ public class LexerTest {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("sqrt(1.2123)");
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
     }
 
     @Test 
@@ -55,6 +55,16 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isNumber());
         assertTrue(tokens.dequeue().isOperator());
         assertTrue(tokens.dequeue().isNumber());
+    }
+
+    @Test
+    public void testLexingComplicatedSymbolNames() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("_a_A__MAMW_AA_X__clz=2:");
+        assertTrue(tokens.dequeue().isSymbol());
+        assertTrue(tokens.dequeue().isAssignment());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isVariableDelimiter());
     }
 
     @Test 
@@ -77,11 +87,11 @@ public class LexerTest {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("max(2,3)");
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isComma());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
     }
 
     @Test 
@@ -91,7 +101,7 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isSymbol());
         assertTrue(tokens.dequeue().isAssignment());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isVariableDelimiter());
     }
 
     @Test
@@ -99,18 +109,18 @@ public class LexerTest {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("max(2,8)-min(8,12)");
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isComma());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
         assertTrue(tokens.dequeue().isOperator());
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isComma());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
     }
 
     @Test 
@@ -159,15 +169,15 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isSymbol());
         assertTrue(tokens.dequeue().isAssignment());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isVariableDelimiter());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isFunction());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
         assertTrue(tokens.dequeue().isSymbol());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isComma());
         assertTrue(tokens.dequeue().isNumber());
-        assertTrue(tokens.dequeue().isEmpty());
-        assertTrue(tokens.dequeue().isEmpty());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
     }
 
     @Test

@@ -50,12 +50,20 @@ public class Token {
         return type == Types.ASSIGNMENT;
     }
 
-    /**
-     * Check if token is a type empty 
-     * @return true if token is empty else false
-     */
-    public boolean isEmpty() {
-        return type == Types.EMPTY;
+    public boolean isOpenParenthesis() {
+        return type == Types.OPEN_PARENTHESIS;
+    }
+
+    public boolean isClosingParenthesis() {
+        return type == Types.CLOSING_PARENTHESIS;
+    }
+
+    public boolean isComma() {
+        return type == Types.COMMA;
+    }
+
+    public boolean isVariableDelimiter() {
+        return type == Types.VARIABLE_DELIMITER;
     }
 
     public boolean isFunction() {
@@ -78,6 +86,10 @@ public class Token {
         this.precedence = precedence;
     }
 
+    /**
+     * Setter for class type value
+     * @param type the type of the token
+     */
     public void setType(Types type) {
         this.type = type;
     }

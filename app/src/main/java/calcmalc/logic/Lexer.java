@@ -1,6 +1,6 @@
 package calcmalc.logic;
 
-import calcmalc.structures.List;
+import calcmalc.structures.HashTable;
 import calcmalc.structures.Queue;
 import calcmalc.exceptions.LexerException;
 import calcmalc.logic.types.*;
@@ -11,6 +11,24 @@ import calcmalc.logic.types.*;
  * @author nnecklace
  */
 public class Lexer {
+    HashTable<Character,Boolean> alphabet = new HashTable<>();
+    HashTable<Character,Boolean> numbers = new HashTable<>();
+
+    public Lexer() {
+        // ideally we would regex match in this case but since it is not allowed in this course we will resort to doing it this way
+        alphabet.placeOrUpdate('_', true);
+       // size         abcdefghijklmnopqrstuvwxyz 
+        for (char ch: "abcdefghijklmnopqrstuvwxyz".toCharArray()) {
+            alphabet.placeOrUpdate(ch, true);
+            ch -= 32; // make uppercase
+            alphabet.placeOrUpdate(ch, true);
+        }
+
+        for (char ch: ".0123456789".toCharArray()) {
+            numbers.placeOrUpdate(ch, true);
+        }
+    }
+
     /**
      * Function lexes, gives each character a token, the given arthemetic expression
      * @param expression the string representing the arthemetic expression we want to lex
@@ -20,38 +38,52 @@ public class Lexer {
     public Queue<Token> lex(String expression) throws LexerException {
         Queue<Token> tokens = new Queue<>();
         for (int i = 0; i < expression.length(); ++i) {
-            String c = Character.toString(expression.charAt(i));
-            if (c.matches("\\+|\\*|/|\\-|\\^|\\%")) {
-                // check if operator is unary - operator
-                // ,-100
-                // -x
-                // (-100)
-                if ("-".equals(c) && (tokens.isEmpty() || tokens.peekLast().getKey().equals("(") || tokens.peekLast().getKey().equals(","))) {
-                    // unary minus operator
-                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
-                } else {
-                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, c));
-                }
-            } else if (c.matches("[.0-9]")) {
-                StringBuilder number = new StringBuilder();
-                number.append(c);
-                i = scan(expression, number, i, "[.0-9]");
-                tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, number.toString()));
-            } else if (c.matches("=")) {
-                tokens.enqueue(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
-            } else if (c.matches("[_a-zA-Z]")) {
-                StringBuilder symbol = new StringBuilder();
-                symbol.append(c);
-                i = scan(expression, symbol, i, "[_a-zA-Z]");
-                tokens.enqueue(TypeBuilder.buildToken(Types.SYMBOL, symbol.toString()));
-            } else if (c.matches("\\(") || c.matches("\\)") || c.matches(",") || c.matches(":")) {
-                if (c.matches("\\(") && !tokens.isEmpty() && tokens.peekLast().isSymbol()) {
-                    tokens.peekLast().setType(Types.FUNCTION);
-                }
-                tokens.enqueue(TypeBuilder.buildToken(Types.EMPTY, c));
-            } else {
-                String errorAt = String.format("%" + (i + 1) + "s", "^");
-                throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
+            char  c = expression.charAt(i);
+            switch (c) {
+                case '=':
+                    tokens.enqueue(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
+                    break;
+                case ')':
+                    tokens.enqueue(TypeBuilder.buildToken(Types.CLOSING_PARENTHESIS, ")"));
+                    break;
+                case ':':
+                    tokens.enqueue(TypeBuilder.buildToken(Types.VARIABLE_DELIMITER, ":"));
+                    break;
+                case ',':
+                    tokens.enqueue(TypeBuilder.buildToken(Types.COMMA, ","));
+                    break;
+                case '(':
+                    if (!tokens.isEmpty() && tokens.peekLast().isSymbol()) {
+                        tokens.peekLast().setType(Types.FUNCTION);
+                    }
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPEN_PARENTHESIS, "("));
+                    break;
+                case '+':
+                case '*':
+                case '/':
+                case '^':
+                case '%':
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, String.valueOf(c)));
+                    break;
+                case '-':
+                    // check if operator is unary - operator ,-100 -x (-100) unary minus operator
+                    if (tokens.isEmpty() || tokens.peekLast().isOpenParenthesis() || tokens.peekLast().isComma()) {
+                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
+                    } else {
+                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, String.valueOf(c)));
+                    }
+                    break;
+                default:
+                    if (alphabet.get(c) != null) {
+                        tokens.enqueue(TypeBuilder.buildToken(Types.SYMBOL, scan(expression, c, i + 1, alphabet)));
+                    } else if (numbers.get(c) != null) {
+                        tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, scan(expression, c, i + 1, numbers)));
+                    } else {
+                        // TODO: should use something else since this is not allowed
+                        String errorAt = String.format("%" + (i + 1) + "s", "^");
+                        throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
+                    }
+                    i += tokens.peekLast().getKey().length() - 1;
             }
         }
 
@@ -67,12 +99,13 @@ public class Lexer {
      * @param pattern the regex to match
      * @return the position in the expression where we no longer match with the regex
      */
-    private int scan(String expression, StringBuilder tokenName, int i, String pattern) {
-        int pos = i;
-        while (pos + 1 < expression.length() && Character.toString(expression.charAt(pos + 1)).matches(pattern)) {
-            tokenName.append(expression.charAt(pos + 1));
-            pos++;
+    private String scan(String expression, char start, int i, HashTable<Character, Boolean> lookup) {
+        String token = String.valueOf(start);
+        while (i < expression.length() && lookup.get(expression.charAt(i)) != null) {
+            token += (expression.charAt(i));
+            i++;
         }
-        return pos;
+
+        return token;
     }
 }

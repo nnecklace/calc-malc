@@ -104,6 +104,9 @@ public class App {
             System.out.println(output);
         } catch (LexerException | ParseException | EvaluatorException | ArithmeticException e) {
             System.err.println(e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("Number was formatted incorrectly: " + e.getMessage());
+        } finally {
             parser = new Parser();
         }
         System.out.println();
