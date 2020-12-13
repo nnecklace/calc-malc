@@ -154,14 +154,14 @@ public class Evaluator {
         }
     }
 
-    private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) throws EvaluatorException {
+    private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) {
         if (arguments.size() == 1) {
             return arguments.dequeue().doubleValue();
         } else {
             if (minOrMax.equals("min")) {
-                return min(arguments.dequeue().doubleValue(), minOrMax("min", arguments));
+                return min(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
             }
-            return max(arguments.dequeue().doubleValue(), minOrMax("max", arguments));
+            return max(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
         }
     }
 
@@ -264,9 +264,16 @@ public class Evaluator {
         }
 
         Queue<Number> arguments = new Queue<>();
-        
-        for (int i = node.children().size() - 1; i >= 0; --i) {
-            arguments.enqueue(evaluate(node.children().get(i))); // O(1) since functions or operators can have 1 or 2 arguments
+        int i = node.children().size() - 1;
+
+        while (i >= 0) {
+            arguments.enqueue(evaluate(node.children().get(i--)));
+            if (arguments.size() == 2 && i >= 0) {
+                // in this case the function takes more than two arguments
+                arguments.enqueue(
+                    evaluateFunction(node.token().getKey(), arguments)
+                );
+            }
         }
 
         return evaluateFunction(node.token().getKey(), arguments);

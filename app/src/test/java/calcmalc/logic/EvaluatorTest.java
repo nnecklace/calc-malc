@@ -425,7 +425,7 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("max(10,max(50,max(100,max(250,max(2,max(1,-100))))))"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("max(10,50,100,250,max(2,1,-100))"));
         assertEquals((Double) 250.0, evaluator.evaluate(nodes.pop()));
     }
 
@@ -443,7 +443,7 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("min(10,min(50,min(100,min(250,min(2,min(1,-100))))))"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("min(10,50,100,250,min(2,1,-100))"));
         assertEquals((Double) (-100.0), evaluator.evaluate(nodes.pop()));
     }
 
