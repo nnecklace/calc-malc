@@ -311,14 +311,70 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        // custom(x,+)=2+x:custom(2,2) send to parser
-        // custom(x,())=2+x:custom(2,2) send to parser
-        // test composition
         Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,sqrt(2))=2+x:custom(2,2)"));
         Queue<ASTNode> variables = parser.variables();
         Exception exception = assertThrows(Exception.class, () -> {
             assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
         }); 
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionComposition() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y)=x+y:custom(abs(-1),1)"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals((Double)2.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionComposition2() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y)=x+y:custom(abs(-1),sqrt(4))"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals((Double)3.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionCompositionWithMaxAndMin() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y)=x+y:custom(min(-1,2,3,0),max(-1,-2,-3,-10,4))"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals((Double)3.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionCompositionWithCustomFunction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y)=x+y:fn(x)=x+2:custom(fn(0),1)"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals("<assignment:fn>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals((Double)3.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateFailsOnEmptyAssignment() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        // custom(x,+)=2+x:custom(2,2) send to parser
+        // custom(x,())=2+x:custom(2,2) send to parser
+        // test composition
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("=:"));
+        Exception exception = assertThrows(EvaluatorException.class, () -> {
+            evaluator.evaluate(parser.variables().dequeue());
+        });
     }
 
     @Test
@@ -382,6 +438,24 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse(lexer.lex("min(-100,0)"));
         assertEquals((Double) (-100.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMaxWithOneArgument() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("max(1)"));
+        assertEquals((Double) 1.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateMinWithOneArgument() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("min(1)"));
+        assertEquals((Double) 1.0, evaluator.evaluate(nodes.pop()));
     }
 
     @Test

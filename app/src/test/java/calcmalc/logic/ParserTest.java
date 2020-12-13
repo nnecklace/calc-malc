@@ -327,6 +327,14 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseCustomFunctionWithCustomFunctionComposition() throws ParseException, LexerException {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        parser.parse(lexer.lex("fn_abs(x,y)=x+y:fn(x)=x+2:fn_abs(fn(0),1)"));
+        assertEquals("xyfn_absxy+=xfnx2+=0fn1fn_abs", parser.printTree());
+    }
+
+    @Test
     public void testParseThrowsExceptionOnWrongArgumentCountCustomFunction() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();

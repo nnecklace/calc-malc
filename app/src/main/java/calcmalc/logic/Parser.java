@@ -192,13 +192,11 @@ public class Parser {
         String output = "";
 
         while (!variables.isEmpty()) {
-            ASTNode root = variables.dequeue();
-            output += depthFirstSearch(root);
+            output += depthFirstSearch(variables.dequeue());
         }
 
         while (!nodes.isEmpty()) {
-            ASTNode root = nodes.pop();
-            output += depthFirstSearch(root);
+            output += depthFirstSearch(nodes.pop());
         }
 
         return output;

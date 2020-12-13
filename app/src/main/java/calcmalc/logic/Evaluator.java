@@ -10,22 +10,15 @@ import calcmalc.logic.types.Token;
  * @author nnecklace
  */
 public class Evaluator {
-    private HashTable<String, Integer> config = new HashTable<>();
+    private HashTable<String, Integer> functionArity = new HashTable<>();
     private HashTable<String, Double> symbolTable = new HashTable<>();
-    private HashTable<String, ASTNode> customFunctionTable = new HashTable<>();
-    private HashTable<String, FunctionArgumentPair> customFunctionArguments = new HashTable<>();
+    private HashTable<String, ASTNode> customFunctionBodies = new HashTable<>();
+    private HashTable<String, FunctionArgumentTuple> customFunctionArguments = new HashTable<>();
     private String context;
 
-    private class FunctionArgumentPair {
+    private class FunctionArgumentTuple {
         String first;
         String second;
-        int argumentCount() {
-            if (second != null) {
-                return 2;
-            }
-
-            return 1;
-        }
     }
 
     /**
@@ -33,22 +26,22 @@ public class Evaluator {
      * Constructor initializes the config table with built in functions and operators
      */
     public Evaluator() { 
-        config.placeOrUpdate("+", 2);
-        config.placeOrUpdate("-", 2);
-        config.placeOrUpdate("*", 2);
-        config.placeOrUpdate("/", 2);
-        config.placeOrUpdate("^", 2);
-        config.placeOrUpdate("%", 2);
-        config.placeOrUpdate("$", 1);
-        config.placeOrUpdate("sqrt", 1);
-        config.placeOrUpdate("log", 1);
-        config.placeOrUpdate("ln", 1);
-        config.placeOrUpdate("abs", 1);
-        config.placeOrUpdate("cos", 1);
-        config.placeOrUpdate("sin", 1);
-        config.placeOrUpdate("tan", 1);
-        config.placeOrUpdate("max", -1);
-        config.placeOrUpdate("min", -1);
+        functionArity.placeOrUpdate("+", 2);
+        functionArity.placeOrUpdate("-", 2);
+        functionArity.placeOrUpdate("*", 2);
+        functionArity.placeOrUpdate("/", 2);
+        functionArity.placeOrUpdate("^", 2);
+        functionArity.placeOrUpdate("%", 2);
+        functionArity.placeOrUpdate("$", 1);
+        functionArity.placeOrUpdate("sqrt", 1);
+        functionArity.placeOrUpdate("log", 1);
+        functionArity.placeOrUpdate("ln", 1);
+        functionArity.placeOrUpdate("abs", 1);
+        functionArity.placeOrUpdate("cos", 1);
+        functionArity.placeOrUpdate("sin", 1);
+        functionArity.placeOrUpdate("tan", 1);
+        functionArity.placeOrUpdate("max", -1);
+        functionArity.placeOrUpdate("min", -1);
     }
 
     /**
@@ -58,8 +51,8 @@ public class Evaluator {
      * @throws EvaluatorException if wrong number of arguments
      */
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
-        Integer value = config.get(symbol);
-        if ((value != null && value != argumentsCount && value != -1)) {
+        Integer value = functionArity.get(symbol);
+        if (value != null && value != argumentsCount && value != -1) {
             throw new EvaluatorException("Wrong number of arguments " + symbol);
         }
     }
@@ -73,7 +66,7 @@ public class Evaluator {
     private <N extends Number> double checkSymbolAndFunctionTable(String token, Stack<N> arguments) throws EvaluatorException {
         Double symbolValue = null;
         if (context != null) {
-            symbolValue = symbolTable.get(context + "_" + token);
+            symbolValue = symbolTable.get(context + "@" + token);
         }
 
         if (symbolValue == null) {
@@ -84,15 +77,15 @@ public class Evaluator {
             return symbolValue;
         }
 
-        ASTNode node = customFunctionTable.get(token);
+        ASTNode node = customFunctionBodies.get(token);
 
         if (node != null) {
-            FunctionArgumentPair argumentPair = customFunctionArguments.get(token);
+            FunctionArgumentTuple argumentPair = customFunctionArguments.get(token);
 
-            symbolTable.placeOrUpdate(token + "_" + argumentPair.first, arguments.pop().doubleValue());
+            symbolTable.placeOrUpdate(token + "@" + argumentPair.first, arguments.pop().doubleValue());
 
             if (argumentPair.second != null) {
-                symbolTable.placeOrUpdate(token + "_" + argumentPair.second, arguments.pop().doubleValue());
+                symbolTable.placeOrUpdate(token + "@" + argumentPair.second, arguments.pop().doubleValue());
             }
 
             context = token;
@@ -201,6 +194,10 @@ public class Evaluator {
      * @throws EvaluatorException if assignment cannot be evaluated
      */
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
+        if (node.children().size() < 2) {
+            throw new EvaluatorException("Assignment error: Assignment operator should have a symbol to assign and a value to assign too");
+        }
+
         ASTNode symbol = node.children().get(node.children().size() - 1);
 
         if (!symbol.token().isFunction() && !symbol.token().isSymbol()) {
@@ -208,7 +205,7 @@ public class Evaluator {
         }
 
         if (symbol.token().isFunction()) {
-            FunctionArgumentPair argumentPair = new FunctionArgumentPair();
+            FunctionArgumentTuple argumentTuple = new FunctionArgumentTuple();
 
             int size = symbol.children().size();
 
@@ -217,25 +214,24 @@ public class Evaluator {
             }
 
             Token firstArg = symbol.children().get(size - 1).token();
-            argumentPair.first = firstArg.getKey();
-
+            argumentTuple.first = firstArg.getKey();
             Token secondArg = null;
 
-            if (size - 2 == 0) {
-                secondArg = symbol.children().get(size - 2).token(); 
-                argumentPair.second = secondArg.getKey();
+            if (size == 2) {
+                secondArg = symbol.children().get(0).token(); 
+                argumentTuple.second = secondArg.getKey();
             }
 
             if (!firstArg.isSymbol() || (secondArg != null && !secondArg.isSymbol())) {
                 throw new EvaluatorException("Custom function arguments have to be symbols");
             }
 
-            config.placeOrUpdate(symbol.token().getKey(), argumentPair.argumentCount()); 
-            customFunctionTable.placeOrUpdate(symbol.token().getKey(), node.children().get(node.children().size() - 2));
-            customFunctionArguments.placeOrUpdate(symbol.token().getKey(), argumentPair);
+            functionArity.placeOrUpdate(symbol.token().getKey(), size); 
+            customFunctionBodies.placeOrUpdate(symbol.token().getKey(), node.children().get(0));
+            customFunctionArguments.placeOrUpdate(symbol.token().getKey(), argumentTuple);
 
         } else {
-            Number value = evaluate(node.children().get(node.children().size() - 2));
+            Number value = evaluate(node.children().get(0));
             symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
         }
 
