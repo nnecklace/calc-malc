@@ -264,11 +264,10 @@ public class Evaluator {
         }
 
         Queue<Number> arguments = new Queue<>();
-        int i = node.children().size() - 1;
 
-        while (i >= 0) {
-            arguments.enqueue(evaluate(node.children().get(i--)));
-            if (arguments.size() == 2 && i >= 0) {
+        for (int i = node.children().size() - 1; i >= 0; --i) {
+            arguments.enqueue(evaluate(node.children().get(i)));
+            if (arguments.size() == 2 && i > 0) {
                 // in this case the function takes more than two arguments
                 arguments.enqueue(
                     evaluateFunction(node.token().getKey(), arguments)
