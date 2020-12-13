@@ -2,7 +2,7 @@ package calcmalc.logic;
 
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.HashTable;
-import calcmalc.structures.Queue;
+import calcmalc.structures.Stack;
 import calcmalc.exceptions.EvaluatorException;
 import calcmalc.logic.types.Token;
 
@@ -70,7 +70,7 @@ public class Evaluator {
      * @return the value associated with the symbol
      * @throws EvaluatorException if symbol is unknown
      */
-    private <N extends Number> double checkSymbolAndFunctionTable(String token, Queue<N> arguments) throws EvaluatorException {
+    private <N extends Number> double checkSymbolAndFunctionTable(String token, Stack<N> arguments) throws EvaluatorException {
         Double symbolValue = null;
         if (context != null) {
             symbolValue = symbolTable.get(context + "_" + token);
@@ -89,10 +89,10 @@ public class Evaluator {
         if (node != null) {
             FunctionArgumentPair argumentPair = customFunctionArguments.get(token);
 
-            symbolTable.placeOrUpdate(token + "_" + argumentPair.first, arguments.dequeue().doubleValue());
+            symbolTable.placeOrUpdate(token + "_" + argumentPair.first, arguments.pop().doubleValue());
 
             if (argumentPair.second != null) {
-                symbolTable.placeOrUpdate(token + "_" + argumentPair.second, arguments.dequeue().doubleValue());
+                symbolTable.placeOrUpdate(token + "_" + argumentPair.second, arguments.pop().doubleValue());
             }
 
             context = token;
@@ -114,37 +114,37 @@ public class Evaluator {
      * @return Whatever result the symbol represents with the given arguments
      * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
-    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
+    public <N extends Number> double evaluateFunction(String token, Stack<N> arguments) throws EvaluatorException {
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
-                return arguments.dequeue().doubleValue() * arguments.dequeue().doubleValue();
+                return arguments.pop().doubleValue() * arguments.pop().doubleValue();
             case "+":
-                return arguments.dequeue().doubleValue() + arguments.dequeue().doubleValue();
+                return arguments.pop().doubleValue() + arguments.pop().doubleValue();
             case "/":
-                return arguments.dequeue().doubleValue() / arguments.dequeue().doubleValue(); 
+                return arguments.pop().doubleValue() / arguments.pop().doubleValue(); 
             case "-":
-                return arguments.dequeue().doubleValue() - arguments.dequeue().doubleValue();
+                return arguments.pop().doubleValue() - arguments.pop().doubleValue();
             case "$":
-                return -arguments.dequeue().doubleValue();
+                return -arguments.pop().doubleValue();
             case "%":
-                return arguments.dequeue().doubleValue() % arguments.dequeue().doubleValue();
+                return arguments.pop().doubleValue() % arguments.pop().doubleValue();
             case "^":
-                return Math.pow(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
+                return Math.pow(arguments.pop().doubleValue(), arguments.pop().doubleValue());
             case "sqrt":
-                return Math.sqrt(arguments.dequeue().doubleValue());
+                return Math.sqrt(arguments.pop().doubleValue());
             case "ln":
-                return Math.log(arguments.dequeue().doubleValue());
+                return Math.log(arguments.pop().doubleValue());
             case "log":
-                return Math.log(arguments.dequeue().doubleValue()) / Math.log(2);
+                return Math.log(arguments.pop().doubleValue()) / Math.log(2);
             case "abs":
-                return abs(arguments.dequeue().doubleValue());
+                return abs(arguments.pop().doubleValue());
             case "cos":
-                return Math.cos(arguments.dequeue().doubleValue());
+                return Math.cos(arguments.pop().doubleValue());
             case "sin":
-                return Math.sin(arguments.dequeue().doubleValue());
+                return Math.sin(arguments.pop().doubleValue());
             case "tan":
-                return Math.tan(arguments.dequeue().doubleValue());
+                return Math.tan(arguments.pop().doubleValue());
             case "max":
                 return minOrMax("max", arguments);
             case "min":
@@ -154,14 +154,14 @@ public class Evaluator {
         }
     }
 
-    private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) {
+    private <N extends Number> double minOrMax(String minOrMax, Stack<N> arguments) {
         if (arguments.size() == 1) {
-            return arguments.dequeue().doubleValue();
+            return arguments.pop().doubleValue();
         } else {
             if (minOrMax.equals("min")) {
-                return min(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
+                return min(arguments.pop().doubleValue(), arguments.pop().doubleValue());
             }
-            return max(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
+            return max(arguments.pop().doubleValue(), arguments.pop().doubleValue());
         }
     }
 
@@ -263,13 +263,13 @@ public class Evaluator {
             return Double.parseDouble(node.token().getKey());
         }
 
-        Queue<Number> arguments = new Queue<>();
+        Stack<Number> arguments = new Stack<>();
 
-        for (int i = node.children().size() - 1; i >= 0; --i) {
-            arguments.enqueue(evaluate(node.children().get(i)));
-            if (arguments.size() == 2 && i > 0) {
+        for (int i = 0; i < node.children().size(); ++i) {
+            arguments.push(evaluate(node.children().get(i)));
+            if (arguments.size() == 2 && i < (node.children().size() - 1)) {
                 // in this case the function takes more than two arguments
-                arguments.enqueue(
+                arguments.push(
                     evaluateFunction(node.token().getKey(), arguments)
                 );
             }
