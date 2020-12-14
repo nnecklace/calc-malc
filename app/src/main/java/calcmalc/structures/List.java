@@ -124,8 +124,4 @@ public class List<T> {
     public boolean isEmpty() {
         return size() == 0;
     }
-
-    public T[] asArray() {
-        return list;
-    }
 }

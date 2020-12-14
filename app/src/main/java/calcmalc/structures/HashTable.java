@@ -71,7 +71,6 @@ public class HashTable<K, V> {
 
         for (int i = 0; i < entries.size(); ++i) {
             HashTableEntry<K, V> entry = entries.get(i);
-            // Nullpointer possible ?
             if (entry.hashCode() == key.hashCode() && entry.getKey().equals(key)) {
                 return entry;
             }

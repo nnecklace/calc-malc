@@ -21,6 +21,23 @@ public class Evaluator {
         String second;
     }
 
+    private String concat(String start, String middle, String end) {
+        int size = start.length() + middle.length() + end.length();
+        char[] combined = new char[size];
+        int i = 0;
+        for (Character c : start.toCharArray()) {
+            combined[i++] = c;
+        }
+        for (Character c : middle.toCharArray()) {
+            combined[i++] = c;
+        }
+        for (Character c : end.toCharArray()) {
+            combined[i++] = c;
+        }
+
+        return new String(combined, 0, size);
+    }
+
     /**
      * Constructor for the Evaluator
      * Constructor initializes the config table with built in functions and operators
@@ -53,6 +70,7 @@ public class Evaluator {
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = functionArity.get(symbol);
         if (value != null && value != argumentsCount && value != -1) {
+            // in exceptions we use the concat operator for strings
             throw new EvaluatorException("Wrong number of arguments for " + symbol);
         }
     }
@@ -66,7 +84,7 @@ public class Evaluator {
     private <N extends Number> double checkSymbolAndFunctionTable(String token, Stack<N> arguments) throws EvaluatorException {
         Double symbolValue = null;
         if (!contexts.isEmpty()) {
-            symbolValue = symbolTable.get(contexts.peek() + "@" + token);
+            symbolValue = symbolTable.get(concat(contexts.peek(), "@", token));
         }
 
         if (symbolValue == null) {
@@ -82,10 +100,10 @@ public class Evaluator {
         if (node != null) {
             FunctionArgumentTuple argumentPair = customFunctionArguments.get(token);
 
-            symbolTable.placeOrUpdate(token + "@" + argumentPair.first, arguments.pop().doubleValue());
+            symbolTable.placeOrUpdate(concat(token, "@", argumentPair.first), arguments.pop().doubleValue());
 
             if (argumentPair.second != null) {
-                symbolTable.placeOrUpdate(token + "@" + argumentPair.second, arguments.pop().doubleValue());
+                symbolTable.placeOrUpdate(concat(token, "@", argumentPair.second), arguments.pop().doubleValue());
             }
 
             contexts.push(token);
@@ -232,7 +250,7 @@ public class Evaluator {
         }
 
 
-        return "<assignment:" + symbol.token().getKey() + ">";
+        return concat("<assignment:", symbol.token().getKey(), ">");
     }
 
     /**
