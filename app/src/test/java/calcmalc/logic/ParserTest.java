@@ -344,6 +344,69 @@ public class ParserTest {
     }
 
     @Test
+    public void testParseThrowsExceptionOnIllegalAssignment() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("2=5:"));
+        });
+    }
+
+    @Test
+    public void testEvaluateThrowsExceptionIfNonAssignmentInExpression() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("2+x=4*2:"));
+        });
+    }
+
+    @Test
+    public void testParseThrowsExceptionOnIllegalAssignment2() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("+=5:"));
+        });
+    }
+
+    @Test
+    public void testEvaluateFailsOnEmptyAssignment() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("=:")); 
+        });
+    }
+
+    @Test
+    public void testEvaluateFailsOnTupleAssignment() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("(x,y)=2.6:")); 
+        });
+    }
+
+    @Test
+    public void testEvaluateFailsOnIllegalParameterForFunction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("custom(x,+)=2+x:custom(2,2):")); 
+        });
+    }
+
+    @Test
+    public void testEvaluateFailsOnEmptyParenthesisAsParameterForFunction() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Exception exception = assertThrows(ParseException.class, () -> {
+            parser.parse(lexer.lex("custom(x,())=2+x:custom(2,2):")); 
+        });
+    }
+
+    @Test
     public void testEvaluateMaxWithNoArguments() throws ParseException, LexerException {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();

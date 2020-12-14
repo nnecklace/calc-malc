@@ -3,7 +3,6 @@ package calcmalc.logic;
 import org.junit.Test;
 
 import calcmalc.exceptions.EvaluatorException;
-import calcmalc.logic.types.Token;
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.Stack;
 import calcmalc.structures.Queue;
@@ -283,6 +282,18 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateCustomFunctionWithCustomFunctionInBody() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x)=2*x:fun(x)=x*custom(x):fun(2)"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals("<assignment:fun>", evaluator.evaluateAssignment(variables.dequeue()));
+        assertEquals((Double)8.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
     public void testEvaluateCustomFunctionFailsWithMoreThanTwoArguments() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
@@ -364,24 +375,10 @@ public class EvaluatorTest {
     }
 
     @Test
-    public void testEvaluateFailsOnEmptyAssignment() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("=:"));
-        Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluate(parser.variables().dequeue());
-        });
-    }
-
-    @Test
     public void testEvaluateFailsOnEmptyAssignment2() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        // custom(x,+)=2+x:custom(2,2) send to parser
-        // custom(x,())=2+x:custom(2,2) send to parser
-        // test composition
         Stack<ASTNode> nodes = parser.parse(lexer.lex("x=:"));
         Exception exception = assertThrows(EvaluatorException.class, () -> {
             evaluator.evaluate(parser.variables().dequeue());
@@ -668,39 +665,6 @@ public class EvaluatorTest {
         Stack<ASTNode> nodes = parser.parse(lexer.lex("abs(2,2)"));
         Exception exception = assertThrows(Exception.class, () -> {
             evaluator.evaluate(nodes.pop());
-        });
-    }
-
-    @Test
-    public void testEvaluateThrowsExceptionIfNonAssignmentInExpression() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("2+x=4*2:"));
-        Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluate(parser.variables().dequeue());
-        });
-    }
-
-    @Test
-    public void testParseThrowsExceptionOnIllegalAssignment() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("2=5:"));
-        Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluate(parser.variables().dequeue());
-        });
-    }
-
-    @Test
-    public void testParseThrowsExceptionOnIllegalAssignment2() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("+=5:"));
-        Exception exception = assertThrows(EvaluatorException.class, () -> {
-            evaluator.evaluate(parser.variables().dequeue());
         });
     }
 }

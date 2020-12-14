@@ -15,23 +15,14 @@ public class Parser {
     private Queue<ASTNode> variables = new Queue<>();
     private Stack<Integer> functionArity = new Stack<>();
 
-    private int assignmentCount = 0;
-
     /**
      * Method accepts list of tokens for the arthemetic expression
      * @return stack of nodes with the top of the stack being root node
      * @throws ParseException if illegal input
      */
     public Stack<ASTNode> parse(Queue<Token> tokens) throws ParseException {
-        // TODO: Needed?
-        assignmentCount = 0;
-
         while (!tokens.isEmpty()) {
             shuntingYardParse(tokens.dequeue());
-        }
-
-        if (assignmentCount > 0) {
-            throw new ParseException("Syntax error: Missing variable delimitter", 0);
         }
 
         while (!operators.isEmpty()) {
@@ -90,12 +81,18 @@ public class Parser {
             case FUNCTION:
                 operators.push(token);
                 break;
-            case OPERATOR:
             case ASSIGNMENT:
-                if (token.isAssignment()) {
-                    assignmentCount++;
+                if (!operators.isEmpty() || 
+                    nodes.isEmpty() || 
+                    !nodes.peek().token().isFunction() && 
+                    !nodes.peek().token().isSymbol()) 
+                {
+                    throw new ParseException("Syntax error: Tried to assign value to non assignable or empty", 0);
                 }
 
+                operators.push(token);
+                break;
+            case OPERATOR:
                 popUntil("(", token.getPrecedence());
                 operators.push(token);
                 break;
@@ -130,7 +127,6 @@ public class Parser {
                 break;
             case VARIABLE_DELIMITER:
                 popUntil("=", 0);
-                assignmentCount--;
 
                 if (operators.isEmpty()) {
                     throw new ParseException("Syntax error: Assignment for variable delimitter missing", 0);

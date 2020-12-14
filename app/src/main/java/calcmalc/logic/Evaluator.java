@@ -14,7 +14,7 @@ public class Evaluator {
     private HashTable<String, Double> symbolTable = new HashTable<>();
     private HashTable<String, ASTNode> customFunctionBodies = new HashTable<>();
     private HashTable<String, FunctionArgumentTuple> customFunctionArguments = new HashTable<>();
-    private String context;
+    private Stack<String> contexts = new Stack<>();
 
     private class FunctionArgumentTuple {
         String first;
@@ -53,7 +53,7 @@ public class Evaluator {
     private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
         Integer value = functionArity.get(symbol);
         if (value != null && value != argumentsCount && value != -1) {
-            throw new EvaluatorException("Wrong number of arguments " + symbol);
+            throw new EvaluatorException("Wrong number of arguments for " + symbol);
         }
     }
 
@@ -65,8 +65,8 @@ public class Evaluator {
      */
     private <N extends Number> double checkSymbolAndFunctionTable(String token, Stack<N> arguments) throws EvaluatorException {
         Double symbolValue = null;
-        if (context != null) {
-            symbolValue = symbolTable.get(context + "@" + token);
+        if (!contexts.isEmpty()) {
+            symbolValue = symbolTable.get(contexts.peek() + "@" + token);
         }
 
         if (symbolValue == null) {
@@ -88,9 +88,9 @@ public class Evaluator {
                 symbolTable.placeOrUpdate(token + "@" + argumentPair.second, arguments.pop().doubleValue());
             }
 
-            context = token;
+            contexts.push(token);
             Double result = (double) evaluate(node);
-            context = null;
+            contexts.pop();
 
             return result;
         }
@@ -199,10 +199,6 @@ public class Evaluator {
         }
 
         ASTNode symbol = node.children().get(node.children().size() - 1);
-
-        if (!symbol.token().isFunction() && !symbol.token().isSymbol()) {
-            throw new EvaluatorException("Assignment error: Can't assign variable to non-symbol or non-function");
-        }
 
         if (symbol.token().isFunction()) {
             FunctionArgumentTuple argumentTuple = new FunctionArgumentTuple();

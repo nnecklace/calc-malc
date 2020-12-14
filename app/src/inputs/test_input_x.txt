@@ -1,0 +1,10 @@
+
+PI = 3.14:
+
+double(x) = 2*x:
+
+hello_world(x) = sqrt(x)+double(x):
+
+Area(radius) = PI*radius^2:
+
+(log(PI)+Area(2))/hello_world(10)

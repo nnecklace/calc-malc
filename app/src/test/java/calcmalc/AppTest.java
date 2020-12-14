@@ -61,6 +61,13 @@ public class AppTest {
     }
 
     @Test
+    public void testMultiLineExpression2ResultIsPrinted() throws IOException {
+        App classUnderTest = new App();
+        classUnderTest.main(new String[]{"src/inputs/test_input_x.txt"});
+        assertEquals("0.613530533033667", outContent.toString().trim());
+    }
+
+    @Test
     public void testAssignmentIsPrinted() {
         ByteArrayInputStream in = new ByteArrayInputStream("x=2:".getBytes());
         System.setIn(in);
@@ -77,23 +84,43 @@ public class AppTest {
     }
 
     @Test
-    public void testEvaluatorExceptionIsThrown() throws Exception {
+    public void testParserExceptionIsThrown() throws Exception {
         String expr = "2 = x : x + 2";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
         System.setIn(in);
         App.repl();
 
-        assertEquals("Assignment error: Can't assign variable to non-symbol or non-function", errContent.toString().trim());
+        assertEquals("Syntax error: Tried to assign value to non assignable or empty", errContent.toString().trim());
     }
 
     @Test
-    public void testEvaluatorExceptionIsThrownOnIllegalAssignment() throws Exception {
+    public void testParserExceptionIsThrownOnIllegalAssignment() throws Exception {
         String expr = "=:";
         ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
         System.setIn(in);
         App.repl();
 
-        assertEquals("Assignment error: Assignment operator should have a symbol to assign and a value to assign too", errContent.toString().trim());
+        assertEquals("Syntax error: Tried to assign value to non assignable or empty", errContent.toString().trim());
+    }
+
+    @Test
+    public void testParserExceptionIsThrownOnIllegalAssignment2() throws Exception {
+        String expr = "(x=2:";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("Syntax error: Tried to assign value to non assignable or empty", errContent.toString().trim());
+    }
+
+    @Test
+    public void testParserExceptionIsThrownOnIllegalAssignment3() throws Exception {
+        String expr = "x=2y=3:z=5:";
+        ByteArrayInputStream in = new ByteArrayInputStream(expr.getBytes());
+        System.setIn(in);
+        App.repl();
+
+        assertEquals("Syntax error: Tried to assign value to non assignable or empty", errContent.toString().trim());
     }
 
     @Test
