@@ -62,25 +62,25 @@ public class Lexer {
                 case '/':
                 case '^':
                 case '%':
-                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, String.valueOf(c)));
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
                     break;
                 case '-':
                     // check if operator is unary - operator ,-100 -x (-100) unary minus operator
                     if (tokens.isEmpty() || tokens.peekLast().isOpenParenthesis() || tokens.peekLast().isComma()) {
                         tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
                     } else {
-                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, String.valueOf(c)));
+                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
                     }
                     break;
                 default:
                     if (alphabet.get(c) != null) {
-                        tokens.enqueue(TypeBuilder.buildToken(Types.SYMBOL, scan(expression, c, i + 1, alphabet)));
+                        tokens.enqueue(TypeBuilder.buildToken(Types.SYMBOL, scan(expression, c, i, alphabet)));
                     } else if (numbers.get(c) != null) {
-                        tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, scan(expression, c, i + 1, numbers)));
+                        tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, scan(expression, c, i, numbers)));
                     } else {
                         // TODO: should use something else since this is not allowed
-                        String errorAt = String.format("%" + (i + 1) + "s", "^");
-                        throw new LexerException("Unknown character " + c + " at position " + (i + 1) + " in expression " + expression + "\n" + expression + "\n" + errorAt);
+                        //String errorAt = String.format("%" + (i + 1) + "s", "^");
+                        throw new LexerException("Unknown character " + c + " at position " + (i + 1));
                     }
                     i += tokens.peekLast().getKey().length() - 1;
             }
@@ -89,22 +89,29 @@ public class Lexer {
         return tokens;
     }
 
-    /**
-     * Method reads all characters until it can no longer match the following character with the givin regex.
-     * Perhaps a bit needlessly complicated function
-     * @param expression the String expression the algoritm is going to evaluate
-     * @param tokenName the token name, all the characters that match the regex will be append to this token name
-     * @param i the position in the expression we are currently in
-     * @param pattern the regex to match
-     * @return the position in the expression where we no longer match with the regex
-     */
-    private String scan(String expression, char start, int i, HashTable<Character, Boolean> lookup) {
-        String token = String.valueOf(start);
-        while (i < expression.length() && lookup.get(expression.charAt(i)) != null) {
-            token += (expression.charAt(i));
-            i++;
+    private String valueOf(char[] charSequence, int size) {
+        return new String(charSequence, 0, size);
+    }
+
+    private String scan(String expression, char start, int i, HashTable<Character, Boolean> lookup) throws LexerException {
+        int maxLength = 64;
+        char[] tokens = new char[maxLength];
+        tokens[0] = start;
+        int offSet;
+
+        for (offSet = i + 1; offSet < expression.length(); ++offSet) {
+            char current = expression.charAt(offSet);
+            if (lookup.get(current) == null) {
+                break;
+            }
+
+            if ((offSet - i) >= maxLength) {
+                throw new LexerException("token " + valueOf(tokens, (offSet - i)) +  " too long. Max length is 64");
+            }
+
+            tokens[offSet - i] = current;
         }
 
-        return token;
+        return valueOf(tokens, (offSet - i));
     }
 }

@@ -67,6 +67,13 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isVariableDelimiter());
     }
 
+    @Test
+    public void testLexingComplicatedSymbolNamesIsCorrect() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("_a_A__MAMW_AA_X__clz");
+        assertEquals("_a_A__MAMW_AA_X__clz", tokens.dequeue().getKey());
+    }
+
     @Test 
     public void testLexingOperators() throws LexerException {
         Lexer lexer = new Lexer();
@@ -190,5 +197,20 @@ public class LexerTest {
         Exception exception = assertThrows(LexerException.class, () -> {
             Queue<Token> tokens = lexer.lex("2@2");
         });
+    }
+
+    @Test
+    public void testLexThrowsOnTooLongContinousSequence() {
+        Lexer lexer = new Lexer();
+        Exception exception = assertThrows(LexerException.class, () -> {
+            Queue<Token> tokens = lexer.lex("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        });
+    }
+
+    @Test
+    public void testLexAllows64CharactersInAContinuousSequence() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        assertEquals("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", tokens.dequeue().getKey());
     }
 }

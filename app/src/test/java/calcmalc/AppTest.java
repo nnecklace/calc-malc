@@ -140,7 +140,7 @@ public class AppTest {
         System.setIn(in);
         App.repl();
 
-        assertEquals("Unknown character @ at position 6 in expression 2+2+2@*5\n2+2+2@*5\n     ^", errContent.toString().trim());
+        assertEquals("Unknown character @ at position 6", errContent.toString().trim());
     }
 
     @Test

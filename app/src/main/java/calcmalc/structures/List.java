@@ -15,7 +15,7 @@ public class List<T> {
      */
     public List() {
         size = 8; // start at 8, usually start at 1 but can be started on any other power of 2
-        list = (T[]) new Object[size]; // should not be done, but Java doesn't support generic arrays
+        list = (T[]) new Object[size]; // should not be done this way, but Java doesn't support generic arrays
         head = 0;
     }
 
@@ -123,5 +123,9 @@ public class List<T> {
      */
     public boolean isEmpty() {
         return size() == 0;
+    }
+
+    public T[] asArray() {
+        return list;
     }
 }
