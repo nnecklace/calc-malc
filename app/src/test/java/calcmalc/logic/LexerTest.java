@@ -174,7 +174,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testLexingAndChangingTypes() throws LexerException {
+    public void testLexingAndChaniningTypes() throws LexerException {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("x=2:(max(x,5))");
         assertTrue(tokens.dequeue().isSymbol());
@@ -187,6 +187,24 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isSymbol());
         assertTrue(tokens.dequeue().isComma());
         assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
+    }
+
+    @Test
+    public void testLexingAndChaniningTypes2() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("__xYh=2:(max(x__X,5.123123))");
+        assertEquals("__xYh", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isAssignment());
+        assertEquals("2", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isVariableDelimiter());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
+        assertEquals("max", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
+        assertEquals("x__X", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isComma());
+        assertEquals("5.123123", tokens.dequeue().getKey());
         assertTrue(tokens.dequeue().isClosingParenthesis());
         assertTrue(tokens.dequeue().isClosingParenthesis());
     }

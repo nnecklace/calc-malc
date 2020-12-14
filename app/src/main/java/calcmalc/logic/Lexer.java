@@ -98,14 +98,14 @@ public class Lexer {
         char[] tokens = new char[maxLength];
         tokens[0] = start;
         int offSet;
-
+    
         for (offSet = i + 1; offSet < expression.length(); ++offSet) {
             char current = expression.charAt(offSet);
             if (lookup.get(current) == null) {
                 break;
             }
 
-            if ((offSet - i) >= maxLength) {
+            if ((offSet - i) == maxLength) {
                 throw new LexerException("token " + valueOf(tokens, (offSet - i)) +  " too long. Max length is 64");
             }
 
