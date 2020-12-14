@@ -95,6 +95,13 @@ task repl(type: JavaExec) {
   args = ["repl"]
 }
 
+task ui(type: JavaExec) {
+  standardInput = System.in
+  main = "calcmalc.App"
+  classpath = sourceSets.main.runtimeClasspath
+  args = ["ui"]
+}
+
 task performance(type: JavaExec) {
     main = 'calcmalc.performance.PerformanceTest'
     classpath = sourceSets.main.runtimeClasspath

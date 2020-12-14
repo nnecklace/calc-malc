@@ -26,12 +26,13 @@ public class App {
     private static Lexer lexer = new Lexer();
     private static Parser parser = new Parser();
     private static String output;
+    private static String error;
 
     /**
      * Method renders ascii greeting message
      * @return greeting message
      */
-    public String getGreeting() {
+    public static String getGreeting() {
         return "  _____      _        __  __       _      \n" + "/ _____|    | |      |  \\/  |     | |     \n"
                 + "| |     __ _| | ___  | \\  / | __ _| | ___  \n" + "| |    / _` | |/ __| | |\\/| |/ _` | |/ __| \n"
                 + "| |___| (_| | | (__  | |  | | (_| | | (__  \n" + "\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
@@ -39,6 +40,18 @@ public class App {
 
     public static void setOutPut(String output) {
         App.output = output;
+    }
+
+    public static String getOutPut() {
+        return output;
+    }
+
+    public static void setError(String error) {
+        App.error = error;
+    }
+
+    public static String getError() {
+        return error;
     }
 
     /**
@@ -53,11 +66,12 @@ public class App {
             if ("repl".equals(args[0].trim())) {
                 System.out.println(new App().getGreeting());
                 repl();
+            } else if ("ui".equals(args[0].trim())) {
+                new UI().run();
             } else {
                 read(Paths.get(args[0]));
             }
         }
-        //new UI().run();
     }
 
     /**
@@ -90,7 +104,11 @@ public class App {
             }
         }
 
-        System.out.println(App.output);
+        if (App.getError() != null) {
+            System.err.println(App.getError());
+        } else {
+            System.out.println(App.getOutPut());
+        }
 
         input.close();
     }
@@ -99,7 +117,9 @@ public class App {
      * Interprets and evaluates one line at a time and outputs a value once no lines remain
      * @param input the line to interpret
      */
-    private static void interpret(String input) {
+    public static void interpret(String input) {
+        setOutPut(null);
+        setError(null);
         try {
             Stack<ASTNode> nodes = parser.parse(
                 lexer.lex(input)
@@ -114,15 +134,12 @@ public class App {
             }
 
         } catch (LexerException | ParseException | EvaluatorException | ArithmeticException e) {
-            setOutPut("");
-            System.err.println(e.getMessage());
+            setError(e.getMessage());
         } catch (NumberFormatException e) {
-            setOutPut("");
-            System.err.println("Number was formatted incorrectly: " + e.getMessage());
+            setError("Number was formatted incorrectly: " + e.getMessage());
         } finally {
             parser = new Parser();
         }
-        System.out.println();
     }
 
     /**
@@ -134,7 +151,11 @@ public class App {
 
         while (input.hasNextLine()) {
             interpret(input.nextLine());
-            System.out.println(App.output);
+            if (App.getError() != null) {
+                System.err.println(App.getError());
+            } else {
+                System.out.println(App.getOutPut());
+            }
         }
 
         input.close();

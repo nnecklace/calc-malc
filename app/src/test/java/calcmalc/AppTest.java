@@ -68,6 +68,13 @@ public class AppTest {
     }
 
     @Test
+    public void testFileErrorIsPrinted() throws IOException {
+        App classUnderTest = new App();
+        classUnderTest.main(new String[]{"src/inputs/test_input_error.txt"});
+        assertEquals("Can't assign values in expressions, values must be assigned before or after expressions", errContent.toString().trim());
+    }
+
+    @Test
     public void testAssignmentIsPrinted() {
         ByteArrayInputStream in = new ByteArrayInputStream("x=2:".getBytes());
         System.setIn(in);
