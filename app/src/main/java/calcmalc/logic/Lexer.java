@@ -39,6 +39,10 @@ public class Lexer {
         for (int i = 0; i < expression.length(); ++i) {
             char  c = expression.charAt(i);
             switch (c) {
+                case ' ': 
+                case '\n':
+                case '\r': // scanner handles these cases for us, but just incase something weird happens with scanner we ignore these manually
+                    break;
                 case '=':
                     tokens.enqueue(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
                     break;
@@ -78,8 +82,6 @@ public class Lexer {
                     } else if (numbers.get(c) != null) {
                         tokens.enqueue(TypeBuilder.buildToken(Types.NUMERIC, scan(expression, c, i, numbers)));
                     } else {
-                        // TODO: should use something else since this is not allowed
-                        //String errorAt = String.format("%" + (i + 1) + "s", "^");
                         throw new LexerException("Unknown character " + c + " at position " + (i + 1));
                     }
                     i += tokens.peekLast().getKey().length() - 1;

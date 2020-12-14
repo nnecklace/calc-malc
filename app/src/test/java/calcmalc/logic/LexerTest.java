@@ -57,6 +57,17 @@ public class LexerTest {
         assertTrue(tokens.dequeue().isNumber());
     }
 
+    @Test 
+    public void testLexingWhiteSpaceText() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("   100+    100*    1560\n\r    \n");
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isOperator());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isOperator());
+        assertTrue(tokens.dequeue().isNumber());
+    }
+
     @Test
     public void testLexingComplicatedSymbolNames() throws LexerException {
         Lexer lexer = new Lexer();

@@ -13,8 +13,6 @@ import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -27,6 +25,7 @@ public class App {
     private static Evaluator evaluator = new Evaluator();
     private static Lexer lexer = new Lexer();
     private static Parser parser = new Parser();
+    private static String output;
 
     /**
      * Method renders ascii greeting message
@@ -36,6 +35,10 @@ public class App {
         return "  _____      _        __  __       _      \n" + "/ _____|    | |      |  \\/  |     | |     \n"
                 + "| |     __ _| | ___  | \\  / | __ _| | ___  \n" + "| |    / _` | |/ __| | |\\/| |/ _` | |/ __| \n"
                 + "| |___| (_| | | (__  | |  | | (_| | | (__  \n" + "\\_____\\___,_|_|\\___| |_|  |_|\\__,_|_|\\___|\n";
+    }
+
+    public static void setOutPut(String output) {
+        App.output = output;
     }
 
     /**
@@ -78,8 +81,18 @@ public class App {
      * @throws IOException if the file cannot be read
      */
     public static void read(Path file) throws IOException {
-        String content = Files.readString(file, StandardCharsets.UTF_8);
-        interpret(content.replaceAll("\\s", ""));
+        Scanner input = new Scanner(file.toFile());
+
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.length() > 0) {
+                interpret(line);
+            }
+        }
+
+        System.out.println(App.output);
+
+        input.close();
     }
 
     /**
@@ -87,24 +100,24 @@ public class App {
      * @param input the line to interpret
      */
     private static void interpret(String input) {
-        String output = "";
         try {
             Stack<ASTNode> nodes = parser.parse(
                 lexer.lex(input)
             );
 
             while (!parser.variables().isEmpty()) {
-                output = evaluator.evaluateAssignment(parser.variables().dequeue());
+                setOutPut(evaluator.evaluateAssignment(parser.variables().dequeue()));
             }
 
             while (!nodes.isEmpty()) {
-                output = format(evaluator.evaluate(nodes.pop()));
+                setOutPut(format(evaluator.evaluate(nodes.pop())));
             }
 
-            System.out.println(output);
         } catch (LexerException | ParseException | EvaluatorException | ArithmeticException e) {
+            setOutPut("");
             System.err.println(e.getMessage());
         } catch (NumberFormatException e) {
+            setOutPut("");
             System.err.println("Number was formatted incorrectly: " + e.getMessage());
         } finally {
             parser = new Parser();
@@ -120,7 +133,8 @@ public class App {
         Scanner input = new Scanner(System.in);
 
         while (input.hasNextLine()) {
-            interpret(input.nextLine().replaceAll("\\s", ""));
+            interpret(input.nextLine());
+            System.out.println(App.output);
         }
 
         input.close();
