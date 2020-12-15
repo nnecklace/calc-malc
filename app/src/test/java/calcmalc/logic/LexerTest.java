@@ -86,6 +86,35 @@ public class LexerTest {
     }
 
     @Test 
+    public void testLexingIncorrectNumbers() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("A__.__B");
+        assertTrue(tokens.dequeue().isSymbol());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isSymbol());
+    }
+
+    @Test 
+    public void testLexingUnaryMinus() throws LexerException {
+        Lexer lexer = new Lexer();
+        Queue<Token> tokens = lexer.lex("x=-10:-2+(-4)+x");
+        assertTrue(tokens.dequeue().isSymbol());
+        assertTrue(tokens.dequeue().isAssignment());
+        assertEquals("$", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isVariableDelimiter());
+        assertEquals("$", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isOperator());
+        assertTrue(tokens.dequeue().isOpenParenthesis());
+        assertEquals("$", tokens.dequeue().getKey());
+        assertTrue(tokens.dequeue().isNumber());
+        assertTrue(tokens.dequeue().isClosingParenthesis());
+        assertTrue(tokens.dequeue().isOperator());
+        assertTrue(tokens.dequeue().isSymbol());
+    }
+
+    @Test 
     public void testLexingOperators() throws LexerException {
         Lexer lexer = new Lexer();
         Queue<Token> tokens = lexer.lex("2+2*5/5-1^2%10");

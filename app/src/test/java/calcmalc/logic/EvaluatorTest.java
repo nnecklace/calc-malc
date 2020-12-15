@@ -667,4 +667,78 @@ public class EvaluatorTest {
             evaluator.evaluate(nodes.pop());
         });
     }
+
+    @Test
+    public void testEvaluateExressions() throws Exception {
+        String expr = new StringBuilder()
+            .append("y = 10^6:\n") // 1000000
+            .append("x = -20+100*log(50):\n") // 371.202300542814
+            .append("very_stupidly_long_variable_name = sqrt(2000)+max(2,6,200,x,y)*(5+(2-5)*2^2+(10*(16+1000))):\n") // 1.015300004472135954999579
+            .append("function_eval_all_sum_what_even_is_this = y+x+very_stupidly_long_variable_name:\n") // 1.01540004159236600928103997900585521656807094214826514819595
+            .append("__lets_call_this__double__EVEN___THOUG_WE_DONT_DOUBLE(x) = 10*(40-25*(-(x+2)*2)):\n") // 51400
+            .append("function_eval_all_sum_what_even_is_this + __lets_call_this__double__EVEN___THOUG_WE_DONT_DOUBLE(10^2)") // 51400+(10^6+-20+100*log(50)+sqrt(2000)+10^6*(5+(2-5)*2^2+(10*(16+1000))))
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals((Double) 1.015405181592366E10, evaluator.evaluate(nodes.pop())); // verified with wolfram alpha
+    }
+
+    @Test
+    public void testEvaluateExressions2() throws Exception {
+        String expr = new StringBuilder()
+            .append("_((((y))),(x))   = (((((x)))+((((((y)))))))):")
+            .append("_(((((2)+(2)))),((((sqrt(2))))))/(((max(((2+3),(((log(20)))))))))")
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals((Double) 1.082842712474619, evaluator.evaluate(nodes.pop())); // verified with wolfram alpha
+    }
+
+    @Test
+    public void testEvaluateExressions3() throws Exception {
+        String expr = new StringBuilder()
+            .append("___(__X,__HOW__) = ((((20000+__X)))^2)%__HOW__:")
+            .append("double(some__number) = (some__number)*(2):")
+            .append("triple(_param) = _param+double(_param):")
+            .append("eleganto(positiveNumber, negativeNumber) = triple((max(2,3,4,5,6,7,10^2)+positiveNumber)+double(negativeNumber)):")
+            .append("2+(2*(-2))+abs(eleganto(___(min(1,1.5), ((1/16))), log(2+2+2+2+2*(2+2+2+2))))") // 2+(2*(-2))+3*(10^2+0+(2*3.17))
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals((Double) 317.0683229820877, evaluator.evaluate(nodes.pop())); // verified with wolfram alpha
+    }
+
+    @Test
+    public void testEvaluateExressions4() throws Exception {
+        String expr = new StringBuilder()
+            .append("1/(1-7)-3-7+(3/tan(2)*6/9)-(9+8/4+cos(7)+cos(7)-9*8/3*6)/(4*7*1/7)-(2/8)-4/5+sin(6)/(5+6+cos(4)+1+cos(2)/5/5+4)/8*(1*4-9)+(3/4)-3/6*sin(8)-(2+3)*4+(1/3)*(6)")
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals((Double) 3.0077798843882384, evaluator.evaluate(nodes.pop()));
+    }
 }

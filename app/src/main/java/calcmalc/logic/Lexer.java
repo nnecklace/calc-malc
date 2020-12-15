@@ -69,8 +69,12 @@ public class Lexer {
                     tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
                     break;
                 case '-':
-                    // check if operator is unary - operator ,-100 -x (-100) unary minus operator
-                    if (tokens.isEmpty() || tokens.peekLast().isOpenParenthesis() || tokens.peekLast().isComma()) {
+                    // check if operator is unary - operator ,-100 -x (-100), x = -1 unary minus operator
+                    if (tokens.isEmpty() ||
+                        tokens.peekLast().isOpenParenthesis() ||
+                        tokens.peekLast().isComma() ||
+                        tokens.peekLast().isAssignment() ||
+                        tokens.peekLast().isVariableDelimiter()) {
                         tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
                     } else {
                         tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
