@@ -12,6 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 
@@ -40,6 +42,9 @@ public class UI extends Application {
         text.setMaxWidth(640);
         text.setMinWidth(640);
         text.setPadding(new Insets(5, 0, 5, 10));
+
+        text.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
+
         text.setOnKeyPressed((ev) -> {
             if (ev.getCode().equals(KeyCode.ENTER)) {
                 String input = text.getText().replaceAll("\\s", "");

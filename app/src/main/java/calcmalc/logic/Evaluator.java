@@ -231,7 +231,7 @@ public class Evaluator {
                 throw new EvaluatorException("Custom function can only be given max two arguments");
             }
 
-            // dfs will run max 2 times
+            // dfs will run max 2 times, since size will max be two
             for (int i = 0; i < size; ++i) {
                 ASTNode child = symbol.children().get(i);
                 if (!child.token().isSymbol()) {
