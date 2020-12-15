@@ -139,7 +139,7 @@ public class ListTest {
         List<Integer> list = new List<>();
         list.append(1); // head = 0
         list.append(1); // head = 1
-        list.append(1); // hjead = 2
+        list.append(1); // head = 2
         list.append(1);
         list.append(1);
         list.append(1);

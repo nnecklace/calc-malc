@@ -3,6 +3,7 @@ package calcmalc.logic;
 import calcmalc.structures.Stack;
 import calcmalc.structures.Queue;
 import calcmalc.structures.ASTNode;
+import calcmalc.structures.List;
 import calcmalc.logic.types.Token;
 import java.text.ParseException;
 
@@ -159,18 +160,21 @@ public class Parser {
                 throw new ParseException("Parse error: functions must have arguments, use variables instead in cases where no arguments are needed", 1);
             }
 
+            List<ASTNode> children = new List<>(argCount);
+
             while (argCount > 0 && !nodes.isEmpty()) {
-                node.addChild(nodes.pop());
-                argCount--;
+                children.set(--argCount, nodes.pop());
             }
+
+            node.setChildren(children);
 
             if (argCount > 0) {
                 throw new ParseException("Parse error: function was expected to have more arguments than available", 1);
             }
 
         } else {
-            ASTNode firstChild = nodes.pop();
             ASTNode secondChild = nodes.pop();
+            ASTNode firstChild = nodes.pop();
 
             if (firstChild != null) {
                 node.addChild(firstChild);
@@ -179,7 +183,6 @@ public class Parser {
             if (secondChild != null) {
                 node.addChild(secondChild);
             }
-
         }
 
         nodes.push(node);
@@ -215,7 +218,7 @@ public class Parser {
 
         String branches = "";
         
-        for (int i = node.children().size() - 1; i >= 0; --i) {
+        for (int i = 0; i < node.children().size(); ++i) {
             branches += depthFirstSearch(node.children().get(i));
         }
 

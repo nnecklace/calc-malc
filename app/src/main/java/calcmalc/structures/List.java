@@ -10,19 +10,25 @@ public class List<T> {
     private int head;
     private int size;
 
+    public List(int capacity) {
+        this.size = capacity + 8; 
+        head = capacity;
+        list = (T[]) new Object[this.size]; // should not be done this way, but Java doesn't support generic arrays
+    }
+
     /**
      * Constructor for list data structure
      */
     public List() {
-        size = 8; // start at 8, usually start at 1 but can be started on any other power of 2
-        list = (T[]) new Object[size]; // should not be done this way, but Java doesn't support generic arrays
-        head = 0;
+        this(0);
     }
 
     /**
      * Method retrives an element from the list at the desired index
+     * 
      * @param index the position of the element to be retrieved
-     * @return T the generic element at the given position of the list or null if index is negitive or above the current size of the list
+     * @return T the generic element at the given position of the list or null if
+     *         index is negitive or above the current size of the list
      */
     public T get(int index) {
         if (index >= head || index < 0) {
@@ -106,6 +112,7 @@ public class List<T> {
      * Method creates a new list and copies the elements from the old list to the new list, and discards the old list.
      */
     private void grow() {
+        // at some point size will overflow, but usually java runs out of memory way before that
         size *= 2;
 
         T[] copy = (T[]) new Object[size];

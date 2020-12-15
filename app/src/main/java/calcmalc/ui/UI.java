@@ -49,10 +49,12 @@ public class UI extends Application {
 
                 App.interpret(input);
                 history.appendText(text.getText() + '\n');
-                if (App.getError() != null) {
-                    textArea.appendText(">>> " + App.getError() + '\n');
+                if (App.output.errorOutput != null) {
+                    textArea.appendText(">>> " + App.output.errorOutput + '\n');
+                } else if (App.output.variableOutput != null) {
+                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
                 } else {
-                    textArea.appendText(">>> " + App.getOutPut() + '\n');
+                    textArea.appendText(">>> " + App.output.numOutput + '\n');
                 }
                 text.clear();
             }
@@ -74,8 +76,14 @@ public class UI extends Application {
             Path file = fileChooser.showOpenDialog(stage).toPath();
             try {
                 App.read(file);
+                if (App.output.errorOutput != null) {
+                    textArea.appendText(">>> " + App.output.errorOutput + '\n');
+                } else if (App.output.variableOutput != null) {
+                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
+                } else {
+                    textArea.appendText(">>> " + App.output.numOutput + '\n');
+                }
                 history.appendText("FILE: " + file.getFileName() + '\n');
-                textArea.appendText(">>> " + App.getOutPut() + '\n');
             } catch (IOException e) {
                 e.printStackTrace();
             }

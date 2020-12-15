@@ -41,4 +41,8 @@ public class ASTNode {
     public List<ASTNode> children() {
         return children;
     }
+
+    public void setChildren(List<ASTNode> children) {
+        this.children = children;
+    }
 }

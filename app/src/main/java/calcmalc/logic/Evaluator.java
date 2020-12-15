@@ -2,9 +2,9 @@ package calcmalc.logic;
 
 import calcmalc.structures.ASTNode;
 import calcmalc.structures.HashTable;
+import calcmalc.structures.Queue;
 import calcmalc.structures.Stack;
 import calcmalc.exceptions.EvaluatorException;
-import calcmalc.logic.types.Token;
 
 /**
  * @author nnecklace
@@ -19,6 +19,13 @@ public class Evaluator {
     private class FunctionArgumentTuple {
         String first;
         String second;
+        public void setNext(String next) {
+            if (first == null) {
+                first = next;
+            } else {
+                second = next;
+            }
+        }
     }
 
     private String concat(String start, String middle, String end) {
@@ -81,7 +88,7 @@ public class Evaluator {
      * @return the value associated with the symbol
      * @throws EvaluatorException if symbol is unknown
      */
-    private <N extends Number> double checkSymbolAndFunctionTable(String token, Stack<N> arguments) throws EvaluatorException {
+    private <N extends Number> double checkSymbolAndFunctionTable(String token, Queue<N> arguments) throws EvaluatorException {
         Double symbolValue = null;
         if (!contexts.isEmpty()) {
             symbolValue = symbolTable.get(concat(contexts.peek(), "@", token));
@@ -100,10 +107,10 @@ public class Evaluator {
         if (node != null) {
             FunctionArgumentTuple argumentPair = customFunctionArguments.get(token);
 
-            symbolTable.placeOrUpdate(concat(token, "@", argumentPair.first), arguments.pop().doubleValue());
+            symbolTable.placeOrUpdate(concat(token, "@", argumentPair.first), arguments.dequeue().doubleValue());
 
             if (argumentPair.second != null) {
-                symbolTable.placeOrUpdate(concat(token, "@", argumentPair.second), arguments.pop().doubleValue());
+                symbolTable.placeOrUpdate(concat(token, "@", argumentPair.second), arguments.dequeue().doubleValue());
             }
 
             contexts.push(token);
@@ -125,37 +132,37 @@ public class Evaluator {
      * @return Whatever result the symbol represents with the given arguments
      * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
-    public <N extends Number> double evaluateFunction(String token, Stack<N> arguments) throws EvaluatorException {
+    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
-                return arguments.pop().doubleValue() * arguments.pop().doubleValue();
+                return arguments.dequeue().doubleValue() * arguments.dequeue().doubleValue();
             case "+":
-                return arguments.pop().doubleValue() + arguments.pop().doubleValue();
+                return arguments.dequeue().doubleValue() + arguments.dequeue().doubleValue();
             case "/":
-                return arguments.pop().doubleValue() / arguments.pop().doubleValue(); 
+                return arguments.dequeue().doubleValue() / arguments.dequeue().doubleValue();
             case "-":
-                return arguments.pop().doubleValue() - arguments.pop().doubleValue();
+                return arguments.dequeue().doubleValue() - arguments.dequeue().doubleValue();
             case "$":
-                return -arguments.pop().doubleValue();
+                return -arguments.dequeue().doubleValue();
             case "%":
-                return arguments.pop().doubleValue() % arguments.pop().doubleValue();
+                return arguments.dequeue().doubleValue() % arguments.dequeue().doubleValue();
             case "^":
-                return Math.pow(arguments.pop().doubleValue(), arguments.pop().doubleValue());
+                return Math.pow(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
             case "sqrt":
-                return Math.sqrt(arguments.pop().doubleValue());
+                return Math.sqrt(arguments.dequeue().doubleValue());
             case "ln":
-                return Math.log(arguments.pop().doubleValue());
+                return Math.log(arguments.dequeue().doubleValue());
             case "log":
-                return Math.log(arguments.pop().doubleValue()) / Math.log(2);
+                return Math.log(arguments.dequeue().doubleValue()) / Math.log(2);
             case "abs":
-                return abs(arguments.pop().doubleValue());
+                return abs(arguments.dequeue().doubleValue());
             case "cos":
-                return Math.cos(arguments.pop().doubleValue());
+                return Math.cos(arguments.dequeue().doubleValue());
             case "sin":
-                return Math.sin(arguments.pop().doubleValue());
+                return Math.sin(arguments.dequeue().doubleValue());
             case "tan":
-                return Math.tan(arguments.pop().doubleValue());
+                return Math.tan(arguments.dequeue().doubleValue());
             case "max":
                 return minOrMax("max", arguments);
             case "min":
@@ -165,14 +172,14 @@ public class Evaluator {
         }
     }
 
-    private <N extends Number> double minOrMax(String minOrMax, Stack<N> arguments) {
+    private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) {
         if (arguments.size() == 1) {
-            return arguments.pop().doubleValue();
+            return arguments.dequeue().doubleValue();
         } else {
             if (minOrMax.equals("min")) {
-                return min(arguments.pop().doubleValue(), arguments.pop().doubleValue());
+                return min(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
             }
-            return max(arguments.pop().doubleValue(), arguments.pop().doubleValue());
+            return max(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
         }
     }
 
@@ -216,7 +223,7 @@ public class Evaluator {
             throw new EvaluatorException("Assignment error: Assignment operator should have a symbol to assign and a value to assign too");
         }
 
-        ASTNode symbol = node.children().get(node.children().size() - 1);
+        ASTNode symbol = node.children().get(0);
 
         if (symbol.token().isFunction()) {
             FunctionArgumentTuple argumentTuple = new FunctionArgumentTuple();
@@ -227,26 +234,24 @@ public class Evaluator {
                 throw new EvaluatorException("Custom function can only be given max two arguments");
             }
 
-            Token firstArg = symbol.children().get(size - 1).token();
-            argumentTuple.first = firstArg.getKey();
-            Token secondArg = null;
-
-            if (size == 2) {
-                secondArg = symbol.children().get(0).token(); 
-                argumentTuple.second = secondArg.getKey();
-            }
-
-            if (!firstArg.isSymbol() || (secondArg != null && !secondArg.isSymbol())) {
-                throw new EvaluatorException("Custom function arguments have to be symbols");
+            // dfs will run max 2 times
+            for (int i = 0; i < size; ++i) {
+                ASTNode child = symbol.children().get(i);
+                if (!child.token().isSymbol()) {
+                    throw new EvaluatorException("Custom function arguments have to be symbols");
+                }
+                argumentTuple.setNext(child.token().getKey());
             }
 
             functionArity.placeOrUpdate(symbol.token().getKey(), size); 
-            customFunctionBodies.placeOrUpdate(symbol.token().getKey(), node.children().get(0));
+            customFunctionBodies.placeOrUpdate(symbol.token().getKey(), node.children().get(1));
             customFunctionArguments.placeOrUpdate(symbol.token().getKey(), argumentTuple);
 
         } else {
-            Number value = evaluate(node.children().get(0));
-            symbolTable.placeOrUpdate(symbol.token().getKey(), value.doubleValue());
+            symbolTable.placeOrUpdate(
+                symbol.token().getKey(),
+                evaluate(node.children().get(1)).doubleValue()
+            );
         }
 
 
@@ -273,13 +278,13 @@ public class Evaluator {
             return Double.parseDouble(node.token().getKey());
         }
 
-        Stack<Number> arguments = new Stack<>();
+        Queue<Number> arguments = new Queue<>();
 
         for (int i = 0; i < node.children().size(); ++i) {
-            arguments.push(evaluate(node.children().get(i)));
+            arguments.enqueue(evaluate(node.children().get(i)));
             if (arguments.size() == 2 && i < (node.children().size() - 1)) {
                 // in this case the function takes more than two arguments
-                arguments.push(
+                arguments.enqueue(
                     evaluateFunction(node.token().getKey(), arguments)
                 );
             }
