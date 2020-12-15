@@ -18,15 +18,19 @@ And many more.
 
 The context free grammar looks something like this.
 
+Capital letter are excluded from the context free grammar, but they can be used just like lower case letters.
+
 ```
-S => E | (E) | V | e
-V => X=Y:V | e
-X => _X | aX | bX | cX | dX | eX | fX | gX | hX | iX | jX | kX | lX | mX | nX | oX | pX | qX | rX | sX | tX | uX | vX | wX | xX | yX | zX | e
-Y => X | E
-E => F(E) | (E) | N | -E | E + E | E - E | E * E | E / E | E^E | E % E
-F => log | abs | min | max | ln | sqrt | sin | cos | tan
-N => 0D | 1D | 2D | 3D | 4D | 5D | 6D | 7D | 8D | 9D
-D => N | e
+S        => EXPR | (EXPR) | VAR | e
+VAR      => VAR_NAME=EXPR_OR_VALUE:VAR | e
+VAR_NAME => VAR_NAME | (VAR_NAME) | SYMBOL() | SYMBOL(SYMBOL) | SYMBOL(SYMBOL,SYMBOL)
+SYMBOL => _LETTER | aLETTER | bLETTER | cLETTER | dLETTER | eLETTER | fLETTER | gLETTER | hLETTER | iLETTER | jLETTER | kLETTER | lLETTER | mLETTER | nLETTER | oLETTER | pLETTER | qLETTER | rLETTER | sLETTER | tLETTER | uLETTER | vLETTER | wLETTER | xLETTER | yLETTER | zLETTER 
+LETTER => _SYMBOL | aSYMBOL | bSYMBOL | cSYMBOL | dSYMBOL | eSYMBOL | fSYMBOL | gSYMBOL | hSYMBOL | iSYMBOL | jSYMBOL | kSYMBOL | lSYMBOL | mSYMBOL | nSYMBOL | oSYMBOL | pSYMBOL | qSYMBOL | rSYMBOL | sSYMBOL | tSYMBOL | uSYMBOL | vSYMBOL | wSYMBOL | xSYMBOL | ySYMBOL | zSYMBOL | e
+EXPR_OR_VALUE => SYMBOL | EXPR
+EXPR => FUNCTION(EXPR) | (EXPR) | NUBER | -EXPR | EXPR + EXPR | EXPR - EXPR | EXPR * EXPR | EXPR / EXPR | EXPR^EXPR | EXPR % EXPR
+FUNCTION => log | abs | min | max | sqrt | sin | cos | tan
+NUMBER => 0DIGIT | 1DIGIT | 2DIGIT | 3DIGIT | 4DIGIT | 5DIGIT | 6DIGIT | 7DIGIT | 8DIGIT | 9DIGIT
+DIGIT => NUMBER | e
 ```
 
 Inputs can be found with the following cfg tool.
