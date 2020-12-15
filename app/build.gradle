@@ -80,6 +80,9 @@ test {
   }
 }
 
+checkstyleMain.exclude("**/ui/*")
+checkstyleTest.enabled = false
+
 task generateRestApiDocs(type: Javadoc) {
   source = sourceSets.main.allJava
   destinationDir = reporting.file("rest-api-docs")
