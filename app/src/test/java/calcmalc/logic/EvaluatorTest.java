@@ -209,7 +209,7 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:ln(x)"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:log(x)"));
         Queue<ASTNode> variables = parser.variables();
         assertEquals("<assignment:x>", evaluator.evaluateAssignment(variables.dequeue()));
         assertEquals((Double) 0.6931471805599453, evaluator.evaluate(nodes.pop()));
@@ -220,7 +220,7 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:log(x)"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:log(x)/log(2)"));
         Queue<ASTNode> variables = parser.variables();
         assertEquals("<assignment:x>", evaluator.evaluateAssignment(variables.dequeue()));
         assertEquals((Double) 1.0, evaluator.evaluate(nodes.pop()));

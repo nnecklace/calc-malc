@@ -59,7 +59,6 @@ public class Evaluator {
         functionArity.placeOrUpdate("$", 1);
         functionArity.placeOrUpdate("sqrt", 1);
         functionArity.placeOrUpdate("log", 1);
-        functionArity.placeOrUpdate("ln", 1);
         functionArity.placeOrUpdate("abs", 1);
         functionArity.placeOrUpdate("cos", 1);
         functionArity.placeOrUpdate("sin", 1);
@@ -151,10 +150,8 @@ public class Evaluator {
                 return Math.pow(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
             case "sqrt":
                 return Math.sqrt(arguments.dequeue().doubleValue());
-            case "ln":
-                return Math.log(arguments.dequeue().doubleValue());
             case "log":
-                return Math.log(arguments.dequeue().doubleValue()) / Math.log(2);
+                return Math.log(arguments.dequeue().doubleValue());
             case "abs":
                 return abs(arguments.dequeue().doubleValue());
             case "cos":

@@ -98,7 +98,6 @@ public class UI extends Application {
         Button button2a = new Button("+");
         Button button3a = new Button("-");
 
-        Button button4 = new Button("ln");
         Button button5 = new Button("sqrt");
         Button button6 = new Button("abs");
 
@@ -116,7 +115,6 @@ public class UI extends Application {
         button1a.setOnAction(eventHandlerA);
         button2a.setOnAction(eventHandlerA);
         button3a.setOnAction(eventHandlerA);
-        button4.setOnAction(eventHandler);
         button5.setOnAction(eventHandler);
         button6.setOnAction(eventHandler);
         button4a.setOnAction(eventHandlerA);
@@ -143,14 +141,13 @@ public class UI extends Application {
 
         HBox btnRow2 = new HBox();
 
-        button4.setStyle(btnSty);
         button5.setStyle(btnSty);
         button6.setStyle(btnSty);
         button4a.setStyle(btnSty);
         button5a.setStyle(btnSty);
         button6a.setStyle(btnSty);
 
-        btnRow2.getChildren().addAll(button4, button5, button6, button4a, button5a, button6a);
+        btnRow2.getChildren().addAll(button5, button6, button7, button4a, button5a, button6a);
         btnRow2.setSpacing(10);
         btnRow2.setPadding(new Insets(0,0,10,0));
 
@@ -160,7 +157,7 @@ public class UI extends Application {
         button8.setStyle(btnSty);
         button9.setStyle(btnSty);
 
-        btnRow3.getChildren().addAll(button7, button8, button9, fileDialog);
+        btnRow3.getChildren().addAll(button8, button9, fileDialog);
         btnRow3.setSpacing(10);
         VBox vbBtn = new VBox();
 

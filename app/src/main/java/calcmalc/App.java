@@ -25,7 +25,7 @@ public class App {
     private static Evaluator evaluator = new Evaluator();
     private static Lexer lexer = new Lexer();
     private static Parser parser = new Parser();
-    public static final Output output = new Output();
+    public static Output output = new Output();
 
     public static class Output {
         public Number numOutput;

@@ -46,8 +46,7 @@ public class Parser {
              token.isFunction() || 
              token.isOpenParenthesis()) && 
              !functionArity.isEmpty() && 
-             functionArity.peek() == 0) 
-        {
+             functionArity.peek() == 0) {
             functionArity.push(functionArity.pop() + 1);
         }
     }
@@ -86,8 +85,7 @@ public class Parser {
                 if (!operators.isEmpty() || 
                     nodes.isEmpty() || 
                     !nodes.peek().token().isFunction() && 
-                    !nodes.peek().token().isSymbol()) 
-                {
+                    !nodes.peek().token().isSymbol()) {
                     throw new ParseException("Syntax error: Tried to assign value to non assignable or empty", 0);
                 }
 

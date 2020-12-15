@@ -11,8 +11,8 @@ import calcmalc.logic.types.*;
  * @author nnecklace
  */
 public class Lexer {
-    HashTable<Character,Boolean> alphabet = new HashTable<>();
-    HashTable<Character,Boolean> numbers = new HashTable<>();
+    HashTable<Character, Boolean> alphabet = new HashTable<>();
+    HashTable<Character, Boolean> numbers = new HashTable<>();
 
     public Lexer() {
         // ideally we would regex match in this case but since it is not allowed in this course we will resort to doing it this way

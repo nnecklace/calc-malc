@@ -7,4 +7,4 @@ hello_world(x) = sqrt(x)+double(x):
 
 Area(radius) = PI*radius^2:
 
-(log(PI)+Area(2))/hello_world(10)
+((log(PI)/log(2))+Area(2))/hello_world(10)
