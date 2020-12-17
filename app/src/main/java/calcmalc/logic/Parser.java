@@ -51,7 +51,7 @@ public class Parser {
         }
     }
 
-    private void popUntil(String tokenKey, int precedence) throws ParseException {
+    private void popUntilTokenOrPrecedence(String tokenKey, int precedence) throws ParseException {
         while (
                 !operators.isEmpty() && 
                 !operators.peek().getKey().equals(tokenKey) &&
@@ -92,7 +92,7 @@ public class Parser {
                 operators.push(token);
                 break;
             case OPERATOR:
-                popUntil("(", token.getPrecedence());
+                popUntilTokenOrPrecedence("(", token.getPrecedence());
                 operators.push(token);
                 break;
             case OPEN_PARENTHESIS:
@@ -103,7 +103,7 @@ public class Parser {
                 operators.push(token);
                 break;
             case CLOSING_PARENTHESIS:
-                popUntil("(", 0);
+                popUntilTokenOrPrecedence("(", 0);
 
                 if (operators.isEmpty()) {
                     throw new ParseException("Syntax error missing parenthesis! 2", 0);
@@ -116,7 +116,7 @@ public class Parser {
                 } 
                 break;
             case COMMA:
-                popUntil("(", 0);
+                popUntilTokenOrPrecedence("(", 0);
 
                 if (functionArity.isEmpty() || functionArity.peek() == 0) {
                     throw new ParseException("Syntax error: Illegal use of comma", 0);
@@ -125,7 +125,7 @@ public class Parser {
                 functionArity.push(functionArity.pop() + 1); 
                 break;
             case VARIABLE_DELIMITER:
-                popUntil("=", 0);
+                popUntilTokenOrPrecedence("=", 0);
 
                 if (operators.isEmpty()) {
                     throw new ParseException("Syntax error: Assignment for variable delimitter missing", 0);

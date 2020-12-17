@@ -6,8 +6,8 @@ package calcmalc.structures;
  * @param <K> the generic key to be contained in the hashtable
  * @param <V> the generic value to be contained in the hashtable
  */
-public class HashTable<K, V> {
-    private List<HashTableEntry<K, V>>[] values;
+public class HashTable<V> {
+    private List<HashTableEntry<V>>[] values;
     private int size;
 
     /**
@@ -33,13 +33,23 @@ public class HashTable<K, V> {
         }
     }
 
+    private int calculateHash(String key) {
+        int hashCode = 0;
+
+        for (char ch : key.toCharArray()) {
+            hashCode = 31 * hashCode + ch;
+        }
+
+        return hashCode;
+    }
+
     /**
      * Method calculates index for a give key
      * @param key to calculate
      * @return an index for the given key
      */
-    private int calculateIndex(K key) {
-        return key.hashCode() & (size - 1);
+    private int calculateIndex(int hashCode) {
+        return hashCode & (size - 1);
     }
 
     /**
@@ -47,13 +57,14 @@ public class HashTable<K, V> {
      * @param key entry for the value
      * @param value the actual value to store in the hash table
      */
-    public void placeOrUpdate(K key, V value) {
-        int index = calculateIndex(key);
+    public void placeOrUpdate(String key, V value) {
+        int hashCode = calculateHash(key);
+        int index = calculateIndex(hashCode);
 
-        HashTableEntry<K, V> entry = find(key);
+        HashTableEntry<V> entry = find(key, hashCode, index);
 
         if (entry == null) {
-            values[index].append(new HashTableEntry<>(key, value, key.hashCode()));
+            values[index].append(new HashTableEntry<>(key, value, hashCode));
         } else {
             entry.setValue(value);
         }
@@ -62,16 +73,14 @@ public class HashTable<K, V> {
     /**
      * Helper function to retrive a record from a give index
      * @param key entry to find
-     * @return Null if not found or the actual entry
+     * @return Null if not found or the actual entry if found
      */
-    private HashTableEntry<K, V> find(K key) {
-        int index = calculateIndex(key);
-
-        List<HashTableEntry<K, V>> entries = values[index];
+    private HashTableEntry<V> find(String key, int hashCode, int index) {
+        List<HashTableEntry<V>> entries = values[index];
 
         for (int i = 0; i < entries.size(); ++i) {
-            HashTableEntry<K, V> entry = entries.get(i);
-            if (entry.hashCode() == key.hashCode() && entry.getKey().equals(key)) {
+            HashTableEntry<V> entry = entries.get(i);
+            if (entry.hashCode() == hashCode && entry.getKey().equals(key)) {
                 return entry;
             }
         }
@@ -84,8 +93,11 @@ public class HashTable<K, V> {
      * @param key entry to retrieve
      * @return the entry value or null if not found
      */
-    public V get(K key) {
-        HashTableEntry<K, V> entry = find(key);
+    public V get(String key) {
+        int hashCode = calculateHash(key);
+        int index = calculateIndex(hashCode);
+
+        HashTableEntry<V> entry = find(key, hashCode, index);
 
         if (entry == null) {
             return null;

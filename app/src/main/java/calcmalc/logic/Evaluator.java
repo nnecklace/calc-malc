@@ -10,23 +10,13 @@ import calcmalc.exceptions.EvaluatorException;
  * @author nnecklace
  */
 public class Evaluator {
-    private HashTable<String, Integer> functionArity = new HashTable<>();
-    private HashTable<String, Double> symbolTable = new HashTable<>();
-    private HashTable<String, ASTNode> customFunctionBodies = new HashTable<>();
-    private HashTable<String, FunctionArgumentTuple> customFunctionArguments = new HashTable<>();
+    private HashTable<Integer> functionArity = new HashTable<>();
+    private HashTable<Double> symbolTable = new HashTable<>(); // rename
+    private HashTable<ASTNode> customFunctionBodies = new HashTable<>();
+    private HashTable<Boolean> standardLibraryFunctions = new HashTable<>();
+    private HashTable<Queue<String>> customFunctionArguments = new HashTable<>();
+    private HashTable<HashTable<Double>> contextSymbolTable = new HashTable<>();
     private Stack<String> contexts = new Stack<>();
-
-    private class FunctionArgumentTuple {
-        String first;
-        String second;
-        public void setNext(String next) {
-            if (first == null) {
-                first = next;
-            } else {
-                second = next;
-            }
-        }
-    }
 
     private String concat(String start, String middle, String end) {
         int size = start.length() + middle.length() + end.length();
@@ -65,6 +55,15 @@ public class Evaluator {
         functionArity.placeOrUpdate("tan", 1);
         functionArity.placeOrUpdate("max", -1);
         functionArity.placeOrUpdate("min", -1);
+
+        standardLibraryFunctions.placeOrUpdate("sqrt", true);
+        standardLibraryFunctions.placeOrUpdate("log", true);
+        standardLibraryFunctions.placeOrUpdate("abs", true);
+        standardLibraryFunctions.placeOrUpdate("cos", true);
+        standardLibraryFunctions.placeOrUpdate("sin", true);
+        standardLibraryFunctions.placeOrUpdate("tan", true);
+        standardLibraryFunctions.placeOrUpdate("max", true);
+        standardLibraryFunctions.placeOrUpdate("min", true);
     }
 
     /**
@@ -87,40 +86,18 @@ public class Evaluator {
      * @return the value associated with the symbol
      * @throws EvaluatorException if symbol is unknown
      */
-    private <N extends Number> double checkSymbolAndFunctionTable(String token, Queue<N> arguments) throws EvaluatorException {
+    private Double checkSymbolAndContextTable(String token) {
         Double symbolValue = null;
         if (!contexts.isEmpty()) {
-            symbolValue = symbolTable.get(concat(contexts.peek(), "@", token));
+            HashTable<Double> contextTable = contextSymbolTable.get(contexts.peek());
+            symbolValue = contextTable.get(token);
         }
 
         if (symbolValue == null) {
             symbolValue = symbolTable.get(token);
         }
 
-        if (symbolValue != null) {
-            return symbolValue;
-        }
-
-        ASTNode node = customFunctionBodies.get(token);
-
-        if (node != null) {
-            FunctionArgumentTuple argumentPair = customFunctionArguments.get(token);
-
-            symbolTable.placeOrUpdate(concat(token, "@", argumentPair.first), arguments.dequeue().doubleValue());
-
-            if (argumentPair.second != null) {
-                symbolTable.placeOrUpdate(concat(token, "@", argumentPair.second), arguments.dequeue().doubleValue());
-            }
-
-            contexts.push(token);
-            Double result = (double) evaluate(node);
-            contexts.pop();
-
-            return result;
-        }
-
-
-        throw new EvaluatorException("Unknown Symbol " + token);
+        return symbolValue;
     }
 
     /**
@@ -131,7 +108,7 @@ public class Evaluator {
      * @return Whatever result the symbol represents with the given arguments
      * @throws EvaluatorException if symbol is unknown or a function was given an incorrect number of arguments
      */
-    public <N extends Number> double evaluateFunction(String token, Queue<N> arguments) throws EvaluatorException {
+    public <N extends Number> double evaluateStlFunction(String token, Queue<N> arguments) throws EvaluatorException {
         checkArguments(token, arguments.size());
         switch (token) {
             case "*":
@@ -165,7 +142,7 @@ public class Evaluator {
             case "min":
                 return minOrMax("min", arguments);
             default:
-                return checkSymbolAndFunctionTable(token, arguments);
+                throw new EvaluatorException("Unknown Symbol " + token);
         }
     }
 
@@ -221,38 +198,71 @@ public class Evaluator {
         }
 
         ASTNode symbol = node.children().get(0);
+        String symbolName = symbol.token().getKey();
 
         if (symbol.token().isFunction()) {
-            FunctionArgumentTuple argumentTuple = new FunctionArgumentTuple();
+            Queue<String> argumentSymbols = new Queue<>();
 
             int size = symbol.children().size();
 
-            if (size > 2) {
-                throw new EvaluatorException("Custom function can only be given max two arguments");
-            }
-
-            // dfs will run max 2 times, since size will max be two
             for (int i = 0; i < size; ++i) {
                 ASTNode child = symbol.children().get(i);
                 if (!child.token().isSymbol()) {
                     throw new EvaluatorException("Custom function arguments have to be symbols");
                 }
-                argumentTuple.setNext(child.token().getKey());
+                argumentSymbols.enqueue(child.token().getKey());
             }
 
-            functionArity.placeOrUpdate(symbol.token().getKey(), size); 
-            customFunctionBodies.placeOrUpdate(symbol.token().getKey(), node.children().get(1));
-            customFunctionArguments.placeOrUpdate(symbol.token().getKey(), argumentTuple);
+            functionArity.placeOrUpdate(symbolName, size);
+            customFunctionBodies.placeOrUpdate(symbolName, node.children().get(1));
+            customFunctionArguments.placeOrUpdate(symbolName, argumentSymbols);
 
         } else {
             symbolTable.placeOrUpdate(
-                symbol.token().getKey(),
+                symbolName,
                 evaluate(node.children().get(1)).doubleValue()
             );
         }
 
 
-        return concat("<assignment:", symbol.token().getKey(), ">");
+        return concat("<assignment:", symbolName, ">");
+    }
+
+    private Number evaluateCustomFunction(ASTNode node) throws EvaluatorException {
+        String functionName = node.token().getKey();
+
+        checkArguments(functionName, node.children().size());
+
+        ASTNode body = customFunctionBodies.get(functionName);
+
+        if (body == null) {
+            throw new EvaluatorException("Unknown function " + functionName);
+        }
+
+        // This hack is made because java always retrieves class by reference so when we dequeue
+        // from argumentSymbols we actually change the queue that is stored inside the Hashtable
+        // we solve this by making a new queue and adding each symbol to it so it can be reused later
+        // we add this new queue argumentSymbolsAgain to the Hashtable.
+        // argumentSymbols and arguments will always be the same length.
+        // checkArguments function will detect if the function was given incorrect amount of arguments
+        Queue<String> argumentSymbolsAgain = new Queue<>();
+        Queue<String> argumentSymbols = customFunctionArguments.get(functionName);
+        HashTable<Double> contextTableEntry = new HashTable<>();
+
+        for (int i = 0; i < node.children().size(); ++i) {
+            String argumentSymbol = argumentSymbols.dequeue();
+            contextTableEntry.placeOrUpdate(argumentSymbol, evaluate(node.children().get(i)).doubleValue());
+            argumentSymbolsAgain.enqueue(argumentSymbol);
+        }
+
+        contextSymbolTable.placeOrUpdate(functionName, contextTableEntry);
+        customFunctionArguments.placeOrUpdate(functionName, argumentSymbolsAgain);
+
+        contexts.push(functionName);
+        Double result = (double) evaluate(body);
+        contexts.pop();
+
+        return result;
     }
 
     /**
@@ -271,8 +281,21 @@ public class Evaluator {
             throw new EvaluatorException("Can't assign values in expressions, values must be assigned before or after expressions");
         }
 
+        String nodeTokenKey = node.token().getKey();
+
         if (node.token().isNumber()) {
-            return Double.parseDouble(node.token().getKey());
+            return Double.parseDouble(nodeTokenKey);
+        }
+
+        if (node.token().isSymbol() && standardLibraryFunctions.get(nodeTokenKey) == null) {
+            Double possibleValue = checkSymbolAndContextTable(nodeTokenKey);
+            if (possibleValue != null) {
+                return possibleValue;
+            }
+        }
+
+        if (node.token().isFunction() && standardLibraryFunctions.get(nodeTokenKey) == null) {
+            return evaluateCustomFunction(node);
         }
 
         Queue<Number> arguments = new Queue<>();
@@ -280,13 +303,14 @@ public class Evaluator {
         for (int i = 0; i < node.children().size(); ++i) {
             arguments.enqueue(evaluate(node.children().get(i)));
             if (arguments.size() == 2 && i < (node.children().size() - 1)) {
+                // evaluate max and min two arguments at a time
                 // in this case the function takes more than two arguments
                 arguments.enqueue(
-                    evaluateFunction(node.token().getKey(), arguments)
+                    evaluateStlFunction(node.token().getKey(), arguments)
                 );
             }
         }
 
-        return evaluateFunction(node.token().getKey(), arguments);
+        return evaluateStlFunction(node.token().getKey(), arguments);
     }
 }

@@ -11,20 +11,20 @@ import calcmalc.logic.types.*;
  * @author nnecklace
  */
 public class Lexer {
-    HashTable<Character, Boolean> alphabet = new HashTable<>();
-    HashTable<Character, Boolean> numbers = new HashTable<>();
+    HashTable<Boolean> alphabet = new HashTable<>();
+    HashTable<Boolean> numbers = new HashTable<>();
 
     public Lexer() {
         // ideally we would regex match in this case but since it is not allowed in this course we will resort to doing it this way
-        alphabet.placeOrUpdate('_', true);
+        alphabet.placeOrUpdate("_", true);
         for (char ch: "abcdefghijklmnopqrstuvwxyz".toCharArray()) {
-            alphabet.placeOrUpdate(ch, true);
+            alphabet.placeOrUpdate(valueOf(ch), true);
             ch -= 32; // make uppercase
-            alphabet.placeOrUpdate(ch, true);
+            alphabet.placeOrUpdate(valueOf(ch), true);
         }
 
         for (char ch: ".0123456789".toCharArray()) {
-            numbers.placeOrUpdate(ch, true);
+            numbers.placeOrUpdate(valueOf(ch), true);
         }
     }
 
@@ -37,38 +37,38 @@ public class Lexer {
     public Queue<Token> lex(String expression) throws LexerException {
         Queue<Token> tokens = new Queue<>();
         for (int i = 0; i < expression.length(); ++i) {
-            char  c = expression.charAt(i);
+            String c = valueOf(expression.charAt(i));
             switch (c) {
-                case ' ': 
-                case '\n':
-                case '\r': // scanner handles these cases for us, but just incase something weird happens with scanner we ignore these manually
+                case " ":
+                case "\n":
+                case "\r": // scanner handles these cases for us, but just incase something weird happens with scanner we ignore these manually
                     break;
-                case '=':
+                case "=":
                     tokens.enqueue(TypeBuilder.buildToken(Types.ASSIGNMENT, "="));
                     break;
-                case ')':
+                case ")":
                     tokens.enqueue(TypeBuilder.buildToken(Types.CLOSING_PARENTHESIS, ")"));
                     break;
-                case ':':
+                case ":":
                     tokens.enqueue(TypeBuilder.buildToken(Types.VARIABLE_DELIMITER, ":"));
                     break;
-                case ',':
+                case ",":
                     tokens.enqueue(TypeBuilder.buildToken(Types.COMMA, ","));
                     break;
-                case '(':
+                case "(":
                     if (!tokens.isEmpty() && tokens.peekLast().isSymbol()) {
                         tokens.peekLast().setType(Types.FUNCTION);
                     }
                     tokens.enqueue(TypeBuilder.buildToken(Types.OPEN_PARENTHESIS, "("));
                     break;
-                case '+':
-                case '*':
-                case '/':
-                case '^':
-                case '%':
-                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
+                case "+":
+                case "*":
+                case "/":
+                case "^":
+                case "%":
+                    tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, c));
                     break;
-                case '-':
+                case "-":
                     // check if operator is unary - operator ,-100 -x (-100), x = -1 unary minus operator
                     if (tokens.isEmpty() ||
                         tokens.peekLast().isOpenParenthesis() ||
@@ -77,7 +77,7 @@ public class Lexer {
                         tokens.peekLast().isVariableDelimiter()) {
                         tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, "$"));
                     } else {
-                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, valueOf(new char[]{c}, 1)));
+                        tokens.enqueue(TypeBuilder.buildToken(Types.OPERATOR, c));
                     }
                     break;
                 default:
@@ -95,18 +95,22 @@ public class Lexer {
         return tokens;
     }
 
+    private String valueOf(char ch) {
+        return valueOf(new char[]{ch}, 1);
+    }
+
     private String valueOf(char[] charSequence, int size) {
         return new String(charSequence, 0, size);
     }
 
-    private String scan(String expression, char start, int i, HashTable<Character, Boolean> lookup) throws LexerException {
+    private String scan(String expression, String start, int i, HashTable<Boolean> lookup) throws LexerException {
         int maxLength = 64;
         char[] tokens = new char[maxLength];
-        tokens[0] = start;
+        tokens[0] = start.charAt(0);
         int offSet;
     
         for (offSet = i + 1; offSet < expression.length(); ++offSet) {
-            char current = expression.charAt(offSet);
+            String current = valueOf(expression.charAt(offSet));
             if (lookup.get(current) == null) {
                 break;
             }
@@ -115,7 +119,7 @@ public class Lexer {
                 throw new LexerException("token " + valueOf(tokens, (offSet - i)) +  " too long. Max length is 64");
             }
 
-            tokens[offSet - i] = current;
+            tokens[offSet - i] = current.charAt(0);
         }
 
         return valueOf(tokens, (offSet - i));

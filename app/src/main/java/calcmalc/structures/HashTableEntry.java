@@ -5,9 +5,9 @@ package calcmalc.structures;
  * @param <K> key of the pair to store in the HashTable
  * @param <V> value of the pair to store in the HashTable
  */
-public class HashTableEntry<K, V> {
+public class HashTableEntry<V> {
     private V value;
-    private K key;
+    private String key;
     private int hash;
 
     /**
@@ -16,7 +16,7 @@ public class HashTableEntry<K, V> {
      * @param value  the value associated with the entry
      * @param hash the hashcode for the entry
      */
-    public HashTableEntry(K key, V value, int hash) {
+    public HashTableEntry(String key, V value, int hash) {
         this.key = key;
         this.value = value;
         this.hash = hash;
@@ -26,7 +26,7 @@ public class HashTableEntry<K, V> {
      * Getter for key property
      * @return key
      */
-    public K getKey() {
+    public String getKey() {
         return key;
     }
 

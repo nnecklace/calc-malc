@@ -294,15 +294,44 @@ public class EvaluatorTest {
     }
 
     @Test
-    public void testEvaluateCustomFunctionFailsWithMoreThanTwoArguments() throws Exception {
+    public void testEvaluateCustomFunctionFailsWithIncorrectAmountOfArguments() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y,z)=y+x+z:custom(2,9,11)"));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y,z)=y+x+z:custom(2,9)"));
         Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
         Exception exception = assertThrows(Exception.class, () -> {
-            assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+            evaluator.evaluate(nodes.pop());
         }); 
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionFailsWithIncorrectAmountOfArguments2() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y,z)=y+x+z:custom(2,9,10,4)"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        Exception exception = assertThrows(Exception.class, () -> {
+            evaluator.evaluate(nodes.pop());
+        }); 
+    }
+
+    @Test
+    public void testEvaluateCustomFunctionFailsWithIncorrectAmountOfArgumentsButSucceedsAfter() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("custom(x,y,z)=y+x+z:custom(2,9)"));
+        Queue<ASTNode> variables = parser.variables();
+        assertEquals("<assignment:custom>", evaluator.evaluateAssignment(variables.dequeue()));
+        Exception exception = assertThrows(Exception.class, () -> {
+            evaluator.evaluate(nodes.pop());
+        }); 
+        Stack<ASTNode> nodesAgain = parser.parse(lexer.lex("custom(2,9,9)"));
+        assertEquals(20.0, evaluator.evaluate(nodesAgain.pop()));
     }
 
     @Test
@@ -741,4 +770,83 @@ public class EvaluatorTest {
         }
         assertEquals((Double) 3.0077798843882384, evaluator.evaluate(nodes.pop()));
     }
+
+    @Test
+    public void testEvaluateExressions5() throws Exception {
+        String expr = new StringBuilder()
+            .append("addX(y) = y+x:")
+            .append("x = 2000:")
+            .append("double(sum_param) = sum_param+sum_param:")
+            .append("addX(double(-abs(sqrt(2))))")
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals((Double) 1997.1715728752538, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateExressions6() throws Exception {
+        String expr = new StringBuilder()
+            .append("addX(y) = y+x:")
+            .append("x = 2000:")
+            .append("sum(a,b,c,d,e,f,g) = a+b+c+d+e+f+g:")
+            .append("addX(sum(1,2,3,4,5,6,7)+sum(2,4,6,8,10,12,14))") // 2084
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+        assertEquals(2084.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testCantReasignStlFunctions() throws Exception {
+        String expr = new StringBuilder()
+            .append("sqrt = 1000:")
+            .append("sqrt")
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            evaluator.evaluate(nodes.pop());
+        });
+    }
+
+    @Test
+    public void testEvaluateThrowsOnUnknownFunctionCall() throws Exception {
+        String expr = new StringBuilder()
+            .append("funfunfun(x) = 2^x:")
+            .append("funfun(2)")
+            .toString();
+
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
+        while(!parser.variables().isEmpty()) {
+            evaluator.evaluateAssignment(parser.variables().dequeue());
+        }
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            evaluator.evaluate(nodes.pop());
+        });
+    }
+    
 }
