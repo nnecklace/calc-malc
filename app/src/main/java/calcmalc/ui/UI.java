@@ -56,10 +56,10 @@ public class UI extends Application {
                 history.appendText(text.getText() + '\n');
                 if (App.output.errorOutput != null) {
                     textArea.appendText(">>> " + App.output.errorOutput + '\n');
-                } else if (App.output.variableOutput != null) {
-                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
-                } else {
+                } else if (App.output.numOutput != null) {
                     textArea.appendText(">>> " + App.output.numOutput + '\n');
+                } else {
+                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
                 }
                 text.clear();
             }
@@ -83,10 +83,10 @@ public class UI extends Application {
                 App.read(file);
                 if (App.output.errorOutput != null) {
                     textArea.appendText(">>> " + App.output.errorOutput + '\n');
-                } else if (App.output.variableOutput != null) {
-                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
-                } else {
+                } else if (App.output.numOutput != null) {
                     textArea.appendText(">>> " + App.output.numOutput + '\n');
+                } else {
+                    textArea.appendText(">>> " + App.output.variableOutput + '\n');
                 }
                 history.appendText("FILE: " + file.getFileName() + '\n');
             } catch (IOException e) {

@@ -13,6 +13,7 @@ import calcmalc.logic.Lexer;
 import calcmalc.logic.Parser;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -114,18 +115,11 @@ public class App {
      * @throws IOException if the file cannot be read
      */
     public static void read(Path file) throws IOException {
-        Scanner input = new Scanner(file.toFile());
+        String contents = Files.readString(file);
 
-        while (input.hasNextLine()) {
-            String line = input.nextLine();
-            if (line.length() > 0) {
-                interpret(line);
-            }
-        }
+        interpret(contents);
 
         App.output.printOutput();
-
-        input.close();
     }
 
     /**
