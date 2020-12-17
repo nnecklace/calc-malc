@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import calcmalc.App;
 import calcmalc.structures.List;
 
+/**
+ * @hidden
+ */
 public class PerformanceTest {
     private static void start(Path p) throws IOException {
         App app = new App();
@@ -34,6 +37,11 @@ public class PerformanceTest {
         }
     }
 
+    /**
+     * @hidden
+     * @param args hidden
+     * @throws IOException hidden
+     */
     public static void main(String[] args) throws IOException {
         PerformanceTest pt = new PerformanceTest();
         StringBuilder st = new StringBuilder();

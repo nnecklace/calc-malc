@@ -52,23 +52,6 @@ public class ListTest {
     }
 
     @Test
-    public void testRemoveElementAtIncorrectIndex() {
-        List<Integer> list = new List<>();
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            list.remove(-1);
-        });
-    }
-
-    @Test
-    public void testRemoveElementAtIncorrectIndex2() {
-        List<Integer> list = new List<>();
-        list.append(1);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            list.remove(1);
-        });
-    }
-
-    @Test
     public void testGetElementAtIncorrectIndex() {
         List<Integer> list = new List<>();
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -117,62 +100,20 @@ public class ListTest {
     }
 
     @Test
-    public void testListShouldBeEmptyWhenRemoingInReverse() {
-        List<Integer> list = new List<>();
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        assertEquals(4, list.size());
-        list.remove(0);
-        assertEquals(3, list.size());
-        list.remove(1);
-        assertEquals(2, list.size());
-        list.remove(1);
-        assertEquals(1, list.size());
-        list.remove(0);
-        assertEquals(0, list.size());
-    }
-
-    @Test
     public void testListSetToPowerOfTwo() {
         List<Integer> list = new List<>();
         list.append(1); // head = 0
         list.append(1); // head = 1
         list.append(1); // head = 2
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.set(8, 2);
-        assertEquals(9, list.size());
-        assertEquals((Integer) 2, list.get(8));
-        assertEquals(16, list.getSpace());
-    }
-
-    @Test
-    public void testEnsureSizeStaysSameEvenAfterRemoving() {
-        List<Integer> list = new List<>();
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        list.append(1);
-        assertEquals(16, list.getSpace());
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
-        list.remove(0);
+        list.append(1); // head = 3
+        list.append(1); // head = 4
+        list.append(1); // head = 5
+        list.append(1); // head = 6
+        assertEquals(8, list.getSpace());
+        list.append(1); // head = 7
+        list.set(7, 2);
+        assertEquals(8, list.size());
+        assertEquals((Integer) 2, list.get(7));
         assertEquals(16, list.getSpace());
     }
 
@@ -196,6 +137,17 @@ public class ListTest {
 
     @Test
     public void testSetThrowsOnIllegalIndex2() {
+        List<Integer> list = new List<>();
+
+        list.append(1);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            list.set(2, 2);
+        });
+    }
+
+    @Test
+    public void testSetIncreasesTheSizeOfTheArray() {
         List<Integer> list = new List<>();
 
         list.append(1);

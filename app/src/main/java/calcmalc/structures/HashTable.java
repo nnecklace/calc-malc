@@ -3,11 +3,17 @@ package calcmalc.structures;
 /**
  * Hash table data structure. This resembles java HashMap data structure.
  * All operations are done in amortized constant time time O(1) or O(m) where m is the number of entries in an index
- * @param <K> the generic key to be contained in the hashtable
+ * All keys for the Hash table are always strings, keys are not generic types
  * @param <V> the generic value to be contained in the hashtable
  */
 public class HashTable<V> {
+    /**
+     * List of entries in the hashtable, sometimes also known as buckets
+     */
     private List<HashTableEntry<V>>[] values;
+    /**
+     * The amount of entries (buckets) the HashTable contains, the larger the size less likely to be collisions but more memory will be used
+     */
     private int size;
 
     /**
@@ -33,6 +39,12 @@ public class HashTable<V> {
         }
     }
 
+    /**
+     * calculates a hash value for the given key
+     * Method is inspired from tirakirja (5.2.1) and jdk source code
+     * @param key the key to calculate the hash for
+     * @return the integer value for the calculated hash
+     */
     private int calculateHash(String key) {
         int hashCode = 0;
 
@@ -44,8 +56,8 @@ public class HashTable<V> {
     }
 
     /**
-     * Method calculates index for a give key
-     * @param key to calculate
+     * Method calculates index for a give hashcode
+     * @param hashCode a hash code for any key in the hash table
      * @return an index for the given key
      */
     private int calculateIndex(int hashCode) {
@@ -73,6 +85,8 @@ public class HashTable<V> {
     /**
      * Helper function to retrive a record from a give index
      * @param key entry to find
+     * @param hashCode the hash code value for the key
+     * @param index the index location for the entry to find
      * @return Null if not found or the actual entry if found
      */
     private HashTableEntry<V> find(String key, int hashCode, int index) {

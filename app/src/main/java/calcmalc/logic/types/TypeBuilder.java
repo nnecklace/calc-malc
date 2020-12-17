@@ -1,9 +1,15 @@
 package calcmalc.logic.types;
 
 /**
+ * The type builder class builds tokens 
+ * @see calcmalc.logic.types.Token
+ * And gives them correct precedence levels
  * @author nnecklace
  */
 public class TypeBuilder {
+    /**
+     * Class is used as static so the constructor is set to private
+     */
     private TypeBuilder() {}
 
     /**

@@ -20,6 +20,9 @@ import javafx.stage.FileChooser;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * @hidden
+ */
 public class UI extends Application {
 
     @Override
@@ -188,6 +191,9 @@ public class UI extends Application {
         stage.show();
     }
 
+    /**
+     * @hidden
+     */
     public void run() {
         launch();
     }

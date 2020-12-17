@@ -20,43 +20,120 @@ import java.text.ParseException;
 import java.util.Scanner;
 
 /**
- * @author nnecklace
+ * @author nnecklac
+ * Main entry point for the program
+ * App controls whether the program displays the ui, starts the repl or reads a file
  */
 public class App {
-    private static Evaluator evaluator = new Evaluator();
+    /**
+     * Lexer property
+     * Lexer performs lexical analysis of the input stream
+     * {@see calcmalc.logic.Lexer}
+     */
     private static Lexer lexer = new Lexer();
+    /**
+     * Parser property
+     * Parser parses the the queue of input tokens, with the shunting yard algorithm,
+     * and creates a syntax tree out of the tokens
+     * {@see calcmalc.logic.Parser}
+     */
     private static Parser parser = new Parser();
+    /**
+     * Evaluator property
+     * Evaluator evaluates the syntax tree made by the parser and returns some value
+     * {@see calcmalc.logic.Evaluator}
+     */
+    private static Evaluator evaluator = new Evaluator();
+    /**
+     * Output property
+     * Output class contains the output to be displayed based on the result from the evaluator
+     * The property is public since it is shared between the App class and the UI class
+     */
     public static Output output = new Output();
 
+    /**
+     * Contains the out to display for the end user
+     * The output can be one of three types.
+     * Error - Some exception occured when lexing, parsing, or evaluating the input
+     * Variable - Parser had found and created abstract syntax trees for variables - If multiple variables are evaluated the Variable output will contain the last variable evaluated
+     * <pre>
+     * x = 2:
+     * y = 3: -- Variable output
+     * </pre>
+     * <br/>
+     * Number - Evaluator evaluate a mathematical expression and the expression is stored in the output class. Unlike variables, Number outputs will only contain the first expression evaluated
+     * <pre> 
+     * max(2,5,6) -- Number output
+     * 
+     * 2+2+2*(2+5)
+     * </pre>
+     */
     public static class Output {
+        /**
+         * Number output property
+         */
         public Number numOutput;
+        /**
+         * Variable output property 
+         */
         public String variableOutput;
+        /**
+         * Error output property 
+         */
         public String errorOutput;
 
+        /**
+         * Setter for error output property
+         * The error will be an exception that was thrown during lexing, parsing, or evaluating
+         * @param errorOutput actual error messaged thrown
+         */
         public void setErrorOutput(String errorOutput) {
             this.errorOutput = errorOutput;
         }
 
+        /**
+         * Setter for the variable output property
+         * The variable will be the last variable evaluated from the parser variable queue
+         * <pre>
+         * x = 2:
+         * </pre>
+         * {@literal <}assignment:x{@literal >}
+         * @param variableOutput the last variable evaluated from the parser
+         */
         public void setVariableOutput(String variableOutput) {
             this.variableOutput = variableOutput;
         }
 
+        /**
+         * Setter for the number output property
+         * The number will be the first expression evaluated from the parser's generated syntax tree
+         * <pre>
+         * max(2,5,6) 
+         * </pre>
+         * @param numOutput the actual evaluated result of the abstract syntax tree
+         */
         public void setNumOutput(Number numOutput) {
             this.numOutput = numOutput;
         }
 
+        /**
+         * Method used to print the output
+         * Errors will be printed first if there are any
+         * Otherwise numbers, and last variables
+         */
         public void printOutput() {
             if (errorOutput != null) {
                 System.err.println(errorOutput);
+            } else if (numOutput != null) {
+                System.out.println(numOutput);
             } else {
-                if (numOutput != null) {
-                    System.out.println(numOutput);
-                } else {
-                    System.out.println(variableOutput);
-                }
+                System.out.println(variableOutput);
             }
         }
-
+        
+        /**
+         * Method clears any and all output properties by setting them to null
+         */
         public void clear() {
             this.errorOutput = null;
             this.variableOutput = null;
@@ -78,7 +155,8 @@ public class App {
      * Main entry point for the algorithm
      * Accepts either an argument of repl, which starts the repl
      * Or file name, which contains a valid input to evaluate
-     * @param args IO params to read, array can be empty
+     * Or ui which starts the GUI javafx program
+     * @param args IO params to read, array can be empty in which case the program exits immediately
      * @throws IOException if file cannot be read
      */
     public static void main(String[] args) throws IOException {
@@ -101,7 +179,7 @@ public class App {
      * @param n the number to format
      * @return formated number
      */
-    public static Number format(Number n) {
+    private static Number format(Number n) {
         if (n.doubleValue() % 1 == 0) {
             return n.longValue();
         }
@@ -111,6 +189,7 @@ public class App {
 
     /**
      * Reads an inteprets the file passed to calcmalc
+     * The file will be read as a whole string and not line by line as the repl does
      * @param file path to the file
      * @throws IOException if the file cannot be read
      */
@@ -123,8 +202,10 @@ public class App {
     }
 
     /**
-     * Interprets and evaluates one line at a time and outputs a value once no lines remain
-     * @param input the line to interpret
+     * Lexes, parses and evaluates one line at a time from the repl, 
+     * or a whole file, and outputs a value once no lines remain
+     * File should be passed as one string to the interpreter
+     * @param input the line, or file string, to interpret
      */
     public static void interpret(String input) {
         App.output.clear();
@@ -144,8 +225,11 @@ public class App {
         } catch (LexerException | ParseException | EvaluatorException | ArithmeticException e) {
             App.output.setErrorOutput(e.getMessage());
         } catch (NumberFormatException e) {
+            // caught incase someone tries to put numbers like 2.2.2 or A.2
             App.output.setErrorOutput("Number was formatted incorrectly: " + e.getMessage());
         } finally {
+            // this is done to empty the parser stacks since errors can mean that the parser currently has some erronous stuff
+            // all variables weren't parsed correctly or some parenthesis was missing etc
             parser = new Parser();
         }
     }
@@ -153,6 +237,7 @@ public class App {
     /**
      * Method starts the repl
      * Repl runs as long as user wants it too
+     * Exit can be done with ctrl+c or cmd+c
      */
     public static void repl() {
         Scanner input = new Scanner(System.in);

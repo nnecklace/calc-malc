@@ -1,13 +1,22 @@
 package calcmalc.structures;
 
 /**
- * Generic container class for HashTable
- * @param <K> key of the pair to store in the HashTable
- * @param <V> value of the pair to store in the HashTable
+ * Generic container class for a HashTable entry
+ * @param <V> value of the entry to store in the HashTable
+ * @author nnecklace
  */
 public class HashTableEntry<V> {
+    /**
+     * The value stored in this entry
+     */
     private V value;
+    /**
+     * The key string associated with the entry
+     */
     private String key;
+    /**
+     * The hashcode associated with the key for this entry
+     */
     private int hash;
 
     /**

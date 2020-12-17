@@ -7,17 +7,132 @@ import calcmalc.structures.Stack;
 import calcmalc.exceptions.EvaluatorException;
 
 /**
+ * Evaluator for the program. 
+ * The evaluator evaluates AST (abstract syntax trees) using dfs (depth first search) and post order traversal
+ * The class will walk (traverse) through the tree and return some value
+ * The evaluation happens bottom up
+ * Time complexity for the evaluator is O(V + E) where V is the number of nodes in the tree and E is the number of edges. All nodes and edges will be visited exactly once.
+ * Evaluator uses more memory than the any other class
+ * Space complexity is O(n^2) where n is the number of custom functions
+ * In the average case space complexity is θ(n)
+ * Examples
+ * <pre>
+ *      +
+ *     / \   => 4
+ *    2   2
+ * 
+ *     max
+ *    / | \  => 5
+ *   2  4  5
+ * 
+ *     abs
+ *      |
+ *      +
+ *     / \      =>  1
+ *    *   1
+ *   / \
+ *  2   $
+ *      |
+ *      1
+ * </pre>
  * @author nnecklace
  */
 public class Evaluator {
+    /**
+     * function arity HashTable contains all the operators, and functions encountered so far,
+     * the count of arguments the operator, or functions, is expected to be given
+     * <pre>
+     * <abs, 1>
+     * <max, -1> -1 means unlimited
+     * <+, 2>
+     * </pre>
+     */
     private HashTable<Integer> functionArity = new HashTable<>();
-    private HashTable<Double> symbolTable = new HashTable<>(); // rename
+    /**
+     * Symbol table, also known as variable table, contains
+     * all variables and their values. Variables are always
+     * evaluated immediatly and their value is stored in this table
+     * Future reuse will just lookup the variable value instead of evaluating it again
+     */
+    private HashTable<Double> symbolTable = new HashTable<>(); 
+    /**
+     * Custom function bodies table works like symbol table. Custom functions have a body.
+     * Functions can't be evaluated immediately, unlike variables, so the function body will be stored in this table
+     * Every time a custom function is called, its body will be retrieved and evaluated with the parameter the function was given
+     * <pre>
+     * 
+     * fn(x) = 1+x:
+     *          ^   this is the body of the custom function
+     * 
+     * </pre>
+     */
     private HashTable<ASTNode> customFunctionBodies = new HashTable<>();
-    private HashTable<Boolean> standardLibraryFunctions = new HashTable<>();
+    /**
+     * Custom function arguments table contains the arguments (list of symbols given to the function).
+     * Custom functions are given some arguments, as symbols, and these symbols are stored in this hashtable.
+     * The symbols are used when custom functions are evaluated. We need to know what value corresponds to what symbol
+     * <pre>
+     * add(x,y) = x + y:
+     *     ^ ^  these are the symbol arguments for the custom function
+     * 
+     * </pre>
+     * 
+     * Ideally there would be only one hashtable that contains both informations that customFunctionBodies and customFunctionArguments contain
+     */
     private HashTable<Queue<String>> customFunctionArguments = new HashTable<>();
+    /**
+     * Hashtable contains all the standard library functions, there is no hashset class
+     * so we use hashtable as a hashset. 
+     * Table is meant to quickly check that the standard library functions are not overwritten by the user
+     */
+    private HashTable<Boolean> standardLibraryFunctions = new HashTable<>();
+
+    /**
+     * Hashtable contains all the custom arguments (symbols) and their values
+     * This is needed since when custom functions are evaluated they will have some context to what the symbols mean
+     * 
+     * Example
+     * <pre>
+     * x = 2:
+     * 
+     * fn(val) = 1+val:
+     * 
+     * double(x) = 1 + val(x):
+     * 
+     * double(1)
+     * 
+     * </pre>
+     * 
+     * In this case the val function will first lookup the current context, which is double
+     * <pre>double -> x -> 1</pre>
+     * In the context of double, x refers to 1, in the global context x refers to 2
+     * Every time a custom function is called, a new entry (or updated) will be made in the contextSymbolTable
+     *<pre> 
+     * double(2)+fn(3)
+     * Two entries will be made
+     * 
+     * double -> x = 2
+     * fn -> val = 3
+     * </pre>
+     */
     private HashTable<HashTable<Double>> contextSymbolTable = new HashTable<>();
+    /**
+     * A stack which contains the current context the function is in
+     * if the stack is empty every symbol lookup will be in the global context
+     * Otherwise it will first lookup the symbol from some function context and if that fails
+     * It will then look it up in the global context
+     */
     private Stack<String> contexts = new Stack<>();
 
+    /**
+     * Basic string concat function
+     * Concatenates three strings togerther, ideally would use string builder or some such
+     * But that is not allowed some we do this instead
+     * @param start first string
+     * @param middle second string
+     * @param end thrid string
+     * @return the three strings concatenated together
+     */
     private String concat(String start, String middle, String end) {
         int size = start.length() + middle.length() + end.length();
         char[] combined = new char[size];
@@ -37,7 +152,8 @@ public class Evaluator {
 
     /**
      * Constructor for the Evaluator
-     * Constructor initializes the config table with built in functions and operators
+     * Constructor initializes the function arity table with built in functions and operators and their argument count
+     * Also initializes the standard library functions table with all the built in functions
      */
     public Evaluator() { 
         functionArity.placeOrUpdate("+", 2);
@@ -67,24 +183,23 @@ public class Evaluator {
     }
 
     /**
-     * Method checks that the given symbol (function) has the correct amount of arguments
-     * @param symbol the symbol to check
+     * Method checks that the given function or operator has the correct amount of arguments
+     * @param function the function or operator to check
      * @param argumentsCount the given number of arguments given to the symbol
      * @throws EvaluatorException if wrong number of arguments
      */
-    private void checkArguments(String symbol, int argumentsCount) throws EvaluatorException {
-        Integer value = functionArity.get(symbol);
+    private void checkArguments(String function, int argumentsCount) throws EvaluatorException {
+        Integer value = functionArity.get(function);
         if (value != null && value != argumentsCount && value != -1) {
             // in exceptions we use the concat operator for strings
-            throw new EvaluatorException("Wrong number of arguments for " + symbol);
+            throw new EvaluatorException("Wrong number of arguments for " + function);
         }
     }
 
     /**
      * Checks if the given symbol (variable) has been defined during runtime
      * @param token The token to check for
-     * @return the value associated with the symbol
-     * @throws EvaluatorException if symbol is unknown
+     * @return the value associated with the symbol or null if the token is unknown
      */
     private Double checkSymbolAndContextTable(String token) {
         Double symbolValue = null;
@@ -101,7 +216,7 @@ public class Evaluator {
     }
 
     /**
-     * Method tries to evaluate the given token, be it a function or variable symbol
+     * Method tries to evaluate the given token. If this method is called the token has to be an Stl function or it is unknown
      * @param <N> Let n be any java Number type
      * @param token the token to be evaluated
      * @param arguments the queue of arguments for the token
@@ -146,6 +261,14 @@ public class Evaluator {
         }
     }
 
+    /**
+     * Method is helper function to determine of or max value of the arguments
+     * @param <N> Let N be any java number type
+     * @param minOrMax string to determine if the method should evaluate min or max of the arguments
+     * @param arguments the arguments queue, at this point the arguments queue will only contain at most two parameters
+     *                  check evaluate method for explanation
+     * @return the max or min of the arguments
+     */
     private <N extends Number> double minOrMax(String minOrMax, Queue<N> arguments) {
         if (arguments.size() == 1) {
             return arguments.dequeue().doubleValue();
@@ -187,10 +310,27 @@ public class Evaluator {
     }
 
     /**
-     * Method evaluates an assignment ASTNode and returns a string representation of the variable that was created
+     * Method evaluates an assignment ASTNode and returns a string representation of the variable or custom functio that was created
+     * 
+     * Examples:
+     * <pre>
+     * 
+     *           =
+     *         /   \
+     *       sum      +
+     *      / | \    / \
+     *     x  y  z   x  +
+     *                 / \
+     *                x   z
+     * 
+     *         =
+     *        / \
+     *       x   2
+     * 
+     * </pre>
      * @param node any assignment node
      * @return string representation of the variable. E.g., x=2 => {@literal <}assignment:x{@literal >}
-     * @throws EvaluatorException if assignment cannot be evaluated
+     * @throws EvaluatorException if assignment cannot be evaluated or the custom function was given illegal arguments
      */
     public String evaluateAssignment(ASTNode node) throws EvaluatorException {
         if (node.children().size() < 2) {
@@ -228,6 +368,30 @@ public class Evaluator {
         return concat("<assignment:", symbolName, ">");
     }
 
+    /**
+     * Method tries to evaluate custom fuction calls. Custom functions are user made functions and don't exist in the stl hashtable.
+     * 
+     * Example
+     * <pre>
+     * custom funiction node:
+     * 
+     * =>     double
+     *          |
+     *          5 
+     * 
+     * FunctionBodyTable double -> [x*2]
+     * Node children 5
+     * Function Arguments table double -> [x]
+     * context table double -> x = 2
+     * 
+     * Function body  =>   *
+     *                    / \   =>  2*2 => 4
+     *                   x   2                 
+     * </pre>
+     * @param node custom function node
+     * @return result of the evaluated body of the custom function
+     * @throws EvaluatorException if the function is unknown, i.e., doesn't have a function body
+     */
     private Number evaluateCustomFunction(ASTNode node) throws EvaluatorException {
         String functionName = node.token().getKey();
 
@@ -267,9 +431,12 @@ public class Evaluator {
 
     /**
      * Method evaluates a given AST tree structure and returns the result of the expression the tree represents.
+     * <pre>
      *      +
      *     / \    ==>   5
      *    2   3
+     * 
+     * </pre>
      * All leaves in the tree should, and must, be a value. Meaning that all leaves are either variables or numbers.
      * Post order traversal is used when traversing the tree.
      * @param node the root node of the AST tree
@@ -287,6 +454,7 @@ public class Evaluator {
             return Double.parseDouble(nodeTokenKey);
         }
 
+        // Node is a leaf symbol
         if (node.token().isSymbol() && standardLibraryFunctions.get(nodeTokenKey) == null) {
             Double possibleValue = checkSymbolAndContextTable(nodeTokenKey);
             if (possibleValue != null) {
