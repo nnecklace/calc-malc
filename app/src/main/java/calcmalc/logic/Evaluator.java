@@ -124,7 +124,7 @@ public class Evaluator {
      */
     private Stack<String> contexts = new Stack<>();
 
-    private static final double NaN = 0.0d / 0.0;
+    private static final double NAN = 0.0d / 0.0;
 
     /**
      * Basic string concat function
@@ -306,7 +306,7 @@ public class Evaluator {
      */
     private double sqrt(double n) {
         if (n < 0.0) {
-            return NaN;
+            return NAN;
         }
 
         if (n == 0.0) {
@@ -318,8 +318,9 @@ public class Evaluator {
         // newtons method
         while (true) {  
             root = 0.5 * (x + n / x);  
-            if (abs(root - x) < 1)
+            if (abs(root - x) < 1) {
                 break;
+            }
             x = root;  
         }  
         
@@ -338,10 +339,10 @@ public class Evaluator {
         int precision = 1000;
         double ln = 0.0;
         for (int i = 1; i <= precision; i = i + 2) {
-           ln += ((1.0 / i) * pow((n - 1)/(n + 1), i));
+            ln += ((1.0 / i) * pow((n - 1) / (n + 1), i));
         }
 
-        return 2*ln;
+        return 2 * ln;
     }
 
     /**
@@ -353,7 +354,7 @@ public class Evaluator {
     private double pow(double n, double e) {
         // we don't handle fractional exponents :(
         if (e % 1 != 0) {
-            return NaN;
+            return NAN;
         }
 
         double result = 1.0;
