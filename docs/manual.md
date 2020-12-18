@@ -49,6 +49,10 @@ The compiled jar doesn't need the --args argument.
 ```./gradlew jacocoReport```
 (make sure you run the unit tests first)
 
+### Run performance test
+
+```./gradlew performance```
+
 ## Usage of functions
 
 ```
