@@ -227,39 +227,6 @@ public class EvaluatorTest {
     }
 
     @Test
-    public void testEvaluateSinFunction() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:sin(x)"));
-        Queue<ASTNode> variables = parser.variables();
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(variables.dequeue()));
-        assertEquals((Double) 0.9092974268256817, evaluator.evaluate(nodes.pop()));
-    }
-
-    @Test
-    public void testEvaluateCosFunction() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:cos(x)"));
-        Queue<ASTNode> variables = parser.variables();
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(variables.dequeue()));
-        assertEquals((Double) (-0.4161468365471424), evaluator.evaluate(nodes.pop()));
-    }
-
-    @Test
-    public void testEvaluateTanFunction() throws Exception {
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("x=2:tan(x)"));
-        Queue<ASTNode> variables = parser.variables();
-        assertEquals("<assignment:x>", evaluator.evaluateAssignment(variables.dequeue()));
-        assertEquals((Double) (-2.185039863261519), evaluator.evaluate(nodes.pop()));
-    }
-
-    @Test
     public void testEvaluateCustomFunction() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
@@ -572,8 +539,8 @@ public class EvaluatorTest {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
         Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex("-1*(-1)/2*(max(2,3,4,5)+(-abs(-5)^cos(2%(5*5*4))))"));
-        assertEquals((Double) (2.244084937441898), evaluator.evaluate(nodes.pop()));
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("-1*(-1)/2*(max(2,3,4,5)+(-abs(-5)*sqrt(2%(5*5*4))))"));
+        assertEquals((Double) (-1.0355339059327378), evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -601,6 +568,24 @@ public class EvaluatorTest {
         Evaluator evaluator = new Evaluator();
         Stack<ASTNode> nodes = parser.parse(lexer.lex("(-2)^4"));
         assertEquals((Double) (16.0), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateExponent4() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("2^(-2)"));
+        assertEquals((Double) (0.25), evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
+    public void testEvaluateExponent5() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("2^(-2.5)"));
+        assertEquals(Double.NaN, evaluator.evaluate(nodes.pop()));
     }
 
     @Test
@@ -753,22 +738,6 @@ public class EvaluatorTest {
             evaluator.evaluateAssignment(parser.variables().dequeue());
         }
         assertEquals((Double) 317.0683229820877, evaluator.evaluate(nodes.pop())); // verified with wolfram alpha
-    }
-
-    @Test
-    public void testEvaluateExressions4() throws Exception {
-        String expr = new StringBuilder()
-            .append("1/(1-7)-3-7+(3/tan(2)*6/9)-(9+8/4+cos(7)+cos(7)-9*8/3*6)/(4*7*1/7)-(2/8)-4/5+sin(6)/(5+6+cos(4)+1+cos(2)/5/5+4)/8*(1*4-9)+(3/4)-3/6*sin(8)-(2+3)*4+(1/3)*(6)")
-            .toString();
-
-        Lexer lexer = new Lexer();
-        Parser parser = new Parser();
-        Evaluator evaluator = new Evaluator();
-        Stack<ASTNode> nodes = parser.parse(lexer.lex(expr));
-        while(!parser.variables().isEmpty()) {
-            evaluator.evaluateAssignment(parser.variables().dequeue());
-        }
-        assertEquals((Double) 3.0077798843882384, evaluator.evaluate(nodes.pop()));
     }
 
     @Test

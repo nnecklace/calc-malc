@@ -124,6 +124,8 @@ public class Evaluator {
      */
     private Stack<String> contexts = new Stack<>();
 
+    private static final double NaN = 0.0d / 0.0;
+
     /**
      * Basic string concat function
      * Concatenates three strings togerther, ideally would use string builder or some such
@@ -239,19 +241,13 @@ public class Evaluator {
             case "%":
                 return arguments.dequeue().doubleValue() % arguments.dequeue().doubleValue();
             case "^":
-                return Math.pow(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
+                return pow(arguments.dequeue().doubleValue(), arguments.dequeue().doubleValue());
             case "sqrt":
-                return Math.sqrt(arguments.dequeue().doubleValue());
+                return Math.sqrt(arguments.dequeue().doubleValue()); // check custom square root function for reason why we use this
             case "log":
-                return Math.log(arguments.dequeue().doubleValue());
+                return Math.log(arguments.dequeue().doubleValue()); // check custom log function for reason of why we use this
             case "abs":
                 return abs(arguments.dequeue().doubleValue());
-            case "cos":
-                return Math.cos(arguments.dequeue().doubleValue());
-            case "sin":
-                return Math.sin(arguments.dequeue().doubleValue());
-            case "tan":
-                return Math.tan(arguments.dequeue().doubleValue());
             case "max":
                 return minOrMax("max", arguments);
             case "min":
@@ -290,6 +286,7 @@ public class Evaluator {
         return n > m ? n : m;
     }
 
+
     /**
      * A basic min function that returns the minimum value of the arguments
      * @param n left number
@@ -298,6 +295,82 @@ public class Evaluator {
      */
     private double min(double n, double m) {
         return n < m ? n : m;
+    }
+
+    /**
+     * A function for calculating the squre root of a positive number
+     * currently not in use since it is much less accurate than the java's standard sqrt
+     * testing and verifying correct results become difficult. Performance is not an issue, but accuracy is
+     * @param n the number to find the squre root of
+     * @return the square root of the param number
+     */
+    private double sqrt(double n) {
+        if (n < 0.0) {
+            return NaN;
+        }
+
+        if (n == 0.0) {
+            return 0.0;
+        }
+
+        double x = n;
+        double root;
+        // newtons method
+        while (true) {  
+            root = 0.5 * (x + n / x);  
+            if (abs(root - x) < 1)
+                break;
+            x = root;  
+        }  
+        
+        return root;
+    }
+
+    /**
+     * Highly inaccurate implementation of logarithm function. 
+     * Function uses Taylor series expansion to converge the natural logarithm. Very slow
+     * For log(100) takes about 42 seconds to compute. Practically unsuable and also very inaccurate.
+     * https://www.efunda.com/math/taylor_series/logarithmic.cfm 
+     * @param n the logarithm of the value
+     * @return the natural log of param value
+     */
+    private double log(double n) {
+        int precision = 1000;
+        double ln = 0.0;
+        for (int i = 1; i <= precision; i = i + 2) {
+           ln += ((1.0 / i) * pow((n - 1)/(n + 1), i));
+        }
+
+        return 2*ln;
+    }
+
+    /**
+     * Calculates the exponential value of a number. Doesn't calculate fractional exponenets.
+     * @param n base value
+     * @param e the exponent value
+     * @return n^e
+     */
+    private double pow(double n, double e) {
+        // we don't handle fractional exponents :(
+        if (e % 1 != 0) {
+            return NaN;
+        }
+
+        double result = 1.0;
+
+        if (e == 0.0) {
+            return result;
+        }
+
+        for (int i = 0; i < abs(e); ++i) {
+            result *= n;
+        }
+
+        if (e < 0.0) {
+            return 1.0 / result;
+        } 
+
+        return result;
     }
 
     /**
