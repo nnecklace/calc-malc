@@ -20,6 +20,9 @@ Once the welcoming message has been shown you can start using the repl.
 `./gradlew run --args='src/inputs/test_input_2.txt'`
 
 Make sure all the test files are located in the app directory!
+The compiled jar doesn't need the --args argument. 
+
+```java -jar <jar-file> test_input_2.txt``` should work
 
 ### Start the UI
 
