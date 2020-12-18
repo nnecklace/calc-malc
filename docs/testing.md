@@ -21,16 +21,17 @@ The context free grammar looks something like this.
 Capital letter are excluded from the context free grammar, but they can be used just like lower case letters.
 
 ```
-S        => EXPR | (EXPR) | VAR | e
-VAR      => VAR_NAME=EXPR_OR_VALUE:VAR | e
-VAR_NAME => VAR_NAME | (VAR_NAME) | SYMBOL() | SYMBOL(SYMBOL) | SYMBOL(SYMBOL,SYMBOL)
-SYMBOL => _LETTER | aLETTER | bLETTER | cLETTER | dLETTER | eLETTER | fLETTER | gLETTER | hLETTER | iLETTER | jLETTER | kLETTER | lLETTER | mLETTER | nLETTER | oLETTER | pLETTER | qLETTER | rLETTER | sLETTER | tLETTER | uLETTER | vLETTER | wLETTER | xLETTER | yLETTER | zLETTER 
-LETTER => _SYMBOL | aSYMBOL | bSYMBOL | cSYMBOL | dSYMBOL | eSYMBOL | fSYMBOL | gSYMBOL | hSYMBOL | iSYMBOL | jSYMBOL | kSYMBOL | lSYMBOL | mSYMBOL | nSYMBOL | oSYMBOL | pSYMBOL | qSYMBOL | rSYMBOL | sSYMBOL | tSYMBOL | uSYMBOL | vSYMBOL | wSYMBOL | xSYMBOL | ySYMBOL | zSYMBOL | e
+S             => EXPR | (EXPR) | VAR | e
+VAR           => VAR_NAME=EXPR_OR_VALUE:VAR | e
+VAR_NAME      => VAR_NAME | (VAR_NAME) | SYMBOL(PARAM)
+PARAM         => SYMBOL,PARAM | SYMBOL | (SYMBOL) | (SYMBOL,PARAM)
+SYMBOL        => _LETTER | aLETTER | bLETTER | cLETTER | dLETTER | eLETTER | fLETTER | gLETTER | hLETTER | iLETTER | jLETTER | kLETTER | lLETTER | mLETTER | nLETTER | oLETTER | pLETTER | qLETTER | rLETTER | sLETTER | tLETTER | uLETTER | vLETTER | wLETTER | xLETTER | yLETTER | zLETTER 
+LETTER        => _SYMBOL | aSYMBOL | bSYMBOL | cSYMBOL | dSYMBOL | eSYMBOL | fSYMBOL | gSYMBOL | hSYMBOL | iSYMBOL | jSYMBOL | kSYMBOL | lSYMBOL | mSYMBOL | nSYMBOL | oSYMBOL | pSYMBOL | qSYMBOL | rSYMBOL | sSYMBOL | tSYMBOL | uSYMBOL | vSYMBOL | wSYMBOL | xSYMBOL | ySYMBOL | zSYMBOL | e
 EXPR_OR_VALUE => SYMBOL | EXPR
-EXPR => FUNCTION(EXPR) | (EXPR) | NUBER | -EXPR | EXPR + EXPR | EXPR - EXPR | EXPR * EXPR | EXPR / EXPR | EXPR^EXPR | EXPR % EXPR
-FUNCTION => log | abs | min | max | sqrt | sin | cos | tan
-NUMBER => 0DIGIT | 1DIGIT | 2DIGIT | 3DIGIT | 4DIGIT | 5DIGIT | 6DIGIT | 7DIGIT | 8DIGIT | 9DIGIT
-DIGIT => NUMBER | e
+EXPR          => FUNCTION(EXPR) | (EXPR) | NUMBER | -EXPR | EXPR + EXPR | EXPR - EXPR | EXPR * EXPR | EXPR / EXPR | EXPR^EXPR | EXPR % EXPR
+FUNCTION      => log | abs | min | max | sqrt | sin | cos | tan
+NUMBER        => 0DIGIT | 1DIGIT | 2DIGIT | 3DIGIT | 4DIGIT | 5DIGIT | 6DIGIT | 7DIGIT | 8DIGIT | 9DIGIT
+DIGIT         => NUMBER | e
 ```
 
 Inputs can be found with the following cfg tool.
@@ -48,8 +49,8 @@ Manual tests can be made easily. First start CalcMalc `./gradlew repl` and wait 
 
 ## Unit Testing
 
-The project currently has about 140 unit tests for different kinds of inputs. All unit tests can be run with gradle `./gradlew test` (unix systems).
-All inputs haven't been tested for each section (Lexer, Parser, Evaluator). Test coverage should be 100%.
+The project currently has about 222 unit tests for different kinds of inputs. All unit tests can be run with gradle `./gradlew test` (unix systems).
+All inputs haven't been tested for each section (Lexer, Parser, Evaluator). Test coverage should be close 100%. Test coverage can be viewed by generating jacoco test report coverage `./gradlew jacocoReport`
 
 ## Performance Testing
 
