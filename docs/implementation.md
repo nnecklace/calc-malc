@@ -402,7 +402,7 @@ loop x  > 0:
 sum
 ```
 
-### Lexer Code
+### Lexer Code
 
 Currently the lexer rereads character from the input string. This happens when reading numbers or continuous character. When the character no longer matches either number or alphabetical letter the lexer has to reread the failed character. In the next version the lexer will be updated to read each character once, and only once.
 
