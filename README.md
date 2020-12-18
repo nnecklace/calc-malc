@@ -21,6 +21,8 @@
 
 [Implementation](https://github.com/nnecklace/calc-malc/blob/main/docs/implementation.md)
 
+[Manual](https://github.com/nnecklace/calc-malc/blob/main/docs/manual.md)
+
 ## Overview 
 
 Faculty: TKT
@@ -33,7 +35,7 @@ CalcMalc is simple arthemetic REPL (Read, Evaluate, Parse, Loop). CalcMalc can r
 
 ## Requirements
 
-Java 14 or higher
+Java 15 or higher
 
 gradle 6.7
 
