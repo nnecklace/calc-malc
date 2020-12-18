@@ -4,6 +4,7 @@ import calcmalc.structures.ASTNode;
 import calcmalc.structures.HashTable;
 import calcmalc.structures.Queue;
 import calcmalc.structures.Stack;
+
 import calcmalc.exceptions.EvaluatorException;
 
 /**

@@ -589,6 +589,15 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void testEvaluateExponent6() throws Exception {
+        Lexer lexer = new Lexer();
+        Parser parser = new Parser();
+        Evaluator evaluator = new Evaluator();
+        Stack<ASTNode> nodes = parser.parse(lexer.lex("2^0"));
+        assertEquals(1.0, evaluator.evaluate(nodes.pop()));
+    }
+
+    @Test
     public void testEvaluateAbsFunction() throws Exception {
         Lexer lexer = new Lexer();
         Parser parser = new Parser();
