@@ -5,6 +5,8 @@
 
 Java 15 or higher
 
+JavaFX SDK 15.0.1
+
 gradle 6.7
 
 Optional: Python 3
@@ -31,6 +33,10 @@ The compiled jar doesn't need the --args argument.
 ### Start the UI
 
 ```./gradlew ui```
+
+With the compiled jar make sure you have javafx installed correctly, then run 
+
+```java --module-path <path to javafx lib> --add-modules javafx.controls -jar <jar file> ui```
 
 ### Generate javadocs
 
