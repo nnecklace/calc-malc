@@ -93,6 +93,9 @@ x ^ y Operator multiples the base x y amount of times to itself.
 x % y Operator returns the modulo of x mod y.
 
 -x Operator is unary and returns the negative of its parameter.
+
+x = 2: Assignment operator creates functions or variables. The assignment operator expects the leftside to be a symbol or a function declaration. Rightside can be another variable, or function call or any expression
+
 ```
 
 ## Examples 
