@@ -415,6 +415,11 @@ In the evaluator there is one place where Double.Parse is used. This might not b
 In some cases the project uses string concat operator +. The operation is really slow, but didn't have time to implement a custom concat function, apart from one place in the evaluator.
 In the future there could be a faster string concat function in the project.
 
+### Better Square root, pow and logarithm functions
+
+Made three custom math functions. 2 of which were almost useless. If I would have had more time I would have tried to make much much better square root function and logarithm function.
+Pow function worked nicely, only problem is that it doesn't support fractional exponents.
+
 ## References
 
 [Tirakirja](https://raw.githubusercontent.com/pllk/tirakirja/master/tirakirja.pdf)
