@@ -124,7 +124,6 @@ public class Evaluator {
      * It will then look it up in the global context
      */
     private Stack<String> contexts = new Stack<>();
-
     /**
      * Static variable to display that the result is not a real number
      */
@@ -289,7 +288,6 @@ public class Evaluator {
     private double max(double n, double m) {
         return n > m ? n : m;
     }
-
 
     /**
      * A basic min function that returns the minimum value of the arguments
