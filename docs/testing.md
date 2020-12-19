@@ -2,7 +2,7 @@
 
 ## What has been tested
 
-In my definitions document is showed a context free language that CalcMalc should recognize and throughout this course I've been trying to make the algorithm accept that context free grammar.
+In my definitions document is showed a context free language that CalcMalc should recognise and throughout this course I've been trying to make the algorithm accept that context free grammar.
 This includes inputs like:
 
 ```
@@ -11,7 +11,7 @@ This includes inputs like:
 2*(2*(2+2)*(1+(4+4*(10+1)))+(10*(5+(2+3))))
 x=2*(2*(2+2)*(1+(4+4*(10+1)))+(10*(5+(2+3)))):
 x=2:y=2:z=4
-sin(max(min(2,5),sqrt(1))+2+2)
+log(max(min(2,5),sqrt(1))+2+2)
 -100+(-100)
 ```
 And many more.
@@ -45,11 +45,11 @@ x = 2:y = 2:z= x^y:
 
 ## Manual testing
 
-Manual tests can be made easily. First start CalcMalc `./gradlew repl` and wait for the greeting message. Then input any of the above mentioned inputs and see the results. I really hope someone finds inputs that break CalcMalc :).
+Manual tests can be made easily. First start CalcMalc `./gradlew repl` or `./gradlew ui` and wait for the greeting message. Then input any of the above mentioned inputs and see the results. I really hope someone finds inputs that break CalcMalc :).
 
 ## Unit Testing
 
-The project currently has about 222 unit tests for different kinds of inputs. All unit tests can be run with gradle `./gradlew test` (unix systems).
+The project currently has about 220 unit tests for different kinds of inputs. All unit tests can be run with gradle `./gradlew test` (unix systems).
 All inputs haven't been tested for each section (Lexer, Parser, Evaluator). Test coverage should be close 100%. Test coverage can be viewed by generating jacoco test report coverage `./gradlew jacocoReport`
 
 ## Performance Testing
@@ -72,28 +72,8 @@ test_input_12.txt   (n = 5000000) = 5741399.3087914875
 test_input_10.txt   (n = 10000000) = -2.960803788820491E8
 ```
 
-The input files can be tested with the command ./gradlew run --args='_some file location_', where _some file location_ should be a valid file location for calcmalc. E.g., 
-`./gradlew run --args='src/inputs/test_input_2.txt'`. The larger files will probably fail without configuring gradle's inner jvm stacksize. Add `jvmArgs '-Xss512m'` should be enough for all the test files.
+All test files were verified with https://api.mathjs.org/ . However, test_input_10.txt remains unverified since https://api.mathjs.org/ takes too long to respond. This can happen with all test files larger than 10^6. In this case the following python code can be used to verify all but test_input_10.txt.
 
-Test files were generated using python scripts.
-
-```python
-import random
-
-output = ""
-
-operators = ["+", "-", "*", "/"] # add more operators if needed
-
-for i in range(1, 100): # some range
-    if i % 2 == 0:
-        output += random.choice(operators)
-    else:
-        output += str(random.randint(1, 9))
-
-print(output,  file=open("test_filename.txt", "a"))
-```
-
-The files were verified by a python script
 ```python
 import os
 
@@ -106,32 +86,124 @@ for file in files:
     st = open("app/src/inputs/" + file, 'r').read()
     print("Result " + str(eval(st)))
 ```
+The result for test_input_10.txt is honestly not that important. More important was to see how the performance behaves on very large inputs.
 
-Some larger files may require configuring the process stack size.
 
-## Results
+The input files can be tested with the command ./gradlew run --args='_some file location_', where _some file location_ should be a valid file location for calcmalc. E.g., 
+`./gradlew run --args='src/inputs/test_input_2.txt'`. The larger files will probably fail without configuring the heap size for the jvm. Add `jvmArgs '-Xss512m'` when running performance tests with jar file, this should be enough for all the test files, with gradle nothing has to be added.
 
-Run the performance test suite with `./gradlew performance`. Test suite can be found in `app/src/main/java/calcmalc/performance/PerformanceTest.java`. Test suite reads and evaluates each generated test file for 40 runs. Below are some benchmark results.
+Test files were generated using python scripts.
+
+```python
+import random
+import json
+import urllib.request
+import subprocess
+import os
+
+output = ""
+
+operators = ["+", "-", "*", "/"] # add more operators here
+functions = ["abs", "sqrt", "max", "min"] # add more functions here
+
+left_paren = 0
+right_paren = 0
+
+for i in range(1, 100):
+    if i % 2 == 0:
+        output += random.choice(operators)
+    else:
+        if random.random() < 0.1: # 10% chance that it will generate a function
+            function = random.choice(functions)
+            output += function
+            output += "("
+            output += str(random.randint(1, 9))
+            if function == "max" or function == "min":
+                for i in range(1, random.randint(1,15)):
+                    output += ("," + str(random.randint(-100, 100)))
+            output += ")"
+        elif random.random() < 0.5: # 50% chance that it will create a parenthesis
+            paren = random.choice(["(", ")"])
+            if paren == ")" and left_paren > right_paren:
+                if not output[-1].isdigit():
+                    output += str(random.randint(1, 25))
+                output += ")"
+                right_paren = right_paren + 1
+            else:
+                output += "("
+                left_paren = left_paren + 1
+                output += str(random.randint(1, 25))
+        else:
+            output += str(random.randint(1, 25))
+
+while left_paren > right_paren:
+    output += ")"
+    right_paren = right_paren + 1
+
+body = {
+    "expr": output
+}
+
+print("Evaluating")
+print(output)
+print(output, file=open('tmp.txt', 'a'))
+
+req = urllib.request.Request("http://api.mathjs.org/v4/", json.dumps(body).encode("utf-8"), headers={'content-type': 'application/json'})
+
+response = urllib.request.urlopen(req)
+
+print("CalcMalc") 
+subprocess.call(['java', '-jar', 'app-1.0.0.jar', 'tmp.txt']) # assume jar name is app-1.0.0.jar
+print('Mathjs')
+print(json.loads(response.read().decode('utf-8'))['result'])
+os.remove('tmp.txt')
+```
+
+The file is located in `scripts/generate.py`. The script will first generate a random input can call calcmalc with it, and then verify the result with a api request to https://api.mathjs.org/.
+
+## Performance Test Results
+
+Run the performance test suite with `./gradlew performance`. Test suite can be found in `app/src/main/java/calcmalc/performance/PerformanceTest.java`. Test suite reads and evaluates each generated test file for 40 runs. Below are some benchmark results. Not all test files are included in the results, since some of them are only meant for unit tests.
+
+Results are displayed in seconds
+```
+test_input_7.txt ran on average 0.0068723878 on runs of 30
+test_input_6.txt ran on average 0.0067285579666666664 on runs of 30
+test_input_4.txt ran on average 0.5972191891333333 on runs of 30
+test_input_5.txt ran on average 0.04518566373333333 on runs of 30
+test_input_1.txt ran on average 7.81546E-4 on runs of 30
+test_input_2.txt ran on average 5.512952666666668E-4 on runs of 30
+test_input_3.txt ran on average 6.937549333333333E-4 on runs of 30
+test_input_12.txt ran on average 4.3993488048 on runs of 30
+test_input_13.txt ran on average 0.2565695782 on runs of 30
+test_input_11.txt ran on average 0.027049322733333336 on runs of 30
+test_input_10.txt ran on average 8.0342533581 on runs of 30
+test_input_8.txt ran on average 2.0447751723333334 on runs of 30
+test_input_9.txt ran on average 1.3458993782666666 on runs of 30
+```
+
+### Difference Between Custom Math Functions
+
+I used 3 custom math functions in calcmalc. All were significantly slower, and more inaccurate than Java Math methods. Below are some comparisons of the implementations.
 
 ```
-Results: 
-test_input_2.txt ran on average 0.0012706414 on runs of 10
-test_input_1.txt ran on average 0.0027720661 on runs of 10
-test_input_3.txt ran on average 0.0029877456 on runs of 10
-test_input_6.txt ran on average 0.0300822358 on runs of 10
-test_input_7.txt ran on average 0.052239819 on runs of 10
-test_input_11.txt ran on average 0.07462040140000001 on runs of 10
-test_input_5.txt ran on average 0.1583822914 on runs of 10
-test_input_13.txt ran on average 0.8369532523 on runs of 10
-test_input_4.txt ran on average 1.214685729 on runs of 10
-test_input_9.txt ran on average 2.6815009426999996 on runs of 10
-test_input_8.txt ran on average 4.0054051211 on runs of 10
-test_input_12.txt ran on average 6.2718223313 on runs of 10
-test_input_10.txt ran on average 12.5357777728 on runs of 10
+Comparing Sqrt
+Custom Sqrt ran on average in 9.936466E-8
+Math Sqrt ran on average in 4.319516E-8
+
+Comparing Log
+Custom Log ran on average 2.7860173684999997E-4
+Math Log ran on average 8.180576E-8
 ```
 
-## Graph
+The tests were performed with 10^5 runs. Although Java Math implementation's were significantly faster, the speed was not the worst part, the inaccuracy was. Custom sqrt uses the newton method to count the square root and it turned out to be much less accurate than Java's native implementation. The custom log was implemented with Taylor's series and it also was highly inaccurate, and in some cases wrong results.
+
+Because of the inaccuracy the veryification became impossible, so decided to go with Java's native solutions instead.
+
+## Results as Graph
 
 <img src="https://raw.githubusercontent.com/nnecklace/calc-malc/main/docs/images/graph.png" width="800px"/>
+
+Right column is seconds, while horizontal axis is input size.
 
 As we can see from the graph the algorithm increases linearly up until n = 2*10^6 after which it starts to increase exponentially.

@@ -125,6 +125,9 @@ public class Evaluator {
      */
     private Stack<String> contexts = new Stack<>();
 
+    /**
+     * Static variable to display that the result is not a real number
+     */
     private static final double NAN = 0.0d / 0.0;
 
     /**

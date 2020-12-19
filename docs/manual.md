@@ -7,6 +7,8 @@ Java 15 or higher
 
 gradle 6.7
 
+Optional: Python 3
+
 ## Commands
 
 ### Start the repl
@@ -19,10 +21,12 @@ Once the welcoming message has been shown you can start using the repl.
 
 `./gradlew run --args='src/inputs/test_input_2.txt'`
 
-Make sure all the test files are located in the app directory!
+Make sure all the test files are located in the `app/src/inputs/` directory!
 The compiled jar doesn't need the --args argument. 
 
-```java -jar <jar-file> test_input_2.txt``` should work
+```java -jar <jar-file> <path to file>``` 
+
+`app/src/inputs/` contains a sandbox file `calc_malc_test.txt`. This file is meant to be a playground where you can write different programs and test calcmalc's features.
 
 ### Start the UI
 
@@ -40,6 +44,8 @@ The compiled jar doesn't need the --args argument.
 
 ```./gradlew build```
 
+The compiled jar will be in `app/build/libs` folder. 
+
 ### Run checkstyle
 
 ```./gradlew checkstyleMain```
@@ -52,6 +58,14 @@ The compiled jar doesn't need the --args argument.
 ### Run performance test
 
 ```./gradlew performance```
+
+### Run outcome verifyer
+
+Make sure you are in the root directory.
+
+```python3 scripts/generate.py```
+
+Make sure the jar file is in the same directory.
 
 ## Usage of functions
 
@@ -79,6 +93,35 @@ x ^ y Operator multiples the base x y amount of times to itself.
 x % y Operator returns the modulo of x mod y.
 
 -x Operator is unary and returns the negative of its parameter.
+```
+
+## Examples 
+
+```
+1.
+2+2
+
+2.
+3*3
+
+3.
+(1+1)^2
+
+4.
+sqrt(2)
+
+5.
+abs(2/((2+2)*(5-2)))
+
+6.
+max(1,2,3,4,5,6,7,8,9,10)
+
+7.
+PI = 3.14:
+
+calculate_circle_area(radius) = RI*radius^2:
+
+calculate_circle_area(sqrt(2))
 ```
 
 ## Context Free Grammar
