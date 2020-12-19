@@ -95,6 +95,7 @@ The input files can be tested with the command ./gradlew run --args='_some file 
 Test files were generated using python script.
 
 The file is located in `scripts/generate.py`. The script will first generate a random input can call calcmalc with it, and then verify the result with a api request to https://api.mathjs.org/.
+There might be some precision errors from time to time. Mathjs is built with Javascript and might give different precision than CalcMalc.
 
 ## Performance Test Results
 
