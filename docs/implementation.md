@@ -420,6 +420,10 @@ In the future there could be a faster string concat function in the project.
 Made three custom math functions. 2 of which were almost useless. If I would have had more time I would have tried to make much much better square root function and logarithm function.
 Pow function worked nicely, only problem is that it doesn't support fractional exponents.
 
+### Better Error Messages
+
+Currently the error messages tell the user quite little about what went wrong. Missing colon error and pointing out where the code failed could be nice features to add.
+
 ## References
 
 [Tirakirja](https://raw.githubusercontent.com/pllk/tirakirja/master/tirakirja.pdf)
