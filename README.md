@@ -31,24 +31,4 @@ Language: English
 
 Programming language: Java
 
-CalcMalc is simple arthemetic REPL (Read, Evaluate, Parse, Loop). CalcMalc can read any normal arthemetic expression, such as `2+2`, and it should also support a handful of other mathematical functions: `log, ln, sqrt, max, min, abs`. You should also be able to create your own temporary values, variables and functions, and be able to reuse them thourghout the process's lifetime. The project is written in Java and all documents and code will be written in English.
-
-## Requirements
-
-Java 15 or higher
-
-gradle 6.7
-
-## Commands
-
-Run the project with a test file `./gradlew run --args='src/inputs/test_input_2.txt'`
-
-Make sure all the test files are located in the app directory!
-
-Run the repl, i.e., interactive environment `./gradlew repl`
-
-Run unit tests `./gradlew test`
-
-Run jacoco test coverage `./gradlew jacocoTestReport` (make sure you run the unit tests first)
-
-Run checkstyle `./gradlew checkstyleMain`
+CalcMalc is simple arthemetic interpreter for the CalcMalc language. The repo contains a REPL (Read, Evaluate, Parse, Loop), and a GUI enviornment. CalcMalc can read any normal arthemetic expression, such as `2+2`, and it should also support a handful of other mathematical functions: `log, sqrt, max, min, abs`. You should also be able to create your own temporary values, variables and functions, and be able to reuse them thourghout the process's lifetime. The project is written in Java and all documents and code will be written in English.
