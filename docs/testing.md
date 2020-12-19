@@ -196,7 +196,7 @@ Custom Log ran on average 2.7860173684999997E-4
 Math Log ran on average 8.180576E-8
 ```
 
-The tests were performed with 10^5 runs. Although Java Math implementation's were significantly faster, the speed was not the worst part, the inaccuracy was. Custom sqrt uses the newton method to count the square root and it turned out to be much less accurate than Java's native implementation. The custom log was implemented with Taylor's series and it also was highly inaccurate, and in some cases wrong results.
+The tests were performed with 10^5 runs. Although Java Math implementation's were significantly faster, the speed was not the worst part, the inaccuracy was. Custom sqrt uses the newton method to count the square root and it turned out to be much less accurate than Java's native implementation. The custom log was implemented with Taylor's series and it also was highly inaccurate, and in some cases wrong results e.g., `log(e) =/= e`.
 
 Because of the inaccuracy the veryification became impossible, so decided to go with Java's native solutions instead.
 
