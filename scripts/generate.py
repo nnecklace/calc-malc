@@ -12,8 +12,8 @@ functions = ["abs", "sqrt", "max", "min"] # add more functions here
 left_paren = 0
 right_paren = 0
 
-for _ in range(5):
-    for i in range(1, 100):
+for _ in range(3): # How many rounds
+    for i in range(1, 1000): # Length of generated input
         if i % 2 == 0:
             output += random.choice(operators)
         else:
@@ -49,6 +49,7 @@ for _ in range(5):
     }
 
     print("Evaluating")
+    print("")
     print(output)
     print(output, file=open('tmp.txt', 'a'))
 
@@ -60,4 +61,6 @@ for _ in range(5):
     subprocess.call(['java', '-jar', 'app-1.0.0.jar', 'tmp.txt'])
     print('Mathjs')
     print(json.loads(response.read().decode('utf-8'))['result'])
+    print("")
     os.remove('tmp.txt')
+    output = ""

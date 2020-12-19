@@ -92,72 +92,7 @@ The result for test_input_10.txt is honestly not that important. More important 
 The input files can be tested with the command ./gradlew run --args='_some file location_', where _some file location_ should be a valid file location for calcmalc. E.g., 
 `./gradlew run --args='src/inputs/test_input_2.txt'`. The larger files will probably fail without configuring the heap size for the jvm. Add `jvmArgs '-Xss512m'` when running performance tests with jar file, this should be enough for all the test files, with gradle nothing has to be added.
 
-Test files were generated using python scripts.
-
-```python
-import random
-import json
-import urllib.request
-import subprocess
-import os
-
-output = ""
-
-operators = ["+", "-", "*", "/"] # add more operators here
-functions = ["abs", "sqrt", "max", "min"] # add more functions here
-
-left_paren = 0
-right_paren = 0
-
-for i in range(1, 100):
-    if i % 2 == 0:
-        output += random.choice(operators)
-    else:
-        if random.random() < 0.1: # 10% chance that it will generate a function
-            function = random.choice(functions)
-            output += function
-            output += "("
-            output += str(random.randint(1, 9))
-            if function == "max" or function == "min":
-                for i in range(1, random.randint(1,15)):
-                    output += ("," + str(random.randint(-100, 100)))
-            output += ")"
-        elif random.random() < 0.5: # 50% chance that it will create a parenthesis
-            paren = random.choice(["(", ")"])
-            if paren == ")" and left_paren > right_paren:
-                if not output[-1].isdigit():
-                    output += str(random.randint(1, 25))
-                output += ")"
-                right_paren = right_paren + 1
-            else:
-                output += "("
-                left_paren = left_paren + 1
-                output += str(random.randint(1, 25))
-        else:
-            output += str(random.randint(1, 25))
-
-while left_paren > right_paren:
-    output += ")"
-    right_paren = right_paren + 1
-
-body = {
-    "expr": output
-}
-
-print("Evaluating")
-print(output)
-print(output, file=open('tmp.txt', 'a'))
-
-req = urllib.request.Request("http://api.mathjs.org/v4/", json.dumps(body).encode("utf-8"), headers={'content-type': 'application/json'})
-
-response = urllib.request.urlopen(req)
-
-print("CalcMalc") 
-subprocess.call(['java', '-jar', 'app-1.0.0.jar', 'tmp.txt']) # assume jar name is app-1.0.0.jar
-print('Mathjs')
-print(json.loads(response.read().decode('utf-8'))['result'])
-os.remove('tmp.txt')
-```
+Test files were generated using python script.
 
 The file is located in `scripts/generate.py`. The script will first generate a random input can call calcmalc with it, and then verify the result with a api request to https://api.mathjs.org/.
 
