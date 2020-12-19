@@ -124,6 +124,46 @@ calculate_circle_area(radius) = RI*radius^2:
 calculate_circle_area(sqrt(2))
 ```
 
+## Basic Programs
+
+Programs in CalcMalc are usually written in a way where variables and custom functions are declared first and the last line is an expression to evaluate.
+Variables are not constants, they can be reassigned at any point, same with functions. The last assignment of the variable or function is aka the source of truth for that variable of function.
+
+```
+add(x,y) = x+y:
+
+add(x,y) = x*y:
+
+add(2,3)
+```
+The result of this program will be 6 and not 5, since the source of truth for add is `x*y`.
+
+Variables and functions are declared on their own line. Variables or functions can't be created inside other variables or functions. Variables and functions also can't be created inside math expressions.
+The following are illegal
+
+```
+x = (y = 4)y+2:
+
+func(x) = (
+    y = 2:
+    x * y
+):
+
+sqrt(x)+y=2*4
+```
+
+Functions and variables also have to end with the delimiter symbol `:`.
+
+One thing to notice is that variables and functions are evaluated separetly from expressions. This means that variables and functions are visible to each other at all times. 
+Example
+```
+calc_circle_area(radius) = PI*radius^2:
+
+PI = 3.14:
+
+calc_circle_area(2)
+```
+
 ## Context Free Grammar
 
 All syntax that calcmalc supports can be described by the following context free grammar.
